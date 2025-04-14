@@ -1,0 +1,74 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String    @id @default(uuid())
+  email     String    @unique
+  password  String
+  name      String
+  createdAt DateTime  @default(now()) @map("created_at")
+  updatedAt DateTime  @updatedAt @map("updated_at")
+  servers   Server[]
+  settings  Settings?
+
+  @@map("users")
+}
+
+model Server {
+  id             String         @id @default(uuid())
+  userId         String         @map("user_id")
+  url            String
+  name           String
+  description    String?
+  isActive       Boolean        @default(true) @map("is_active")
+  pingInterval   Int            @default(300) @map("ping_interval") // in seconds
+  createdAt      DateTime       @default(now()) @map("created_at")
+  updatedAt      DateTime       @updatedAt @map("updated_at")
+  lastPingedAt   DateTime?      @map("last_pinged_at")
+  user           User           @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pingHistory    PingHistory[]
+  alertSettings  AlertSettings?
+
+  @@map("servers")
+}
+
+model PingHistory {
+  id           String   @id @default(uuid())
+  serverId     String   @map("server_id")
+  status       Boolean  // success or failure
+  responseTime Int?     @map("response_time") // in milliseconds
+  statusCode   Int?     @map("status_code")
+  timestamp    DateTime @default(now())
+  heapUsage    Float?   @map("heap_usage") // heap usage in MB
+  rssMemory    Float?   @map("rss_memory") // resident set size in MB
+  server       Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@map("ping_history")
+}
+
+model AlertSettings {
+  id                  String  @id @default(uuid())
+  serverId            String  @unique @map("server_id")
+  emailNotifications  Boolean @default(true) @map("email_notifications")
+  failureThreshold    Int     @default(3) @map("failure_threshold")
+  responseTimeThreshold Int?  @map("response_time_threshold") // alert if response time exceeds this value (ms)
+  server              Server  @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@map("alert_settings")
+}
+
+model Settings {
+  id                  String  @id @default(uuid())
+  userId              String  @unique @map("user_id")
+  emailNotifications  Boolean @default(true) @map("email_notifications")
+  darkMode            Boolean @default(false) @map("dark_mode")
+  user                User    @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("settings")
+} 
