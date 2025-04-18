@@ -1,15 +1,10 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { useRecoilValue } from "recoil";
+import { serversAtom, Server } from "../../atoms/serverAtoms";
+import { format } from "date-fns";
 
-interface Card {
-  title: string;
-  url: string;
-  pingTime: string;
-  pingInterval: string;
-  status: "online" | "offline";
-}
-
-type CarouselItem = { type: "add-new" } | { type: "card"; data: Card };
+type CarouselItem = { type: "add-new" } | { type: "card"; data: Server };
 
 interface SectionCardsProps {
   onServerSelect: (serverName: string | null) => void;
@@ -23,6 +18,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const [currentPage, setCurrentPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(3);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
+  const servers = useRecoilValue(serversAtom);
 
   // Sync internal selection with external selection
   useEffect(() => {
@@ -52,54 +48,9 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
-  const cards: Card[] = [
-    {
-      title: "google server",
-      url: "https://www.google.com",
-      pingTime: "2024-01-10 15:30:00",
-      pingInterval: "5m",
-      status: "online",
-    },
-    {
-      title: "youtube server",
-      url: "https://www.youtube.com",
-      pingTime: "2024-01-10 15:25:00",
-      pingInterval: "10m",
-      status: "offline",
-    },
-    {
-      title: "amazon server",
-      url: "https://www.amazon.com",
-      pingTime: "2024-01-10 15:20:00",
-      pingInterval: "15m",
-      status: "online",
-    },
-    {
-      title: "flipkart server",
-      url: "https://www.flipkart.com",
-      pingTime: "2024-01-10 15:15:00",
-      pingInterval: "20m",
-      status: "offline",
-    },
-    {
-      title: "netflix server",
-      url: "https://www.netflix.com",
-      pingTime: "2024-01-10 15:10:00",
-      pingInterval: "5m",
-      status: "online",
-    },
-    {
-      title: "microsoft server",
-      url: "https://www.microsoft.com",
-      pingTime: "2024-01-10 15:05:00",
-      pingInterval: "10m",
-      status: "online",
-    },
-  ];
-
   const allItems: CarouselItem[] = [
     { type: "add-new" },
-    ...cards.map((card) => ({ type: "card" as const, data: card })),
+    ...servers.map((server) => ({ type: "card" as const, data: server })),
   ];
 
   const pageCount = Math.ceil(allItems.length / cardsPerPage);
@@ -127,6 +78,12 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const handleCardSelect = (serverName: string) => {
     setSelectedCard(serverName);
     onServerSelect(serverName);
+  };
+
+  const formatPingInterval = (seconds: number): string => {
+    if (seconds < 60) return `${seconds}s`;
+    const minutes = Math.floor(seconds / 60);
+    return `${minutes}m`;
   };
 
   return (
@@ -212,26 +169,26 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   </div>
                 ) : (
                   <div
-                    key={`${item.data.title}-${index}`}
-                    onClick={() => handleCardSelect(item.data.title)}
+                    key={`${item.data.id}-${index}`}
+                    onClick={() => handleCardSelect(item.data.name)}
                     className={`rounded-lg border-white/10 border bg-black/20 p-4 sm:p-6 hover:bg-white/5 transition-all duration-200 group relative cursor-pointer ${
-                      selectedCard === item.data.title
+                      selectedCard === item.data.name
                         ? "ring-2 ring-blue-500/50 border-blue-500/50 bg-white/5"
                         : ""
                     }`}
                   >
                     <div className="flex justify-between items-start">
                       <p className="text-sm font-semibold text-white capitalize hover:text-gray-300 transition-colors">
-                        {item.data.title}
+                        {item.data.name}
                       </p>
                       <span
                         className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.data.status === "online"
+                          item.data.isActive
                             ? "bg-green-500/10 text-green-500"
                             : "bg-red-500/10 text-red-500"
                         }`}
                       >
-                        {item.data.status}
+                        {item.data.isActive ? "online" : "offline"}
                       </span>
                     </div>
                     <div className="mt-3">
@@ -253,7 +210,13 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           />
                         </svg>
                         <span className="truncate">
-                          Last ping: {item.data.pingTime}
+                          Last ping:{" "}
+                          {item.data.lastPingedAt
+                            ? format(
+                                new Date(item.data.lastPingedAt),
+                                "yyyy-MM-dd HH:mm:ss"
+                              )
+                            : "Never"}
                         </span>
                       </p>
                       <p className="mt-1 text-[13px] font-medium text-gray-400 flex items-center gap-1">
@@ -271,7 +234,8 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           />
                         </svg>
                         <span className="truncate">
-                          Ping interval: {item.data.pingInterval}
+                          Ping interval:{" "}
+                          {formatPingInterval(item.data.pingInterval)}
                         </span>
                       </p>
                     </div>

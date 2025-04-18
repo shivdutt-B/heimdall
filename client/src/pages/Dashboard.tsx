@@ -4,6 +4,9 @@ import { SectionCards } from "../components/dashboard/SectionCards";
 import { DataTable } from "../components/dashboard/DataTable";
 import { ChartAreaInteractive } from "../components/dashboard/ChartAreaInteractive";
 import { ServerStatsCards } from "../components/dashboard/ServerStatsCards";
+import { useServers } from "../hooks/useServers";
+import { useRecoilValue } from "recoil";
+import { serversAtom } from "../atoms/serverAtoms";
 
 interface ServerStats {
   serverName: string;
@@ -100,12 +103,47 @@ const mockServerStats: ServerStatsMap = {
 
 const Dashboard: React.FC = () => {
   const [selectedServer, setSelectedServer] = useState<string | null>(null);
+  const { refetchServers } = useServers(); // Initialize the server data fetching
+  const servers = useRecoilValue(serversAtom);
 
   // Automatically select the first server on mount
   useEffect(() => {
-    const firstServer = Object.keys(mockServerStats)[0];
-    setSelectedServer(firstServer);
-  }, []);
+    if (servers.length > 0) {
+      setSelectedServer(servers[0].name);
+    }
+  }, [servers]);
+
+  // Calculate server stats from real data
+  const calculateServerStats = (serverName: string): ServerStats | null => {
+    const server = servers.find((s) => s.name === serverName);
+    if (!server) return null;
+
+    const totalPings = server.pingHistory.length;
+    const successfulPings = server.pingHistory.filter(
+      (ping) => ping.status
+    ).length;
+    const failedPings = totalPings - successfulPings;
+    const uptime = totalPings > 0 ? (successfulPings / totalPings) * 100 : 100;
+
+    // Get the latest ping for memory stats
+    const latestPing = server.pingHistory[0];
+    const memoryUsage = {
+      used: latestPing?.heapUsage || 0,
+      total: latestPing?.totalHeap || 0,
+      percentage: latestPing
+        ? (latestPing.heapUsage / latestPing.totalHeap) * 100
+        : 0,
+    };
+
+    return {
+      serverName,
+      totalPings,
+      successfulPings,
+      failedPings,
+      uptime,
+      memoryUsage,
+    };
+  };
 
   return (
     <DashboardLayout>
@@ -142,7 +180,9 @@ const Dashboard: React.FC = () => {
               )}
             </div>
             <ServerStatsCards
-              stats={selectedServer ? mockServerStats[selectedServer] : null}
+              stats={
+                selectedServer ? calculateServerStats(selectedServer) : null
+              }
             />
           </section>
 
@@ -209,15 +249,9 @@ const Dashboard: React.FC = () => {
                     />
                   </svg>
                 </button>
-                <button className="px-3 py-1.5 text-sm font-medium text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors flex items-center gap-1">
-                  <span>Add New</span>
-                  <span className="text-lg leading-none">+</span>
-                </button>
               </div>
             </div>
-            <div className="bg-black/20 rounded-lg border border-white/10 overflow-hidden">
-              <DataTable className="w-full" />
-            </div>
+            <DataTable />
           </section>
         </div>
       </div>

@@ -28,7 +28,7 @@ const pingServer = async (serverId) => {
       },
     });
 
-    if (!server || !server.isActive) {
+    if (!server) {
       console.log(`Server ${serverId} is not active or doesn't exist`);
       return null;
     }
@@ -39,6 +39,8 @@ const pingServer = async (serverId) => {
     let responseTime = null;
     let heapUsage = null;
     let rssMemory = null;
+    let totalHeap = null;
+    let totalRss = null;
 
     try {
       // Try to ping the server's health check endpoint
@@ -79,10 +81,13 @@ const pingServer = async (serverId) => {
       },
     });
 
-    // Update server's last pinged time
+    // Update server's last pinged time and active status based on ping result
     await prisma.server.update({
       where: { id: serverId },
-      data: { lastPingedAt: new Date() },
+      data: {
+        lastPingedAt: new Date(),
+        isActive: success,
+      },
     });
 
     // Check if we need to send alerts
