@@ -10,8 +10,8 @@ const prisma = new PrismaClient();
  */
 
 /*
-* In response don't send whole ping history, send only last 10 pings, and each ping object should only have id, status, timestamp, responseTime.
-*/
+ * In response don't send whole ping history, send only last 10 pings, and each ping object should only have id, status, timestamp, responseTime.
+ */
 exports.getServers = async (req, res) => {
   try {
     const servers = await prisma.server.findMany({
@@ -77,12 +77,14 @@ exports.getServerById = async (req, res) => {
  * @route POST /api/servers
  */
 exports.createServer = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
+  // const errors = validationResult(req);
+  // console.log(errors);
+  // if (!errors.isEmpty()) {
+  //   return res.status(400).json({ errors: errors.array() });
+  // }
 
   const { url, name, description, pingInterval } = req.body;
+  console.log(req.body);
 
   try {
     // Create server with default alert settings

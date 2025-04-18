@@ -60,7 +60,6 @@ exports.register = async (req, res) => {
         res.status(201).json({
           token,
           user: {
-            id: user.id,
             name: user.name,
             email: user.email,
           },
@@ -116,7 +115,6 @@ exports.login = async (req, res) => {
         res.json({
           token,
           user: {
-            id: user.id,
             name: user.name,
             email: user.email,
           },
@@ -139,16 +137,16 @@ exports.getMe = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: {
-        id: true,
+        // id: true,
         name: true,
         email: true,
-        createdAt: true,
-        settings: {
-          select: {
-            emailNotifications: true,
-            darkMode: true,
-          },
-        },
+        // createdAt: true,
+        // settings: {
+        //   select: {
+        //     emailNotifications: true,
+        //     darkMode: true,
+        //   },
+        // },
       },
     });
 

@@ -1,7 +1,7 @@
-const express = require('express');
-const cors = require('cors');
+const express = require("express");
+const cors = require("cors");
 // const morgan = require('morgan');
-require('dotenv').config();
+require("dotenv").config();
 
 // Create Express app
 const app = express();
@@ -12,37 +12,43 @@ app.use(express.json());
 // app.use(morgan('dev'));
 
 // Root route
-app.get('/', (req, res) => {
-  res.json({ message: 'Test server is running' });
+app.get("/", (req, res) => {
+  res.json({ message: "Test server is running" });
 });
 
-app.get('/__ping__', (req, res) => {
+app.get("/__ping__", (req, res) => {
   // Log the ping request
-  console.log('Ping received at:', new Date().toISOString());
-  
+  console.log("Ping received at:", new Date().toISOString());
+
   // Return a simple response with timestamp and memory usage
+
+  const memoryUsage = process.memoryUsage();
+  console.log("memoryUsage: ", memoryUsage);
+  console.log("memoryUsage.heapTotal: ", memoryUsage.heapTotal);
   res.json({
-    status: 'ok',
-    message: 'Ping successful',
+    status: "ok",
+    message: "Ping successful",
     timestamp: new Date().toISOString(),
     memory: {
-      heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100, // MB (rounded to 2 decimal places)
-      rss: Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100 // MB (rounded to 2 decimal places)
-    }
+      heapUsed: Math.round((memoryUsage.heapUsed / 1024 / 1024) * 100) / 100, // MB (rounded to 2 decimal places)
+      heapTotal: Math.round((memoryUsage.heapTotal / 1024 / 1024) * 100) / 100, // MB (rounded to 2 decimal places)
+      rss: Math.round((memoryUsage.rss / 1024 / 1024) * 100) / 100, // MB (rounded to 2 decimal places)
+      external: Math.round((memoryUsage.external / 1024 / 1024) * 100) / 100, // MB (rounded to 2 decimal places)
+    },
   });
 });
 
 // Server status endpoint
-app.get('/status', (req, res) => {
+app.get("/status", (req, res) => {
   res.json({
-    status: 'online',
+    status: "online",
     timestamp: new Date(),
     memory: process.memoryUsage().heapUsed / 1024 / 1024, // MB
   });
 });
 
 // Simulate different response times
-app.get('/delay/:ms', (req, res) => {
+app.get("/delay/:ms", (req, res) => {
   const delay = parseInt(req.params.ms) || 0;
   setTimeout(() => {
     res.json({ message: `Response delayed by ${delay}ms` });
@@ -50,7 +56,7 @@ app.get('/delay/:ms', (req, res) => {
 });
 
 // Simulate error responses
-app.get('/error/:code', (req, res) => {
+app.get("/error/:code", (req, res) => {
   const code = parseInt(req.params.code) || 500;
   res.status(code).json({ error: `Simulated ${code} error` });
 });
@@ -59,8 +65,8 @@ app.get('/error/:code', (req, res) => {
 app.use((err, req, res, next) => {
   console.error(err.stack);
   res.status(500).json({
-    message: 'Internal Server Error',
-    error: process.env.NODE_ENV === 'development' ? err.message : undefined,
+    message: "Internal Server Error",
+    error: process.env.NODE_ENV === "development" ? err.message : undefined,
   });
 });
 

@@ -46,7 +46,9 @@ model PingHistory {
   statusCode   Int?     @map("status_code")
   timestamp    DateTime @default(now())
   heapUsage    Float?   @map("heap_usage") // heap usage in MB
+  totalHeap    Float?   @map("total_heap")
   rssMemory    Float?   @map("rss_memory") // resident set size in MB
+  totalRss     Float?   @map("total_rss")
   server       Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
   @@map("ping_history")

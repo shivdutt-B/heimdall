@@ -47,6 +47,8 @@ const pingServer = async (serverId) => {
       success = true;
       statusCode = result.status;
       responseTime = Date.now() - startTime;
+      totalHeap = result.data.memory.heapTotal;
+      totalRss = result.data.memory.external;
 
       // Extract memory usage from the response if available
       if (result.data && result.data.memory) {
@@ -72,6 +74,8 @@ const pingServer = async (serverId) => {
         statusCode,
         heapUsage,
         rssMemory,
+        totalHeap,
+        totalRss,
       },
     });
 
@@ -122,9 +126,9 @@ const makeRequest = async (url) => {
     //     rss: 56.78 // MB
     //   }
     // }
-    console.log("================================================")
+    console.log("================================================");
     console.log("Ping response:", response.data);
-    console.log("================================================")
+    console.log("================================================");
 
     return response;
   } catch (error) {
