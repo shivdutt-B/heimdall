@@ -44,11 +44,7 @@ const refreshServerCache = async () => {
   try {
     console.log("------------ Getting all active servers ------------");
     // Get all active servers
-    const servers = await prisma.server.findMany({
-      where: {
-        isActive: true,
-      },
-    });
+    const servers = await prisma.server.findMany();
 
     console.log(`Found ${servers.length} active servers to monitor`);
 

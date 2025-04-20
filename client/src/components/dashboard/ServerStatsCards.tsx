@@ -1,5 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
+import { ServerStatsCardsSkeleton } from "../skeletons/DashboardSkeletons";
 
 interface ServerStats {
   serverName: string;
@@ -16,17 +17,15 @@ interface ServerStats {
 
 interface ServerStatsCardsProps {
   stats: ServerStats | null;
+  loading?: boolean;
 }
 
 export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
   stats,
+  loading = false,
 }) => {
-  if (!stats) {
-    return (
-      <div className="text-center text-white/50 py-8 font-medium">
-        Select a server to view its statistics
-      </div>
-    );
+  if (!stats || loading) {
+    return <ServerStatsCardsSkeleton />;
   }
 
   const cards = [
@@ -90,9 +89,8 @@ export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
     {
       title: "Uptime",
       value: (
-        // <div className="flex items-center gap-2">
         <div>
-          <span>{stats.uptime.toFixed(2)}%</span>
+          <span>{stats.uptime.toFixed(1)}%</span>
           <div className="mt-2.5 flex-1 h-2 bg-gray-700 rounded-full overflow-hidden">
             <div
               className="h-full bg-green-500 rounded-full"
@@ -119,49 +117,10 @@ export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
       color: "from-green-500/20 to-green-600/20",
       textColor: "text-green-400",
     },
-    {
-      title: "Memory Usage",
-      value: (
-        <div className="space-y-2">
-          <div className="flex items-center gap-2">
-            <span>
-              {(stats.memoryUsage.used / 1024).toFixed(1)}GB /{" "}
-              {(stats.memoryUsage.total / 1024).toFixed(1)}GB
-            </span>
-          </div>
-          <div className="h-2 bg-gray-700 rounded-full overflow-hidden">
-            <div
-              className="h-full bg-orange-500 rounded-full"
-              style={{ width: `${stats.memoryUsage.percentage}%` }}
-            ></div>
-          </div>
-          <div className="text-sm text-orange-400">
-            {stats.memoryUsage.percentage}% used
-          </div>
-        </div>
-      ),
-      icon: (
-        <svg
-          className="w-5 h-5"
-          fill="none"
-          viewBox="0 0 24 24"
-          stroke="currentColor"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M9 17v-2m3 2v-4m3 4v-6m2 10H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
-          />
-        </svg>
-      ),
-      color: "from-orange-500/20 to-orange-600/20",
-      textColor: "text-orange-400",
-    },
   ];
 
   return (
-    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+    <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       {cards.map((card, index) => (
         <motion.div
           initial={{ opacity: 0, y: 20 }}
@@ -174,7 +133,6 @@ export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
             <div className={`p-2 rounded-lg bg-black/30 ${card.textColor}`}>
               {card.icon}
             </div>
-            <div className="text-xs font-medium text-white/40">Last 24h</div>
           </div>
           <div className="mt-3">
             <div className="text-sm font-semibold text-white/60">

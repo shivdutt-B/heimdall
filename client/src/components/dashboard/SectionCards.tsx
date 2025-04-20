@@ -1,24 +1,41 @@
 import React, { useState, useEffect } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { useRecoilValue } from "recoil";
-import { serversAtom, Server } from "../../atoms/serverAtoms";
+import { serversAtom } from "../../store/serverAtoms";
 import { format } from "date-fns";
+import { SectionCardsSkeleton } from "../skeletons/DashboardSkeletons";
+
+interface Server {
+  id: string;
+  name: string;
+  url: string;
+  isActive: boolean;
+  lastPingedAt: string | null;
+  pingInterval: number;
+}
 
 type CarouselItem = { type: "add-new" } | { type: "card"; data: Server };
 
 interface SectionCardsProps {
   onServerSelect: (serverName: string | null) => void;
   selectedServer?: string | null;
+  loading?: boolean;
 }
 
 export const SectionCards: React.FC<SectionCardsProps> = ({
   onServerSelect,
   selectedServer: externalSelectedServer,
+  loading = false,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(3);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const servers = useRecoilValue(serversAtom);
+
+  // Show skeleton during loading or when servers are not available
+  if (loading || !Array.isArray(servers)) {
+    return <SectionCardsSkeleton />;
+  }
 
   // Sync internal selection with external selection
   useEffect(() => {
@@ -32,18 +49,15 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     const handleResize = () => {
       const width = window.innerWidth;
       if (width < 640) {
-        // sm
         setCardsPerPage(1);
       } else if (width < 1024) {
-        // md
         setCardsPerPage(2);
       } else {
-        // lg and above
         setCardsPerPage(3);
       }
     };
 
-    handleResize(); // Initial check
+    handleResize();
     window.addEventListener("resize", handleResize);
     return () => window.removeEventListener("resize", handleResize);
   }, []);
@@ -74,7 +88,6 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     }
   };
 
-  // Handle card selection
   const handleCardSelect = (serverName: string) => {
     setSelectedCard(serverName);
     onServerSelect(serverName);

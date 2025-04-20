@@ -6,7 +6,7 @@ import { ChartAreaInteractive } from "../components/dashboard/ChartAreaInteracti
 import { ServerStatsCards } from "../components/dashboard/ServerStatsCards";
 import { useServers } from "../hooks/useServers";
 import { useRecoilValue } from "recoil";
-import { serversAtom } from "../atoms/serverAtoms";
+import { serversAtom, serverDetailsAtom } from "../store/serverAtoms";
 
 interface ServerStats {
   serverName: string;
@@ -21,90 +21,15 @@ interface ServerStats {
   };
 }
 
-type ServerStatsMap = {
-  [key: string]: ServerStats;
-};
-
-// Mock data for demonstration
-const mockServerStats: ServerStatsMap = {
-  "google server": {
-    serverName: "google server",
-    totalPings: 43250,
-    successfulPings: 43200,
-    failedPings: 50,
-    uptime: 99.88,
-    memoryUsage: {
-      used: 6144, // 6GB in MB
-      total: 8192, // 8GB in MB
-      percentage: 75,
-    },
-  },
-  "youtube server": {
-    serverName: "youtube server",
-    totalPings: 38900,
-    successfulPings: 38500,
-    failedPings: 400,
-    uptime: 98.97,
-    memoryUsage: {
-      used: 12288, // 12GB in MB
-      total: 16384, // 16GB in MB
-      percentage: 85,
-    },
-  },
-  "amazon server": {
-    serverName: "amazon server",
-    totalPings: 41500,
-    successfulPings: 41450,
-    failedPings: 50,
-    uptime: 99.87,
-    memoryUsage: {
-      used: 4096, // 4GB in MB
-      total: 8192, // 8GB in MB
-      percentage: 50,
-    },
-  },
-  "flipkart server": {
-    serverName: "flipkart server",
-    totalPings: 35800,
-    successfulPings: 35000,
-    failedPings: 800,
-    uptime: 97.77,
-    memoryUsage: {
-      used: 3072, // 3GB in MB
-      total: 4096, // 4GB in MB
-      percentage: 65,
-    },
-  },
-  "netflix server": {
-    serverName: "netflix server",
-    totalPings: 42100,
-    successfulPings: 42000,
-    failedPings: 100,
-    uptime: 99.76,
-    memoryUsage: {
-      used: 14336, // 14GB in MB
-      total: 16384, // 16GB in MB
-      percentage: 88,
-    },
-  },
-  "microsoft server": {
-    serverName: "microsoft server",
-    totalPings: 39800,
-    successfulPings: 39750,
-    failedPings: 50,
-    uptime: 99.87,
-    memoryUsage: {
-      used: 8192, // 8GB in MB
-      total: 16384, // 16GB in MB
-      percentage: 45,
-    },
-  },
-};
-
 const Dashboard: React.FC = () => {
   const [selectedServer, setSelectedServer] = useState<string | null>(null);
-  const { refetchServers } = useServers(); // Initialize the server data fetching
+  const [selectedDays, setSelectedDays] = useState(7); // Default to 7 days
+  const [statusFilter, setStatusFilter] = useState<"all" | "success" | "fail">(
+    "all"
+  );
+  const { refetchServers, fetchServerDetails } = useServers();
   const servers = useRecoilValue(serversAtom);
+  const serverDetails = useRecoilValue(serverDetailsAtom);
 
   // Automatically select the first server on mount
   useEffect(() => {
@@ -113,34 +38,56 @@ const Dashboard: React.FC = () => {
     }
   }, [servers]);
 
+  // Fetch server details when a server is selected
+  useEffect(() => {
+    if (selectedServer) {
+      const server = servers.find((s) => s.name === selectedServer);
+      if (server) {
+        fetchServerDetails(server.id);
+      }
+    }
+  }, [selectedServer, servers]);
+
+  // Get the selected server's ID
+  const selectedServerId = selectedServer
+    ? servers.find((s) => s.name === selectedServer)?.id || null
+    : null;
+
+  // Get ping counts for the selected server
+  const getPingCounts = () => {
+    if (!selectedServerId || !serverDetails[selectedServerId]) {
+      return { success: 0, fail: 0 };
+    }
+    const { pingStats } = serverDetails[selectedServerId];
+    return {
+      success: pingStats.successful,
+      fail: pingStats.failed,
+    };
+  };
+
+  const pingCounts = getPingCounts();
+
   // Calculate server stats from real data
   const calculateServerStats = (serverName: string): ServerStats | null => {
     const server = servers.find((s) => s.name === serverName);
-    if (!server) return null;
+    if (!server || !serverDetails[server.id]) return null;
 
-    const totalPings = server.pingHistory.length;
-    const successfulPings = server.pingHistory.filter(
-      (ping) => ping.status
-    ).length;
-    const failedPings = totalPings - successfulPings;
-    const uptime = totalPings > 0 ? (successfulPings / totalPings) * 100 : 100;
+    const details = serverDetails[server.id];
+    const { pingStats } = details;
 
-    // Get the latest ping for memory stats
-    const latestPing = server.pingHistory[0];
+    // Since we don't have pingHistory anymore, we'll use a default memory usage
     const memoryUsage = {
-      used: latestPing?.heapUsage || 0,
-      total: latestPing?.totalHeap || 0,
-      percentage: latestPing
-        ? (latestPing.heapUsage / latestPing.totalHeap) * 100
-        : 0,
+      used: 0,
+      total: 0,
+      percentage: 0,
     };
 
     return {
       serverName,
-      totalPings,
-      successfulPings,
-      failedPings,
-      uptime,
+      totalPings: pingStats.total,
+      successfulPings: pingStats.successful,
+      failedPings: pingStats.failed,
+      uptime: parseFloat(pingStats.successRate),
       memoryUsage,
     };
   };
@@ -192,20 +139,12 @@ const Dashboard: React.FC = () => {
               <h2 className="text-xl sm:text-2xl font-semibold text-white">
                 Analytics Overview
               </h2>
-              <div className="flex flex-wrap items-center gap-2">
-                <button className="px-3 py-1.5 text-sm font-medium text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors">
-                  Last 3 months
-                </button>
-                <button className="px-3 py-1.5 text-sm font-medium text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors">
-                  Last 30 days
-                </button>
-                <button className="px-3 py-1.5 text-sm font-medium text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors">
-                  Last 7 days
-                </button>
-              </div>
             </div>
             <div className="bg-black/20 rounded-lg border border-white/10 p-4 sm:p-6">
-              <ChartAreaInteractive className="w-full" />
+              <ChartAreaInteractive
+                className="w-full"
+                serverId={selectedServerId}
+              />
             </div>
           </section>
 
@@ -213,45 +152,52 @@ const Dashboard: React.FC = () => {
           <section className="space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-4">
               <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-                <button className="px-3 py-1.5 text-sm font-semibold text-white bg-white/10 rounded-md">
-                  Overview
-                </button>
-                <button className="px-3 py-1.5 text-sm font-medium text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors flex items-center gap-1">
-                  Performance
-                  <span className="bg-white/10 text-xs px-1.5 rounded-full">
-                    3
+                <button
+                  onClick={() => setStatusFilter("all")}
+                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors ${
+                    statusFilter === "all"
+                      ? "bg-white/20 font-semibold"
+                      : "bg-white/5 hover:bg-white/10"
+                  }`}
+                >
+                  All
+                  <span className="ml-1.5 bg-white/10 text-xs px-1.5 rounded-full">
+                    {pingCounts.success + pingCounts.fail}
                   </span>
                 </button>
-                <button className="px-3 py-1.5 text-sm font-medium text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors flex items-center gap-1">
-                  Team
-                  <span className="bg-white/10 text-xs px-1.5 rounded-full">
-                    2
+                <button
+                  onClick={() => setStatusFilter("success")}
+                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${
+                    statusFilter === "success"
+                      ? "bg-white/20 font-semibold"
+                      : "bg-white/5 hover:bg-white/10"
+                  }`}
+                >
+                  Success
+                  <span className="bg-green-500/20 text-green-400 text-xs px-1.5 rounded-full">
+                    {pingCounts.success}
                   </span>
                 </button>
-                <button className="px-3 py-1.5 text-sm font-medium text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors">
-                  Documents
-                </button>
-              </div>
-              <div className="flex items-center gap-2">
-                <button className="px-3 py-1.5 text-sm font-medium text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors flex items-center gap-1">
-                  <span>Customize</span>
-                  <svg
-                    className="w-4 h-4"
-                    fill="none"
-                    viewBox="0 0 24 24"
-                    stroke="currentColor"
-                  >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M19 9l-7 7-7-7"
-                    />
-                  </svg>
+                <button
+                  onClick={() => setStatusFilter("fail")}
+                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${
+                    statusFilter === "fail"
+                      ? "bg-white/20 font-semibold"
+                      : "bg-white/5 hover:bg-white/10"
+                  }`}
+                >
+                  Fail
+                  <span className="bg-red-500/20 text-red-400 text-xs px-1.5 rounded-full">
+                    {pingCounts.fail}
+                  </span>
                 </button>
               </div>
             </div>
-            <DataTable />
+            <DataTable
+              serverId={selectedServerId}
+              selectedDays={selectedDays}
+              statusFilter={statusFilter}
+            />
           </section>
         </div>
       </div>

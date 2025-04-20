@@ -16,6 +16,11 @@ router.use(authMiddleware);
 // @access  Private
 router.get("/", serverController.getServers);
 
+// @route   GET api/server
+// @desc    Get server pings with date filter
+// @access  Private
+router.get("/server-pings", serverController.getServerPings);
+
 // @route   GET api/servers/:id
 // @desc    Get server by ID
 // @access  Private

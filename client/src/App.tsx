@@ -8,6 +8,7 @@ import { Routes, Route, useLocation } from "react-router-dom";
 import Dashboard from "./pages/Dashboard";
 import { useAuth } from "./hooks/useAuth";
 import AddServerPage from "./pages/AddServer";
+import Profile from "./pages/Profile";
 
 function App() {
   const location = useLocation();
@@ -25,6 +26,7 @@ function App() {
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
         <Route path="/add-server" element={<AddServerPage />} />
+        <Route path="/profile" element={<Profile />} />
       </Routes>
       <Footer />
     </>

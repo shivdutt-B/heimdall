@@ -45,7 +45,7 @@ const server = app.listen(PORT, async () => {
 
   // Initialize the scheduler after server starts
   try {
-    await initializeScheduler();
+    // await initializeScheduler();
     console.log("Server ping scheduler initialized successfully");
   } catch (error) {
     console.error("Failed to initialize scheduler:", error);

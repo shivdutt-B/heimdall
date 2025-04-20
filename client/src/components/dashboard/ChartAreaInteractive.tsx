@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import {
   Area,
   AreaChart,
@@ -7,125 +7,135 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
+import axios from "axios";
+import { ChartAreaSkeleton } from "../skeletons/DashboardSkeletons";
 
 interface Props {
   className?: string;
+  serverId: string | null;
 }
 
-// Clean up data to remove duplicates and sort by date
-const data = [
-  { date: "Jun 1", visitors: 3000, engagement: 1400 },
-  { date: "Jun 3", visitors: 2000, engagement: 1300 },
-  { date: "Jun 5", visitors: 2780, engagement: 1908 },
-  { date: "Jun 7", visitors: 4890, engagement: 2800 },
-  { date: "Jun 9", visitors: 2390, engagement: 1800 },
-  { date: "Jun 11", visitors: 3490, engagement: 2300 },
-  { date: "Jun 13", visitors: 2000, engagement: 1500 },
-  { date: "Jun 15", visitors: 4000, engagement: 2400 },
-  { date: "Jun 17", visitors: 3000, engagement: 2000 },
-  { date: "Jun 19", visitors: 2000, engagement: 1600 },
-  { date: "Jun 21", visitors: 4000, engagement: 2400 },
-  { date: "Jun 23", visitors: 3000, engagement: 2000 },
-  { date: "Jun 25", visitors: 2000, engagement: 1600 },
-  { date: "Jun 27", visitors: 4000, engagement: 2400 },
-  { date: "Jun 30", visitors: 2000, engagement: 1500 },
-  { date: "Jul 2", visitors: 3500, engagement: 2100 },
-  { date: "Jul 4", visitors: 4200, engagement: 2600 },
-  { date: "Jul 6", visitors: 3800, engagement: 2300 },
-  { date: "Jul 8", visitors: 2900, engagement: 1900 },
-  { date: "Jul 10", visitors: 3300, engagement: 2000 },
-  { date: "Jul 12", visitors: 4100, engagement: 2500 },
-  { date: "Jul 14", visitors: 3600, engagement: 2200 },
-  { date: "Jul 16", visitors: 2800, engagement: 1700 },
-  { date: "Jul 18", visitors: 3900, engagement: 2400 },
-  { date: "Jul 20", visitors: 4300, engagement: 2700 },
-  { date: "Jul 22", visitors: 3700, engagement: 2300 },
-  { date: "Jul 24", visitors: 3100, engagement: 1900 },
-  { date: "Jul 26", visitors: 4000, engagement: 2500 },
-  { date: "Jul 28", visitors: 3400, engagement: 2100 },
-  { date: "Jul 30", visitors: 3800, engagement: 2400 },
-];
+interface PingData {
+  id: string;
+  serverId: string;
+  status: boolean;
+  responseTime: number | null;
+  statusCode: number | null;
+  timestamp: string;
+  heapUsage: number | null;
+  totalHeap: number | null;
+  rssMemory: number | null;
+  totalRss: number | null;
+}
 
-export const ChartAreaInteractive: React.FC<Props> = ({ className }) => {
+interface ChartData {
+  date: string;
+  rss: number | null;
+  heap: number | null;
+}
+
+export const ChartAreaInteractive: React.FC<Props> = ({
+  className,
+  serverId,
+}) => {
   const [scrollPosition, setScrollPosition] = useState(0);
+  const [selectedDays, setSelectedDays] = useState(7); // Default to 7 days
+  const [daysInput, setDaysInput] = useState("7"); // New state for input value
+  const [chartData, setChartData] = useState<ChartData[]>([]);
+  const [loading, setLoading] = useState(false);
+
+  useEffect(() => {
+    const fetchPingData = async () => {
+      if (!serverId) return;
+
+      setLoading(true);
+      try {
+        const token = localStorage.getItem("token");
+        const response = await axios.get(
+          `http://localhost:5000/api/servers/server-pings?id=${serverId}&days=${selectedDays}`,
+          {
+            headers: {
+              "x-auth-token": token,
+            },
+          }
+        );
+
+        // Transform ping data for the chart
+        const transformedData: ChartData[] = response.data.pings.map(
+          (ping: PingData) => ({
+            date: ping.timestamp,
+            rss: ping.rssMemory,
+            heap: ping.heapUsage,
+          })
+        );
+
+        setChartData(transformedData);
+      } catch (error) {
+        console.error("Error fetching ping data:", error);
+      } finally {
+        setLoading(false);
+      }
+    };
+
+    fetchPingData();
+  }, [serverId, selectedDays]);
 
   // Calculate the width based on data points (50px per point is a good starting point)
-  const chartWidth = Math.max(data.length * 50, 800);
+  const chartWidth = Math.max(chartData.length * 50, 800);
+
+  if (!serverId || loading) {
+    return <ChartAreaSkeleton className={className} />;
+  }
 
   return (
     <div
-      className={`rounded-xl border border-gray-800 bg-gray-900/50 ${className}`}
+      className={`rounded-md border border-gray-800 bg-transparent ${className}`}
     >
       {/* Chart Header with Navigation */}
       <div className="flex items-center justify-between p-6 pb-0">
         <div className="flex items-center gap-4">
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-blue-500/50"></div>
-            <span className="text-sm font-medium text-white/60">Visitors</span>
+            <span className="text-sm font-medium text-white/60">
+              RSS Memory
+            </span>
           </div>
           <div className="flex items-center gap-2">
             <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
             <span className="text-sm font-medium text-white/60">
-              Engagement
+              Heap Memory
             </span>
           </div>
         </div>
-        <div className="flex gap-2">
-          <button
-            onClick={() => {
-              const container = document.getElementById("chart-container");
-              if (container) {
-                container.scrollTo({
-                  left: Math.max(0, container.scrollLeft - 200),
-                  behavior: "smooth",
-                });
-              }
-            }}
-            className="p-2 text-white/60 hover:text-white/90 transition-colors disabled:opacity-50"
-            disabled={scrollPosition === 0}
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
+        <div className="flex items-center gap-4">
+          <div className="flex items-center gap-2">
+            <span className="text-sm font-medium text-white/60">Last</span>
+            <input
+              type="number"
+              min="1"
+              max="365"
+              value={daysInput}
+              onChange={(e) => {
+                const value = e.target.value;
+                if (parseInt(value) > 0 && parseInt(value) <= 365) {
+                  setDaysInput(value);
+                }
+              }}
+              className="w-16 px-2 py-1 text-sm font-medium text-white/90 bg-transparent rounded-md border border-gray-700 focus:outline-none"
+            />
+            <span className="text-sm font-medium text-white/60">Days</span>
+            <button
+              onClick={() => {
+                const days = parseInt(daysInput);
+                if (days > 0 && days <= 365) {
+                  setSelectedDays(days);
+                }
+              }}
+              className="px-3 py-1 text-sm font-semibold text-white/90 bg-blue-500 rounded-sm transition-colors cursor-pointer"
             >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M15 19l-7-7 7-7"
-              />
-            </svg>
-          </button>
-          <button
-            onClick={() => {
-              const container = document.getElementById("chart-container");
-              if (container) {
-                container.scrollTo({
-                  left: container.scrollLeft + 200,
-                  behavior: "smooth",
-                });
-              }
-            }}
-            className="p-2 text-white/60 hover:text-white/90 transition-colors"
-          >
-            <svg
-              width="20"
-              height="20"
-              viewBox="0 0 24 24"
-              fill="none"
-              stroke="currentColor"
-            >
-              <path
-                strokeLinecap="round"
-                strokeLinejoin="round"
-                strokeWidth={2}
-                d="M9 5l7 7-7 7"
-              />
-            </svg>
-          </button>
+              Go
+            </button>
+          </div>
         </div>
       </div>
 
@@ -143,21 +153,15 @@ export const ChartAreaInteractive: React.FC<Props> = ({ className }) => {
         >
           <ResponsiveContainer width="100%" height="100%">
             <AreaChart
-              data={data}
+              data={chartData}
               margin={{ top: 10, right: 30, left: 0, bottom: 0 }}
             >
               <defs>
-                <linearGradient id="colorVisitors" x1="0" y1="0" x2="0" y2="1">
+                <linearGradient id="colorRSS" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#3B82F6" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#3B82F6" stopOpacity={0} />
                 </linearGradient>
-                <linearGradient
-                  id="colorEngagement"
-                  x1="0"
-                  y1="0"
-                  x2="0"
-                  y2="1"
-                >
+                <linearGradient id="colorHeap" x1="0" y1="0" x2="0" y2="1">
                   <stop offset="5%" stopColor="#10B981" stopOpacity={0.3} />
                   <stop offset="95%" stopColor="#10B981" stopOpacity={0} />
                 </linearGradient>
@@ -169,13 +173,20 @@ export const ChartAreaInteractive: React.FC<Props> = ({ className }) => {
                 tickLine={false}
                 axisLine={false}
                 interval="preserveStartEnd"
+                tickFormatter={(value) => new Date(value).toLocaleDateString()}
+                label={{ value: "Date", position: "bottom", offset: 0 }}
               />
               <YAxis
                 stroke="#4B5563"
                 fontSize={12}
                 tickLine={false}
                 axisLine={false}
-                tickFormatter={(value) => `${value}`}
+                tickFormatter={(value) => `${value} MB`}
+                label={{
+                  value: "Memory (MB)",
+                  angle: -90,
+                  position: "insideLeft",
+                }}
               />
               <Tooltip
                 contentStyle={{
@@ -184,22 +195,26 @@ export const ChartAreaInteractive: React.FC<Props> = ({ className }) => {
                   borderRadius: "8px",
                   color: "#F3F4F6",
                 }}
+                formatter={(value) => [`${value} MB`]}
+                labelFormatter={(label) => new Date(label).toLocaleString()}
               />
               <Area
                 type="monotone"
-                dataKey="visitors"
+                dataKey="rss"
                 stroke="#3B82F6"
                 strokeWidth={2}
                 fillOpacity={1}
-                fill="url(#colorVisitors)"
+                fill="url(#colorRSS)"
+                name="RSS Memory"
               />
               <Area
                 type="monotone"
-                dataKey="engagement"
+                dataKey="heap"
                 stroke="#10B981"
                 strokeWidth={2}
                 fillOpacity={1}
-                fill="url(#colorEngagement)"
+                fill="url(#colorHeap)"
+                name="Heap Memory"
               />
             </AreaChart>
           </ResponsiveContainer>

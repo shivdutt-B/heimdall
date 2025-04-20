@@ -18,15 +18,15 @@ exports.getServers = async (req, res) => {
       where: {
         userId: req.user.id,
       },
-      include: {
-        alertSettings: true,
-        pingHistory: {
-          take: 10,
-          orderBy: {
-            timestamp: "desc",
-          },
-        },
-      },
+      // include: {
+      //   alertSettings: true,
+      //   pingHistory: {
+      //     take: 10,
+      //     orderBy: {
+      //       timestamp: "desc",
+      //     },
+      //   },
+      // },
       orderBy: {
         createdAt: "desc",
       },
@@ -45,27 +45,63 @@ exports.getServers = async (req, res) => {
  */
 exports.getServerById = async (req, res) => {
   try {
+    // Get server details
     const server = await prisma.server.findUnique({
       where: {
         id: req.params.id,
         userId: req.user.id,
       },
-      include: {
-        alertSettings: true,
-        pingHistory: {
-          orderBy: {
-            timestamp: "desc",
-          },
-          take: 100, // Limit to 100 most recent ping records
-        },
-      },
+      // include: {
+      //   alertSettings: true,
+      //   pingHistory: {
+      //     orderBy: {
+      //       timestamp: "desc",
+      //     },
+      //     take: 10,
+      //   },
+      // },
     });
 
     if (!server) {
       return res.status(404).json({ message: "Server not found" });
     }
 
-    res.json(server);
+    // Get ping statistics
+    const pingStats = await prisma.pingHistory.groupBy({
+      by: ["status"],
+      where: {
+        serverId: req.params.id,
+      },
+      _count: {
+        status: true,
+      },
+    });
+
+    // Calculate total pings and successful/failed counts
+    const totalPings = pingStats.reduce(
+      (acc, curr) => acc + curr._count.status,
+      0
+    );
+    const successfulPings =
+      pingStats.find((p) => p.status === true)?._count.status || 0;
+    const failedPings =
+      pingStats.find((p) => p.status === false)?._count.status || 0;
+
+    // Add stats to response
+    const response = {
+      ...server,
+      pingStats: {
+        total: totalPings,
+        successful: successfulPings,
+        failed: failedPings,
+        successRate:
+          totalPings > 0
+            ? ((successfulPings / totalPings) * 100).toFixed(1)
+            : 0,
+      },
+    };
+
+    res.json(response);
   } catch (err) {
     console.error("Get server error:", err.message);
     res.status(500).send("Server error");
@@ -253,6 +289,61 @@ exports.updateAlertSettings = async (req, res) => {
     res.json(alertSettings);
   } catch (err) {
     console.error("Update alert settings error:", err.message);
+    res.status(500).send("Server error");
+  }
+};
+
+/**
+ * Get server pings with date filter
+ * @route GET /api/server
+ */
+exports.getServerPings = async (req, res) => {
+  try {
+    const { id, days } = req.query;
+    const daysNum = parseInt(days);
+
+    if (!id || !days || isNaN(daysNum)) {
+      return res.status(400).json({ message: "Invalid parameters" });
+    }
+
+    // Calculate the date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysNum);
+
+    // Get server pings within date range
+    const pings = await prisma.pingHistory.findMany({
+      where: {
+        serverId: id,
+        timestamp: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+    });
+
+    // Calculate total pages for pagination
+    const totalPings = await prisma.pingHistory.count({
+      where: {
+        serverId: id,
+        timestamp: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+    });
+
+    res.json({
+      pings,
+      totalPings,
+      startDate,
+      endDate,
+    });
+  } catch (err) {
+    console.error("Get server pings error:", err.message);
     res.status(500).send("Server error");
   }
 };
