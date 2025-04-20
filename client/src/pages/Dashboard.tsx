@@ -31,22 +31,24 @@ const Dashboard: React.FC = () => {
   const servers = useRecoilValue(serversAtom);
   const serverDetails = useRecoilValue(serverDetailsAtom);
 
-  // Automatically select the first server on mount
+  // Automatically select the first server on mount if no servers are loaded
   useEffect(() => {
-    if (servers.length > 0) {
+    if (servers.length === 0) {
+      refetchServers();
+    } else if (!selectedServer) {
       setSelectedServer(servers[0].name);
     }
-  }, [servers]);
+  }, [servers, selectedServer]);
 
-  // Fetch server details when a server is selected
+  // Fetch server details only if not in cache
   useEffect(() => {
     if (selectedServer) {
       const server = servers.find((s) => s.name === selectedServer);
-      if (server) {
+      if (server && !serverDetails[server.id]) {
         fetchServerDetails(server.id);
       }
     }
-  }, [selectedServer, servers]);
+  }, [selectedServer, servers, serverDetails]);
 
   // Get the selected server's ID
   const selectedServerId = selectedServer

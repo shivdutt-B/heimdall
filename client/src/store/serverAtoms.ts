@@ -47,6 +47,15 @@ export interface ServerDetailed extends ServerBasic {
   pingStats: PingStats;
 }
 
+// Interface for ping history cache
+interface PingHistoryCache {
+  [key: string]: {
+    // key format: `${serverId}-${days}`
+    data: PingHistory[];
+    lastFetched: number;
+  };
+}
+
 // Store the list of basic server info
 export const serversAtom = atom<ServerBasic[]>({
   key: "serversState",
@@ -56,5 +65,11 @@ export const serversAtom = atom<ServerBasic[]>({
 // Store detailed server data with caching
 export const serverDetailsAtom = atom<{ [key: string]: ServerDetailed }>({
   key: "serverDetailsState",
+  default: {},
+});
+
+// Store ping history data with caching
+export const pingHistoryAtom = atom<PingHistoryCache>({
+  key: "pingHistoryState",
   default: {},
 });

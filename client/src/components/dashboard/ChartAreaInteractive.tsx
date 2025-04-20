@@ -8,6 +8,8 @@ import {
   YAxis,
 } from "recharts";
 import axios from "axios";
+import { useRecoilState } from "recoil";
+import { pingHistoryAtom } from "../../store/serverAtoms";
 import { ChartAreaSkeleton } from "../skeletons/DashboardSkeletons";
 
 interface Props {
@@ -34,6 +36,8 @@ interface ChartData {
   heap: number | null;
 }
 
+const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
+
 export const ChartAreaInteractive: React.FC<Props> = ({
   className,
   serverId,
@@ -43,10 +47,31 @@ export const ChartAreaInteractive: React.FC<Props> = ({
   const [daysInput, setDaysInput] = useState("7"); // New state for input value
   const [chartData, setChartData] = useState<ChartData[]>([]);
   const [loading, setLoading] = useState(false);
+  const [pingHistory, setPingHistory] = useRecoilState(pingHistoryAtom);
 
   useEffect(() => {
     const fetchPingData = async () => {
       if (!serverId) return;
+
+      const cacheKey = `${serverId}-${selectedDays}`;
+      const cachedData = pingHistory[cacheKey];
+      const now = Date.now();
+
+      // Check if we have valid cached data
+      if (
+        cachedData &&
+        cachedData.lastFetched &&
+        now - cachedData.lastFetched < CACHE_DURATION
+      ) {
+        // Transform cached data for the chart
+        const transformedData: ChartData[] = cachedData.data.map((ping) => ({
+          date: ping.timestamp,
+          rss: ping.rssMemory,
+          heap: ping.heapUsage,
+        }));
+        setChartData(transformedData);
+        return;
+      }
 
       setLoading(true);
       try {
@@ -59,6 +84,15 @@ export const ChartAreaInteractive: React.FC<Props> = ({
             },
           }
         );
+
+        // Cache the new data
+        setPingHistory((prev) => ({
+          ...prev,
+          [cacheKey]: {
+            data: response.data.pings,
+            lastFetched: now,
+          },
+        }));
 
         // Transform ping data for the chart
         const transformedData: ChartData[] = response.data.pings.map(
@@ -78,7 +112,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
     };
 
     fetchPingData();
-  }, [serverId, selectedDays]);
+  }, [serverId, selectedDays, pingHistory, setPingHistory]);
 
   // Calculate the width based on data points (50px per point is a good starting point)
   const chartWidth = Math.max(chartData.length * 50, 800);
