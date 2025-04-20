@@ -1,10 +1,8 @@
-import React from 'react'
-import AddServer from '../components/AddServer';
+import React from "react";
+import AddServer from "../components/Dashboard/AddServer";
 
 function AddServerLayout() {
-  return (
-    <AddServer />
-  )
+  return <AddServer />;
 }
 
 export default AddServerLayout;

@@ -1,5 +1,5 @@
 import React from "react";
-import { SiteHeader } from "../components/dashboard/SiteHeader";
+import { SiteHeader } from "../components/Dashboard/SiteHeader";
 
 interface DashboardLayoutProps {
   children: React.ReactNode;

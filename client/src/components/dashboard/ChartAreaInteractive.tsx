@@ -10,7 +10,7 @@ import {
 import axios from "axios";
 import { useRecoilState } from "recoil";
 import { pingHistoryAtom } from "../../store/serverAtoms";
-import { ChartAreaSkeleton } from "../skeletons/DashboardSkeletons";
+import { ChartAreaSkeleton } from "../../skeletons/dashboard/ChartAreaSkeleton";
 
 interface Props {
   className?: string;
@@ -51,6 +51,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
 
   useEffect(() => {
     const fetchPingData = async () => {
+      console.log("Fetching ping and memory data from CHART AREA INTERACTIVE");
       if (!serverId) return;
 
       const cacheKey = `${serverId}-${selectedDays}`;

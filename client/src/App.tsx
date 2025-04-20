@@ -1,14 +1,14 @@
 import "./App.css";
-import Footer from "./components/Footer";
-import NavBar from "./components/NavBar";
-import HomePage from "./pages/Home";
-import AuthPage from "./pages/Auth";
-import DocsPage from "./pages/Docs";
+import Footer from "./components/Footer/Footer";
+import NavBar from "./components/Navbar/NavBar";
+import HomePage from "./pages/HomePage";
+import AuthPage from "./pages/AuthPage";
+import DocsPage from "./pages/DocsPage";
 import { Routes, Route, useLocation } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
+import Dashboard from "./pages/DasboardPage";
 import { useAuth } from "./hooks/useAuth";
 import AddServerPage from "./pages/AddServer";
-import Profile from "./pages/Profile";
+import Profile from "./pages/ProfilePage";
 
 function App() {
   const location = useLocation();

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
-import { DataTableSkeleton } from "../skeletons/DashboardSkeletons";
+import { DataTableSkeleton } from "../../skeletons/dashboard/DataTableSkeleton";
 
 interface Props {
   className?: string;
@@ -37,6 +37,7 @@ export const DataTable: React.FC<Props> = ({
 
   useEffect(() => {
     const fetchPingData = async () => {
+      console.log("Fetching ping data from DATA TABLE");
       if (!serverId) return;
 
       setLoading(true);
