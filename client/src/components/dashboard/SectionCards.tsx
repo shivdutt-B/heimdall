@@ -3,7 +3,7 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useRecoilValue } from "recoil";
 import { serversAtom } from "../../store/serverAtoms";
 import { format } from "date-fns";
-import { SectionCardsSkeleton } from "../skeletons/DashboardSkeletons";
+import { SectionCardsSkeleton } from "../../skeletons/dashboard/SectionCardsSkeleton";
 
 interface Server {
   id: string;
@@ -32,18 +32,6 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const servers = useRecoilValue(serversAtom);
 
-  // Show skeleton during loading or when servers are not available
-  if (loading || !Array.isArray(servers)) {
-    return <SectionCardsSkeleton />;
-  }
-
-  // Sync internal selection with external selection
-  useEffect(() => {
-    if (externalSelectedServer) {
-      setSelectedCard(externalSelectedServer);
-    }
-  }, [externalSelectedServer]);
-
   // Update cards per page based on screen size
   useEffect(() => {
     const handleResize = () => {
@@ -62,19 +50,29 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     return () => window.removeEventListener("resize", handleResize);
   }, []);
 
+  // Sync internal selection with external selection
+  useEffect(() => {
+    if (externalSelectedServer) {
+      setSelectedCard(externalSelectedServer);
+    }
+  }, [externalSelectedServer]);
+
+  // Show skeleton during loading
+  if (loading) {
+    return <SectionCardsSkeleton />;
+  }
+
   const allItems: CarouselItem[] = [
     { type: "add-new" },
-    ...servers.map((server) => ({ type: "card" as const, data: server })),
+    ...(Array.isArray(servers) ? servers : []).map((server) => ({
+      type: "card" as const,
+      data: server,
+    })),
   ];
 
   const pageCount = Math.ceil(allItems.length / cardsPerPage);
   const startIndex = currentPage * cardsPerPage;
   const visibleItems = allItems.slice(startIndex, startIndex + cardsPerPage);
-
-  // Reset to first page when cardsPerPage changes
-  useEffect(() => {
-    setCurrentPage(0);
-  }, [cardsPerPage]);
 
   const nextPage = () => {
     if (currentPage < pageCount - 1) {

@@ -1,6 +1,6 @@
 import React from "react";
 import { motion } from "framer-motion";
-import { ServerStatsCardsSkeleton } from "../skeletons/DashboardSkeletons";
+import { ServerStatsCardsSkeleton } from "../../skeletons/dashboard/ServerStatsCardsSkeleton";
 
 interface ServerStats {
   serverName: string;
@@ -24,8 +24,19 @@ export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
   stats,
   loading = false,
 }) => {
-  if (!stats || loading) {
+  if (loading) {
     return <ServerStatsCardsSkeleton />;
+  }
+
+  // If no stats are available, show a placeholder state
+  if (!stats) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+        <div className="rounded-lg bg-black/20 border border-white/10 p-6 text-center">
+          <p className="text-white/60">Select a server to view statistics</p>
+        </div>
+      </div>
+    );
   }
 
   const cards = [
