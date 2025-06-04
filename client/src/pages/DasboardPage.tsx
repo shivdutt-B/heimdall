@@ -1,9 +1,12 @@
 import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "../layouts/DashboardLayout";
+
+// Dashboard architecture
 import { SectionCards } from "../components/Dashboard/SectionCards";
 import { DataTable } from "../components/Dashboard/DataTable";
 import { ChartAreaInteractive } from "../components/Dashboard/ChartAreaInteractive";
 import { ServerStatsCards } from "../components/Dashboard/ServerStatsCards";
+
 import { useServerData } from "../hooks/useServerData";
 import { useAuth } from "../hooks/useAuth";
 import { Navigate } from "react-router-dom";
@@ -40,7 +43,7 @@ const Dashboard: React.FC = () => {
     if (servers.length > 0 && !selectedServer) {
       setSelectedServer(servers[0].name);
     }
-  }, [servers]);
+  }, []);
 
   // If not authenticated and not loading, redirect to auth page
   if (!isAuthenticated && !authLoading) {
@@ -125,12 +128,12 @@ const Dashboard: React.FC = () => {
                 </div>
               )}
             </div>
-            <ServerStatsCards
+            {/* <ServerStatsCards
               stats={
                 selectedServer ? calculateServerStats(selectedServer) : null
               }
               loading={authLoading || serversLoading}
-            />
+            /> */}
           </section>
 
           {/* Analytics Section */}
@@ -141,10 +144,10 @@ const Dashboard: React.FC = () => {
               </h2>
             </div>
             <div className="bg-black/20 rounded-lg border border-white/10 p-4 sm:p-6">
-              <ChartAreaInteractive
+              {/* <ChartAreaInteractive
                 className="w-full"
                 serverId={selectedServerId}
-              />
+              /> */}
             </div>
           </section>
 
@@ -193,11 +196,11 @@ const Dashboard: React.FC = () => {
                 </button>
               </div>
             </div>
-            <DataTable
+            {/* <DataTable
               serverId={selectedServerId}
               selectedDays={selectedDays}
               statusFilter={statusFilter}
-            />
+            /> */}
           </section>
         </div>
       </div>
