@@ -41,15 +41,15 @@ router.put(
 // @route   PUT api/users/settings
 // @desc    Update user settings
 // @access  Private
-router.put(
-  "/settings",
-  [
-    check("emailNotifications", "Email notifications must be a boolean")
-      .optional()
-      .isBoolean(),
-    check("darkMode", "Dark mode must be a boolean").optional().isBoolean(),
-  ],
-  userController.updateSettings
-);
+// router.put(
+//   "/settings",
+//   [
+//     check("emailNotifications", "Email notifications must be a boolean")
+//       .optional()
+//       .isBoolean(),
+//     check("darkMode", "Dark mode must be a boolean").optional().isBoolean(),
+//   ],
+//   userController.updateSettings
+// );
 
 module.exports = router;

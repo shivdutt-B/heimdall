@@ -37,12 +37,6 @@ exports.register = async (req, res) => {
         name,
         email,
         password: hashedPassword,
-        settings: {
-          create: {
-            emailNotifications: true,
-            darkMode: false,
-          },
-        },
       },
     });
 
@@ -137,16 +131,8 @@ exports.getMe = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { id: req.user.id },
       select: {
-        // id: true,
         name: true,
         email: true,
-        // createdAt: true,
-        // settings: {
-        //   select: {
-        //     emailNotifications: true,
-        //     darkMode: true,
-        //   },
-        // },
       },
     });
 

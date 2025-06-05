@@ -18,15 +18,6 @@ exports.getServers = async (req, res) => {
       where: {
         userId: req.user.id,
       },
-      // include: {
-      //   alertSettings: true,
-      //   pingHistory: {
-      //     take: 10,
-      //     orderBy: {
-      //       timestamp: "desc",
-      //     },
-      //   },
-      // },
       orderBy: {
         createdAt: "desc",
       },
@@ -51,15 +42,6 @@ exports.getServerById = async (req, res) => {
         id: req.params.id,
         userId: req.user.id,
       },
-      // include: {
-      //   alertSettings: true,
-      //   pingHistory: {
-      //     orderBy: {
-      //       timestamp: "desc",
-      //     },
-      //     take: 10,
-      //   },
-      // },
     });
 
     if (!server) {
@@ -113,11 +95,11 @@ exports.getServerById = async (req, res) => {
  * @route POST /api/servers
  */
 exports.createServer = async (req, res) => {
-  // const errors = validationResult(req);
-  // console.log(errors);
-  // if (!errors.isEmpty()) {
-  //   return res.status(400).json({ errors: errors.array() });
-  // }
+  const errors = validationResult(req);
+  console.log(errors);
+  if (!errors.isEmpty()) {
+    return res.status(400).json({ errors: errors.array() });
+  }
 
   const { url, name, pingInterval } = req.body;
   console.log(req.body);
@@ -143,15 +125,6 @@ exports.createServer = async (req, res) => {
         name,
         pingInterval: pingInterval || 300, // Default to 5 minutes
         userId: req.user.id,
-        alertSettings: {
-          create: {
-            emailNotifications: true,
-            failureThreshold: 3,
-          },
-        },
-      },
-      include: {
-        alertSettings: true,
       },
     });
 
@@ -175,7 +148,7 @@ exports.updateServer = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { url, name, description, isActive, pingInterval } = req.body;
+  const { url, name, isActive, pingInterval } = req.body;
 
   try {
     // Check if server exists and belongs to user
@@ -198,8 +171,6 @@ exports.updateServer = async (req, res) => {
       data: {
         url: url || existingServer.url,
         name: name || existingServer.name,
-        description:
-          description !== undefined ? description : existingServer.description,
         isActive: isActive !== undefined ? isActive : existingServer.isActive,
         pingInterval: pingInterval || existingServer.pingInterval,
       },
@@ -246,61 +217,6 @@ exports.deleteServer = async (req, res) => {
     res.json({ message: "Server removed" });
   } catch (err) {
     console.error("Delete server error:", err.message);
-    res.status(500).send("Server error");
-  }
-};
-
-/**
- * Update alert settings for a server
- * @route PUT /api/servers/:id/alerts
- */
-exports.updateAlertSettings = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { emailNotifications, failureThreshold, responseTimeThreshold } =
-    req.body;
-
-  try {
-    // Check if server exists and belongs to user
-    const server = await prisma.server.findUnique({
-      where: {
-        id: req.params.id,
-        userId: req.user.id,
-      },
-      include: {
-        alertSettings: true,
-      },
-    });
-
-    if (!server) {
-      return res.status(404).json({ message: "Server not found" });
-    }
-
-    // Update alert settings
-    const alertSettings = await prisma.alertSettings.update({
-      where: {
-        serverId: req.params.id,
-      },
-      data: {
-        emailNotifications:
-          emailNotifications !== undefined
-            ? emailNotifications
-            : server.alertSettings.emailNotifications,
-        failureThreshold:
-          failureThreshold || server.alertSettings.failureThreshold,
-        responseTimeThreshold:
-          responseTimeThreshold !== undefined
-            ? responseTimeThreshold
-            : server.alertSettings.responseTimeThreshold,
-      },
-    });
-
-    res.json(alertSettings);
-  } catch (err) {
-    console.error("Update alert settings error:", err.message);
     res.status(500).send("Server error");
   }
 };

@@ -91,32 +91,3 @@ exports.updatePassword = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
-
-/**
- * Update user settings
- * @route PUT /api/users/settings
- */
-exports.updateSettings = async (req, res) => {
-  const errors = validationResult(req);
-  if (!errors.isEmpty()) {
-    return res.status(400).json({ errors: errors.array() });
-  }
-
-  const { emailNotifications, darkMode } = req.body;
-
-  try {
-    // Update user settings
-    const settings = await prisma.settings.update({
-      where: { userId: req.user.id },
-      data: {
-        emailNotifications: emailNotifications !== undefined ? emailNotifications : undefined,
-        darkMode: darkMode !== undefined ? darkMode : undefined
-      }
-    });
-
-    res.json(settings);
-  } catch (err) {
-    console.error('Update settings error:', err.message);
-    res.status(500).send('Server error');
-  }
-}; 

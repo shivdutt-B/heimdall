@@ -69,47 +69,47 @@ router.delete("/:id", serverController.deleteServer);
 // @route   PUT api/servers/:id/alerts
 // @desc    Update alert settings for a server
 // @access  Private
-router.put(
-  "/:id/alerts",
-  [
-    check("failureThreshold", "Failure threshold must be a positive number")
-      .optional()
-      .isInt({ min: 1 }),
-    check(
-      "responseTimeThreshold",
-      "Response time threshold must be a positive number"
-    )
-      .optional()
-      .isInt({ min: 100 }),
-  ],
-  serverController.updateAlertSettings
-);
+// router.put(
+//   "/:id/alerts",
+//   [
+//     check("failureThreshold", "Failure threshold must be a positive number")
+//       .optional()
+//       .isInt({ min: 1 }),
+//     check(
+//       "responseTimeThreshold",
+//       "Response time threshold must be a positive number"
+//     )
+//       .optional()
+//       .isInt({ min: 100 }),
+//   ],
+//   serverController.updateAlertSettings
+// );
 
 // @route   POST api/servers/:id/ping
 // @desc    Manually ping a server
 // @access  Private
-router.post("/:id/ping", async (req, res) => {
-  try {
-    // Check if server exists and belongs to user
-    const server = await prisma.server.findUnique({
-      where: {
-        id: req.params.id,
-        userId: req.user.id,
-      },
-    });
+// router.post("/:id/ping", async (req, res) => {
+//   try {
+//     // Check if server exists and belongs to user
+//     const server = await prisma.server.findUnique({
+//       where: {
+//         id: req.params.id,
+//         userId: req.user.id,
+//       },
+//     });
 
-    if (!server) {
-      return res.status(404).json({ message: "Server not found" });
-    }
+//     if (!server) {
+//       return res.status(404).json({ message: "Server not found" });
+//     }
 
-    // Trigger a manual ping
-    const pingResult = await triggerPing(req.params.id);
+//     // Trigger a manual ping
+//     const pingResult = await triggerPing(req.params.id);
 
-    res.json(pingResult);
-  } catch (err) {
-    console.error("Manual ping error:", err.message);
-    res.status(500).send("Server error");
-  }
-});
+//     res.json(pingResult);
+//   } catch (err) {
+//     console.error("Manual ping error:", err.message);
+//     res.status(500).send("Server error");
+//   }
+// });
 
 module.exports = router;
