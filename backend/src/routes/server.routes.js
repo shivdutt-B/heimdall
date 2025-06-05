@@ -34,6 +34,12 @@ router.post(
   [
     check("url", "Valid URL is required").isURL(),
     check("name", "Name is required").not().isEmpty(),
+    check(
+      "failureThreshold",
+      "Failure threshold must be an integer between 1 and 10"
+    )
+      .optional()
+      .isInt({ min: 1, max: 10 }),
   ],
   serverController.createServer
 );
@@ -47,9 +53,7 @@ router.put(
     check("url", "URL must be valid if provided")
       .optional()
       .matches(/^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)
-      .withMessage(
-        "URL must be in the format https://xyz-abc.com"
-      ),
+      .withMessage("URL must be in the format https://xyz-abc.com"),
     check("name", "Name must not be empty if provided")
       .optional()
       .not()
@@ -57,6 +61,12 @@ router.put(
     check("pingInterval", "Ping interval must be a positive number")
       .optional()
       .isInt({ min: 30 }),
+    check(
+      "failureThreshold",
+      "Failure threshold must be an integer between 1 and 10"
+    )
+      .optional()
+      .isInt({ min: 1, max: 10 }),
   ],
   serverController.updateServer
 );
@@ -65,51 +75,5 @@ router.put(
 // @desc    Delete server
 // @access  Private
 router.delete("/:id", serverController.deleteServer);
-
-// @route   PUT api/servers/:id/alerts
-// @desc    Update alert settings for a server
-// @access  Private
-// router.put(
-//   "/:id/alerts",
-//   [
-//     check("failureThreshold", "Failure threshold must be a positive number")
-//       .optional()
-//       .isInt({ min: 1 }),
-//     check(
-//       "responseTimeThreshold",
-//       "Response time threshold must be a positive number"
-//     )
-//       .optional()
-//       .isInt({ min: 100 }),
-//   ],
-//   serverController.updateAlertSettings
-// );
-
-// @route   POST api/servers/:id/ping
-// @desc    Manually ping a server
-// @access  Private
-// router.post("/:id/ping", async (req, res) => {
-//   try {
-//     // Check if server exists and belongs to user
-//     const server = await prisma.server.findUnique({
-//       where: {
-//         id: req.params.id,
-//         userId: req.user.id,
-//       },
-//     });
-
-//     if (!server) {
-//       return res.status(404).json({ message: "Server not found" });
-//     }
-
-//     // Trigger a manual ping
-//     const pingResult = await triggerPing(req.params.id);
-
-//     res.json(pingResult);
-//   } catch (err) {
-//     console.error("Manual ping error:", err.message);
-//     res.status(500).send("Server error");
-//   }
-// });
 
 module.exports = router;

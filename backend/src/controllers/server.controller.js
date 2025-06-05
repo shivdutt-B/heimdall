@@ -101,7 +101,7 @@ exports.createServer = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { url, name, pingInterval } = req.body;
+  const { url, name, pingInterval, failureThreshold } = req.body;
   console.log(req.body);
 
   try {
@@ -124,6 +124,7 @@ exports.createServer = async (req, res) => {
         url,
         name,
         pingInterval: pingInterval || 300, // Default to 5 minutes
+        failureThreshold: failureThreshold || 3,
         userId: req.user.id,
       },
     });
@@ -148,7 +149,7 @@ exports.updateServer = async (req, res) => {
     return res.status(400).json({ errors: errors.array() });
   }
 
-  const { url, name, isActive, pingInterval } = req.body;
+  const { url, name, isActive, pingInterval, failureThreshold } = req.body;
 
   try {
     // Check if server exists and belongs to user
@@ -173,6 +174,8 @@ exports.updateServer = async (req, res) => {
         name: name || existingServer.name,
         isActive: isActive !== undefined ? isActive : existingServer.isActive,
         pingInterval: pingInterval || existingServer.pingInterval,
+        failureThreshold:
+          failureThreshold || existingServer.failureThreshold || 3,
       },
     });
 

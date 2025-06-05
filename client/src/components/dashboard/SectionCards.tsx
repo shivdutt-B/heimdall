@@ -14,6 +14,7 @@ interface Server {
   isActive: boolean;
   lastPingedAt: string | null;
   pingInterval: number;
+  failureThreshold: number;
 }
 
 type CarouselItem = { type: "add-new" } | { type: "card"; data: Server };
@@ -90,6 +91,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     name: "",
     url: "",
     pingInterval: 60,
+    failureThreshold: 3,
   });
   const [formError, setFormError] = useState("");
   const [isSubmitting, setIsSubmitting] = useState(false);
@@ -104,6 +106,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     name: "",
     url: "",
     pingInterval: 60,
+    failureThreshold: 3,
   });
   const [isModifying, setIsModifying] = useState(false);
   const [modifyError, setModifyError] = useState("");
@@ -156,10 +159,15 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
 
   const allItems: CarouselItem[] = [
     { type: "add-new" },
-    ...(Array.isArray(servers) ? servers : []).map((server) => ({
-      type: "card" as const,
-      data: server,
-    })),
+    ...(Array.isArray(servers)
+      ? servers.map((server) => ({
+          type: "card" as const,
+          data: {
+            ...server,
+            failureThreshold: (server as any).failureThreshold ?? 3,
+          },
+        }))
+      : []),
   ];
 
   const pageCount = Math.ceil(allItems.length / cardsPerPage);
@@ -352,6 +360,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                             name: item.data.name,
                             url: item.data.url,
                             pingInterval: item.data.pingInterval,
+                            failureThreshold: item.data.failureThreshold,
                           });
                           setShowModifyDialog(true);
                         }}
@@ -414,7 +423,12 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                 const result = await addServer(form, token);
                 if (result.success) {
                   setIsDialogOpen(false);
-                  setForm({ name: "", url: "", pingInterval: 60 });
+                  setForm({
+                    name: "",
+                    url: "",
+                    pingInterval: 60,
+                    failureThreshold: 3,
+                  });
                   refetchServers();
                   setIsSubmitting(false);
                 } else {
@@ -499,6 +513,41 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     }
                     required
                   />
+                </div>
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-sm text-white flex items-center gap-1"
+                    htmlFor="failure-threshold"
+                  >
+                    Failure Threshold
+                    <div className="relative group cursor-pointer mb-1">
+                      <span className="text-white font-bold border-[1px] py-[1px] px-[6px] rounded-full text-[10px]">
+                        !
+                      </span>
+                      <div className="absolute z-10 hidden group-hover:block w-56 p-2 bg-gray-800 text-white text-xs rounded shadow-lg top-full left-1/2 -translate-x-1/2 mt-1">
+                        Alerts you after this many consecutive server failures.
+                      </div>
+                    </div>
+                  </label>
+
+                  <select
+                    id="failure-threshold"
+                    className="w-full p-2 border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm bg-black"
+                    value={form.failureThreshold}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        failureThreshold: Number(e.target.value),
+                      }))
+                    }
+                    required
+                  >
+                    {[...Array(10)].map((_, i) => (
+                      <option key={i + 1} value={i + 1}>
+                        {i + 1}
+                      </option>
+                    ))}
+                  </select>
                 </div>
                 <div className="flex justify-end gap-2 mt-6">
                   <button
@@ -648,6 +697,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                       name: modifyForm.name,
                       url: modifyForm.url,
                       pingInterval: modifyForm.pingInterval,
+                      failureThreshold: modifyForm.failureThreshold,
                     },
                     {
                       headers: {
@@ -718,6 +768,40 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   }
                   required
                 />
+              </div>
+              <div className="text-left">
+                <label
+                  className="text-sm font-sm text-white flex items-center gap-1"
+                  htmlFor="failure-threshold"
+                >
+                  Failure Threshold
+                  <div className="relative group cursor-pointer mb-1">
+                    <span className="text-white font-bold border-[1px] py-[1px] px-[6px] rounded-full text-[10px]">
+                      !
+                    </span>
+                    <div className="absolute z-10 hidden group-hover:block w-56 p-2 bg-gray-800 text-white text-xs rounded shadow-lg top-full left-1/2 -translate-x-1/2 mt-1">
+                      Alerts you after this many consecutive server failures.
+                    </div>
+                  </div>
+                </label>
+                <select
+                  id="modify-failure-threshold"
+                  className="w-full px-3 py-2 rounded bg-black text-white text-sm border border-gray-700 focus:outline-none"
+                  value={modifyForm.failureThreshold}
+                  onChange={(e) =>
+                    setModifyForm((f) => ({
+                      ...f,
+                      failureThreshold: Number(e.target.value),
+                    }))
+                  }
+                  required
+                >
+                  {[...Array(10)].map((_, i) => (
+                    <option key={i + 1} value={i + 1}>
+                      {i + 1}
+                    </option>
+                  ))}
+                </select>
               </div>
               {modifyError && (
                 <div className="mt-2 p-2 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
