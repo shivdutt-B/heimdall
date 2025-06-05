@@ -1,5 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "../layouts/DashboardLayout";
+import { useRecoilState } from "recoil";
+import { selectedDaysAtom } from "../store/serverAtoms";
 
 // Dashboard architecture
 import { SectionCards } from "../components/Dashboard/SectionCards";
@@ -26,12 +28,12 @@ interface ServerStats {
 
 const Dashboard: React.FC = () => {
   const [selectedServer, setSelectedServer] = useState<string | null>(null);
-  const [selectedDays, setSelectedDays] = useState(7);
+  const [selectedDays, setSelectedDays] = useRecoilState(selectedDaysAtom);
   const [statusFilter, setStatusFilter] = useState<"all" | "success" | "fail">(
     "all"
   );
 
-  const { isAuthenticated, isLoading: authLoading } = useAuth();
+  // const { isAuthenticated, isLoading: authLoading } = useAuth();
   const {
     servers,
     serverDetails,
@@ -43,12 +45,9 @@ const Dashboard: React.FC = () => {
     if (servers.length > 0 && !selectedServer) {
       setSelectedServer(servers[0].name);
     }
-  }, []);
+  }, [servers, selectedServer]);
 
   // If not authenticated and not loading, redirect to auth page
-  if (!isAuthenticated && !authLoading) {
-    return <Navigate to="/auth/login" />;
-  }
 
   // Get the selected server's ID
   const selectedServerId = selectedServer
@@ -71,6 +70,7 @@ const Dashboard: React.FC = () => {
 
   // Calculate server stats from real data
   const calculateServerStats = (serverName: string): ServerStats | null => {
+    // console.log("calc stats", serverName);
     const server = servers.find((s) => s.name === serverName);
     if (!server || !serverDetails[server.id]) return null;
 
@@ -93,6 +93,8 @@ const Dashboard: React.FC = () => {
     };
   };
 
+  // console.log("selected90", selectedServer);
+
   return (
     <DashboardLayout>
       <div className="min-h-screen bg-[#040506]">
@@ -108,7 +110,7 @@ const Dashboard: React.FC = () => {
               <SectionCards
                 onServerSelect={setSelectedServer}
                 selectedServer={selectedServer}
-                loading={authLoading || serversLoading}
+                loading={serversLoading}
               />
             </div>
           </section>
@@ -128,12 +130,13 @@ const Dashboard: React.FC = () => {
                 </div>
               )}
             </div>
-            {/* <ServerStatsCards
+
+            <ServerStatsCards
               stats={
                 selectedServer ? calculateServerStats(selectedServer) : null
               }
-              loading={authLoading || serversLoading}
-            /> */}
+              loading={serversLoading}
+            />
           </section>
 
           {/* Analytics Section */}
@@ -143,11 +146,13 @@ const Dashboard: React.FC = () => {
                 Analytics Overview
               </h2>
             </div>
-            <div className="bg-black/20 rounded-lg border border-white/10 p-4 sm:p-6">
-              {/* <ChartAreaInteractive
+            <div className="bg-black/20 rounded-lg border border-white/10 ">
+              <ChartAreaInteractive
                 className="w-full"
                 serverId={selectedServerId}
-              /> */}
+                selectedDays={selectedDays}
+                setSelectedDays={setSelectedDays}
+              />
             </div>
           </section>
 
@@ -196,11 +201,11 @@ const Dashboard: React.FC = () => {
                 </button>
               </div>
             </div>
-            {/* <DataTable
+            <DataTable
               serverId={selectedServerId}
               selectedDays={selectedDays}
               statusFilter={statusFilter}
-            /> */}
+            />
           </section>
         </div>
       </div>

@@ -1,10 +1,29 @@
 import React from "react";
-import { Link } from "react-router-dom";
-import { useRecoilValue } from "recoil";
+import { Link, useNavigate } from "react-router-dom";
+import { useRecoilValue, useResetRecoilState } from "recoil";
 import { authState } from "../../store/auth";
 
 const NavBar: React.FC = () => {
   const auth = useRecoilValue(authState);
+  const [showUserDialog, setShowUserDialog] = React.useState(false);
+  const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
+  const navigate = useNavigate();
+  const resetAuth = useResetRecoilState(authState);
+
+  // Close dialog on outside click
+  React.useEffect(() => {
+    if (!showUserDialog) return;
+    function handleClick(e: MouseEvent) {
+      if (
+        !document.getElementById("user-dialog")?.contains(e.target as Node) &&
+        !document.getElementById("signup-link")?.contains(e.target as Node)
+      ) {
+        setShowUserDialog(false);
+      }
+    }
+    document.addEventListener("mousedown", handleClick);
+    return () => document.removeEventListener("mousedown", handleClick);
+  }, [showUserDialog]);
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-sm text-white shadow-sm bg-transparent transition-all duration-200">
@@ -153,10 +172,18 @@ const NavBar: React.FC = () => {
                     </svg>
                   </div>
                 ) : (
-                  <Link
-                    to={auth.user ? "/profile" : "/auth"}
-                    className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none bg-white text-primary-foreground hover:bg-white/90 h-8 rounded-sm px-2 py-3 border border-gray-300"
+                  <button
+                    className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none bg-white text-primary-foreground hover:bg-white/90 h-8 rounded-sm px-2 py-3 border border-gray-300 relative"
                     id="signup-link"
+                    type="button"
+                    onClick={(e) => {
+                      if (auth.user) {
+                        e.preventDefault();
+                        setShowUserDialog((v) => !v);
+                      } else {
+                        navigate("/auth");
+                      }
+                    }}
                   >
                     {auth.user ? "Profile" : "Auth"}
                     <svg
@@ -174,13 +201,83 @@ const NavBar: React.FC = () => {
                       <path d="M20 21v-2a4 4 0 0 0-4-4H8a4 4 0 0 0-4 4v2"></path>
                       <circle cx="12" cy="7" r="4"></circle>
                     </svg>
-                  </Link>
+                    {showUserDialog && auth.user && (
+                      <div
+                        id="user-dialog"
+                        className="w-64 bg-black border border-gray-700 rounded shadow-lg z-50 p-4 text-left flex flex-col items-stretch gap-2"
+                        style={{ top: "50px", position: "absolute", right: 0 }}
+                      >
+                        <div className="mb-2">
+                          <span className="block text-sm text-white font-semibold">
+                            {auth.user.name}
+                          </span>
+                          <span className="block text-xs text-white/70">
+                            {auth.user.email}
+                          </span>
+                        </div>
+                        <div className="flex flex-col gap-2 mt-4">
+                          <button
+                            className="w-full px-3 py-1 bg-white text-black rounded hover:bg-white/90 text-sm cursor-pointer"
+                            type="button"
+                            onClick={() => {
+                              setShowUserDialog(false);
+                            }}
+                          >
+                            Close
+                          </button>
+                          <button
+                            className="w-full px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm cursor-pointer"
+                            type="button"
+                            onClick={() => setShowLogoutConfirm(true)}
+                          >
+                            Logout
+                          </button>
+                        </div>
+                      </div>
+                    )}
+                  </button>
                 )}
               </div>
             </div>
           </div>
         </div>
       </div>
+      {/* Logout Confirmation Dialog */}
+      {showLogoutConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          style={{ minHeight: "100vh", minWidth: "100vw" }}
+        >
+          <div className="bg-black rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
+            <h2 className="text-md font-semibold text-white mb-2">
+              Confirm Logout
+            </h2>
+            <p className="text-white/70 mb-4 text-sm">
+              Are you sure you want to log out?
+            </p>
+            <div className="flex gap-2 justify-center">
+              <button
+                className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                onClick={() => setShowLogoutConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold text-sm cursor-pointer"
+                onClick={() => {
+                  localStorage.removeItem("token");
+                  resetAuth();
+                  setShowLogoutConfirm(false);
+                  setShowUserDialog(false);
+                  navigate("/");
+                }}
+              >
+                Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </nav>
   );
 };

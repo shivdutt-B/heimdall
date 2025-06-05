@@ -44,7 +44,12 @@ router.post(
 router.put(
   "/:id",
   [
-    check("url", "URL must be valid if provided").optional().isURL(),
+    check("url", "URL must be valid if provided")
+      .optional()
+      .matches(/^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)
+      .withMessage(
+        "URL must be in the format https://xyz-abc.com"
+      ),
     check("name", "Name must not be empty if provided")
       .optional()
       .not()

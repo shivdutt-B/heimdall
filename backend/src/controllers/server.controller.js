@@ -119,16 +119,28 @@ exports.createServer = async (req, res) => {
   //   return res.status(400).json({ errors: errors.array() });
   // }
 
-  const { url, name, description, pingInterval } = req.body;
+  const { url, name, pingInterval } = req.body;
   console.log(req.body);
 
   try {
+    // Prevent duplicate servers (by url or name for this user)
+    const existingServer = await prisma.server.findFirst({
+      where: {
+        userId: req.user.id,
+        OR: [{ url: url }, { name: name }],
+      },
+    });
+    if (existingServer) {
+      return res
+        .status(400)
+        .json({ message: "A server with this URL or name already exists." });
+    }
+
     // Create server with default alert settings
     const server = await prisma.server.create({
       data: {
         url,
         name,
-        description,
         pingInterval: pingInterval || 300, // Default to 5 minutes
         userId: req.user.id,
         alertSettings: {
@@ -144,7 +156,7 @@ exports.createServer = async (req, res) => {
     });
 
     // Refresh the server cache to include the new server
-    await refreshServerCache();
+    // await refreshServerCache();
 
     res.status(201).json(server);
   } catch (err) {

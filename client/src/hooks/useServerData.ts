@@ -14,38 +14,44 @@ export const useServerData = (selectedServer: string | null) => {
 
   // Fetch servers when auth is ready
   useEffect(() => {
-    const fetchData = async () => {
-      if (auth.user && !auth.loading) {
+    // console.log("check if")
+    if (servers.length === 0) {
+      const fetchData = async () => {
         setIsDataLoading(true);
         try {
           await refetchServers();
         } finally {
           setIsDataLoading(false);
         }
-      }
-    };
-
-    fetchData();
-  }, [auth.user, auth.loading, refetchServers]);
+      };
+      fetchData();
+    }
+    // else, servers are already in Recoil, no need to fetch
+  }, [servers.length, refetchServers]);
 
   // Fetch server details when a server is selected and auth is ready
-  useEffect(() => {
-    const fetchDetails = async () => {
-      if (auth.user && !auth.loading && selectedServer) {
-        const server = servers.find((s) => s.name === selectedServer);
-        if (server) {
-          setIsDataLoading(true);
-          try {
-            await fetchServerDetails(server.id);
-          } finally {
-            setIsDataLoading(false);
+  useEffect(
+    () => {
+      const fetchDetails = async () => {
+        // await new Promise((resolve) => setTimeout(resolve, 5000));
+        if (auth.user && !auth.loading && selectedServer) {
+          const server = servers.find((s) => s.name === selectedServer);
+          if (server) {
+            setIsDataLoading(true);
+            try {
+              await fetchServerDetails(server.id);
+            } finally {
+              setIsDataLoading(false);
+            }
           }
         }
-      }
-    };
+      };
 
-    fetchDetails();
-  }, [selectedServer, servers, auth.user, auth.loading, fetchServerDetails]);
+      fetchDetails();
+    },
+    //  [selectedServer, servers, auth.user, auth.loading, fetchServerDetails]
+    [selectedServer, servers]
+  );
 
   return {
     servers,

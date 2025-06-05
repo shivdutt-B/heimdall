@@ -39,7 +39,7 @@ function HeroOnRipple() {
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
               {/* <AnimatedSubscribeButton
                 className="bg-white hover:bg-white/80 transition-all duration-300 text-black px-6 py-2 rounded-sm shadow-md text-sm"
-                onClick={() => console.log("Get Started clicked")}
+                onClick={() => // console.log("Get Started clicked")}
               > */}
               {auth.loading ? (
                 <div className="bg-white px-6 py-2 rounded-sm shadow-md text-sm flex items-center gap-2 font-semibold">

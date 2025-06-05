@@ -73,3 +73,8 @@ export const pingHistoryAtom = atom<PingHistoryCache>({
   key: "pingHistoryState",
   default: {},
 });
+
+export const selectedDaysAtom = atom<number>({
+  key: "selectedDaysAtom",
+  default: 7,
+});

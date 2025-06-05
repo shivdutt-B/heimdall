@@ -480,7 +480,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 const nodeJsCode = `// Express.js endpoint
 app.get('/__ping__', (req, res) => {
   // Log the ping request
-  console.log('Ping received at:', new Date().toISOString());
+  // console.log('Ping received at:', new Date().toISOString());
   
   // Return a simple response with timestamp and memory usage
   res.json({

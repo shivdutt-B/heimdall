@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import axios from "axios";
 import { format } from "date-fns";
 import { DataTableSkeleton } from "../../skeletons/dashboard/DataTableSkeleton";
+import { useServerPings } from "../../hooks/useServerPings";
 
 interface Props {
   className?: string;
@@ -29,42 +30,11 @@ export const DataTable: React.FC<Props> = ({
   selectedDays,
   statusFilter,
 }) => {
-  const [pings, setPings] = useState<PingData[]>([]);
-  const [loading, setLoading] = useState(false);
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
 
-  useEffect(() => {
-    const fetchPingData = async () => {
-      console.log("Fetching ping data from DATA TABLE");
-      if (!serverId) return;
-
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `http://localhost:5000/api/servers/server-pings?id=${serverId}&days=${selectedDays}`,
-          {
-            headers: {
-              "x-auth-token": token,
-            },
-          }
-        );
-
-        if (response.data && response.data.pings) {
-          setPings(response.data.pings);
-          setCurrentPage(1); // Reset to first page when data changes
-        }
-      } catch (error) {
-        console.error("Error fetching ping data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPingData();
-  }, [serverId, selectedDays]);
+  const { data: pings, loading } = useServerPings(serverId, selectedDays);
 
   // Filter pings based on status
   const filteredPings = pings.filter((ping) => {

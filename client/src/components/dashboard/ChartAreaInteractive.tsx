@@ -11,10 +11,13 @@ import axios from "axios";
 import { useRecoilState } from "recoil";
 import { pingHistoryAtom } from "../../store/serverAtoms";
 import { ChartAreaSkeleton } from "../../skeletons/dashboard/ChartAreaSkeleton";
+import { useServerPings } from "../../hooks/useServerPings";
 
 interface Props {
   className?: string;
   serverId: string | null;
+  selectedDays: number;
+  setSelectedDays: (days: number) => void;
 }
 
 interface PingData {
@@ -41,81 +44,23 @@ const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
 export const ChartAreaInteractive: React.FC<Props> = ({
   className,
   serverId,
+  selectedDays,
+  setSelectedDays,
 }) => {
   const [scrollPosition, setScrollPosition] = useState(0);
-  const [selectedDays, setSelectedDays] = useState(7); // Default to 7 days
-  const [daysInput, setDaysInput] = useState("7"); // New state for input value
-  const [chartData, setChartData] = useState<ChartData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [pingHistory, setPingHistory] = useRecoilState(pingHistoryAtom);
+  const [daysInput, setDaysInput] = useState(selectedDays.toString());
+  const { data: pings, loading } = useServerPings(serverId, selectedDays);
 
   useEffect(() => {
-    const fetchPingData = async () => {
-      console.log("Fetching ping and memory data from CHART AREA INTERACTIVE");
-      if (!serverId) return;
-
-      const cacheKey = `${serverId}-${selectedDays}`;
-      const cachedData = pingHistory[cacheKey];
-      const now = Date.now();
-
-      // Check if we have valid cached data
-      if (
-        cachedData &&
-        cachedData.lastFetched &&
-        now - cachedData.lastFetched < CACHE_DURATION
-      ) {
-        // Transform cached data for the chart
-        const transformedData: ChartData[] = cachedData.data.map((ping) => ({
-          date: ping.timestamp,
-          rss: ping.rssMemory,
-          heap: ping.heapUsage,
-        }));
-        setChartData(transformedData);
-        return;
-      }
-
-      setLoading(true);
-      try {
-        const token = localStorage.getItem("token");
-        const response = await axios.get(
-          `http://localhost:5000/api/servers/server-pings?id=${serverId}&days=${selectedDays}`,
-          {
-            headers: {
-              "x-auth-token": token,
-            },
-          }
-        );
-
-        // Cache the new data
-        setPingHistory((prev) => ({
-          ...prev,
-          [cacheKey]: {
-            data: response.data.pings,
-            lastFetched: now,
-          },
-        }));
-
-        // Transform ping data for the chart
-        const transformedData: ChartData[] = response.data.pings.map(
-          (ping: PingData) => ({
-            date: ping.timestamp,
-            rss: ping.rssMemory,
-            heap: ping.heapUsage,
-          })
-        );
-
-        setChartData(transformedData);
-      } catch (error) {
-        console.error("Error fetching ping data:", error);
-      } finally {
-        setLoading(false);
-      }
-    };
-
-    fetchPingData();
-  }, [serverId, selectedDays, pingHistory, setPingHistory]);
+    setDaysInput(selectedDays.toString());
+  }, [selectedDays]);
 
   // Calculate the width based on data points (50px per point is a good starting point)
+  const chartData: ChartData[] = pings.map((ping) => ({
+    date: ping.timestamp,
+    rss: ping.rssMemory,
+    heap: ping.heapUsage,
+  }));
   const chartWidth = Math.max(chartData.length * 50, 800);
 
   if (!serverId || loading) {

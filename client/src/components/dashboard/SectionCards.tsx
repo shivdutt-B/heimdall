@@ -4,6 +4,8 @@ import { useRecoilValue } from "recoil";
 import { serversAtom } from "../../store/serverAtoms";
 import { format } from "date-fns";
 import { SectionCardsSkeleton } from "../../skeletons/dashboard/SectionCardsSkeleton";
+import axios from "axios";
+import { useServers } from "../../hooks/useServers";
 
 interface Server {
   id: string;
@@ -22,6 +24,58 @@ interface SectionCardsProps {
   loading?: boolean;
 }
 
+// Function to handle adding a new server
+type AddServerParams = { name: string; url: string; pingInterval: number };
+async function addServer(
+  { name, url, pingInterval }: AddServerParams,
+  token: string | null
+) {
+  try {
+    const response = await axios.post(
+      "http://localhost:5000/api/servers",
+      {
+        name,
+        url,
+        pingInterval,
+      },
+      {
+        headers: {
+          "x-auth-token": token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { success: true, data: response.data };
+  } catch (err: any) {
+    let message = "Failed to add server. Please try again.";
+    if (err.response && err.response.data && err.response.data.message) {
+      message = err.response.data.message;
+    } else if (err.response && err.response.data && err.response.data.errors) {
+      // Express-validator errors
+      message = err.response.data.errors.map((e: any) => e.msg).join(", ");
+    }
+    return { success: false, error: message };
+  }
+}
+
+// Function to handle deleting a server
+async function handleDeleteServer(serverId: string, token: string | null) {
+  try {
+    await axios.delete(`http://localhost:5000/api/servers/${serverId}`, {
+      headers: {
+        "x-auth-token": token,
+      },
+    });
+    return { success: true };
+  } catch (err: any) {
+    let message = "Failed to delete server. Please try again.";
+    if (err.response && err.response.data && err.response.data.message) {
+      message = err.response.data.message;
+    }
+    return { success: false, error: message };
+  }
+}
+
 export const SectionCards: React.FC<SectionCardsProps> = ({
   onServerSelect,
   selectedServer: externalSelectedServer,
@@ -31,6 +85,44 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const [cardsPerPage, setCardsPerPage] = useState(3);
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const servers = useRecoilValue(serversAtom);
+  const [isDialogOpen, setIsDialogOpen] = useState(false);
+  const [form, setForm] = useState({
+    name: "",
+    url: "",
+    pingInterval: 60,
+  });
+  const [formError, setFormError] = useState("");
+  const [isSubmitting, setIsSubmitting] = useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
+  const [serverToDelete, setServerToDelete] = useState<Server | null>(null);
+  const { refetchServers } = useServers();
+  const [isDeleting, setIsDeleting] = useState(false);
+  const [deleteError, setDeleteError] = useState("");
+  const [showModifyDialog, setShowModifyDialog] = useState(false);
+  const [serverToModify, setServerToModify] = useState<Server | null>(null);
+  const [modifyForm, setModifyForm] = useState({
+    name: "",
+    url: "",
+    pingInterval: 60,
+  });
+  const [isModifying, setIsModifying] = useState(false);
+  const [modifyError, setModifyError] = useState("");
+
+  // Automatically clear error after 5 seconds
+  useEffect(() => {
+    if (formError) {
+      const timer = setTimeout(() => setFormError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [formError]);
+
+  // Automatically clear delete error after 3 seconds
+  useEffect(() => {
+    if (deleteError) {
+      const timer = setTimeout(() => setDeleteError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [deleteError]);
 
   // Update cards per page based on screen size
   useEffect(() => {
@@ -143,7 +235,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
           </svg>
         </button>
 
-        <div className="overflow-hidden px-4 sm:px-6">
+        <div className="overflow-hidden">
           <AnimatePresence mode="wait" initial={false}>
             <motion.div
               key={currentPage}
@@ -158,6 +250,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   <div
                     key="add-new"
                     className="rounded-lg border-dashed border-2 border-white/20 p-4 sm:p-6 hover:bg-white/5 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center h-full group"
+                    onClick={() => setIsDialogOpen(true)}
                   >
                     <div className="flex flex-col items-center">
                       <svg
@@ -251,10 +344,27 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                       </p>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
-                      <button className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors">
+                      <button
+                        className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                        onClick={() => {
+                          setServerToModify(item.data);
+                          setModifyForm({
+                            name: item.data.name,
+                            url: item.data.url,
+                            pingInterval: item.data.pingInterval,
+                          });
+                          setShowModifyDialog(true);
+                        }}
+                      >
                         Modify
                       </button>
-                      <button className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors">
+                      <button
+                        className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                        onClick={() => {
+                          setServerToDelete(item.data);
+                          setShowDeleteConfirm(true);
+                        }}
+                      >
                         Delete
                       </button>
                     </div>
@@ -291,6 +401,372 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
           </svg>
         </button>
       </div>
+      {/* Add New Server Dialog */}
+      {isDialogOpen && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-bg-[#27272a] p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px] backdrop-blur-sm">
+          <div className="bg-[#181A20] rounded-lg p-0 w-full max-w-md shadow-lg">
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setFormError("");
+                setIsSubmitting(true);
+                const token = localStorage.getItem("token");
+                const result = await addServer(form, token);
+                if (result.success) {
+                  setIsDialogOpen(false);
+                  setForm({ name: "", url: "", pingInterval: 60 });
+                  refetchServers();
+                  setIsSubmitting(false);
+                } else {
+                  setFormError(
+                    result.error || "Failed to add server. Please try again."
+                  );
+                  setIsSubmitting(false);
+                }
+              }}
+              className="bg-black p-6 border border-gray-700 shadow-lg rounded-lg min-h-[400px]"
+            >
+              <div className="mb-4">
+                <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                  Add New Server
+                </h2>
+                <p className="text-sm text-white/60">
+                  Enter the details to add a new server to your dashboard
+                </p>
+                {formError && (
+                  <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
+                    {formError}
+                  </div>
+                )}
+              </div>
+              <div className="space-y-4">
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-sm text-white"
+                    htmlFor="server-name"
+                  >
+                    Server Name
+                  </label>
+                  <input
+                    id="server-name"
+                    type="text"
+                    className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                    value={form.name}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, name: e.target.value }))
+                    }
+                    placeholder="My Server"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-sm text-white"
+                    htmlFor="server-url"
+                  >
+                    URL
+                  </label>
+                  <input
+                    id="server-url"
+                    type="url"
+                    className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                    value={form.url}
+                    onChange={(e) =>
+                      setForm((f) => ({ ...f, url: e.target.value }))
+                    }
+                    placeholder="https://example.com"
+                    required
+                  />
+                </div>
+                <div className="space-y-2">
+                  <label
+                    className="text-sm font-sm text-white"
+                    htmlFor="ping-interval"
+                  >
+                    Ping Interval (seconds)
+                  </label>
+                  <input
+                    id="ping-interval"
+                    type="number"
+                    min={10}
+                    className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                    value={form.pingInterval}
+                    onChange={(e) =>
+                      setForm((f) => ({
+                        ...f,
+                        pingInterval: Number(e.target.value),
+                      }))
+                    }
+                    required
+                  />
+                </div>
+                <div className="flex justify-end gap-2 mt-6">
+                  <button
+                    type="button"
+                    className="px-4 py-2 bg-red-500 text-white rounded-sm hover:bg-red-700 transition-colors cursor-pointer text-[15px] font-semibold"
+                    onClick={() => setIsDialogOpen(false)}
+                  >
+                    Cancel
+                  </button>
+                  <button
+                    type="submit"
+                    className="px-4 py-2 bg-white text-black font-medium rounded-sm hover:bg-white/90 transition-colors transform duration-200 text-sm cursor-pointer flex items-center justify-center gap-2"
+                    disabled={isSubmitting}
+                  >
+                    {isSubmitting && (
+                      <svg
+                        className="animate-spin h-5 w-5 text-black"
+                        xmlns="http://www.w3.org/2000/svg"
+                        fill="none"
+                        viewBox="0 0 24 24"
+                      >
+                        <circle
+                          className="opacity-25"
+                          cx="12"
+                          cy="12"
+                          r="10"
+                          stroke="currentColor"
+                          strokeWidth="4"
+                        ></circle>
+                        <path
+                          className="opacity-75"
+                          fill="currentColor"
+                          d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                        ></path>
+                      </svg>
+                    )}
+                    {isSubmitting ? "Adding..." : "Add Server"}
+                  </button>
+                </div>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
+      {/* Delete Confirmation Dialog */}
+      {showDeleteConfirm && serverToDelete && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          style={{ minHeight: "100vh", minWidth: "100vw" }}
+        >
+          <div className="bg-black rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
+            <h2 className="text-md font-semibold text-white mb-2">
+              Confirm Delete
+            </h2>
+            <p className="text-white/70 mb-4 text-sm">
+              Are you sure you want to delete{" "}
+              <span className="font-bold text-red-400">
+                {serverToDelete.name}
+              </span>
+              ?
+            </p>
+            <div className="flex gap-2 justify-center">
+              <button
+                className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                onClick={() => setShowDeleteConfirm(false)}
+              >
+                Cancel
+              </button>
+              <button
+                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold text-sm cursor-pointer"
+                disabled={isDeleting}
+                onClick={async () => {
+                  if (!serverToDelete) return;
+                  setIsDeleting(true);
+                  setDeleteError("");
+                  const token = localStorage.getItem("token");
+                  const result = await handleDeleteServer(
+                    serverToDelete.id,
+                    token
+                  );
+                  if (result.success) {
+                    setShowDeleteConfirm(false);
+                    setServerToDelete(null);
+                    refetchServers();
+                  } else {
+                    setDeleteError(
+                      result.error ||
+                        "Failed to delete server. Please try again."
+                    );
+                  }
+                  setIsDeleting(false);
+                }}
+              >
+                {isDeleting && (
+                  <svg
+                    className="animate-spin h-4 w-4 text-white inline-block mr-2"
+                    xmlns="http://www.w3.org/2000/svg"
+                    fill="none"
+                    viewBox="0 0 24 24"
+                  >
+                    <circle
+                      className="opacity-25"
+                      cx="12"
+                      cy="12"
+                      r="10"
+                      stroke="currentColor"
+                      strokeWidth="4"
+                    ></circle>
+                    <path
+                      className="opacity-75"
+                      fill="currentColor"
+                      d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                    ></path>
+                  </svg>
+                )}
+                {isDeleting ? "Deleting..." : "Delete"}
+              </button>
+            </div>
+            {deleteError && (
+              <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
+                {deleteError}
+              </div>
+            )}
+          </div>
+        </div>
+      )}
+      {/* Modify Server Dialog */}
+      {showModifyDialog && serverToModify && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          style={{ minHeight: "100vh", minWidth: "100vw" }}
+        >
+          <div className="bg-black rounded-lg p-6 w-full max-w-[400px] shadow-lg border border-gray-700 text-center">
+            <h2 className="text-md font-semibold text-white mb-2">
+              Modify Server
+            </h2>
+            <form
+              onSubmit={async (e) => {
+                e.preventDefault();
+                setIsModifying(true);
+                setModifyError("");
+                try {
+                  const token = localStorage.getItem("token");
+                  await axios.put(
+                    `http://localhost:5000/api/servers/${serverToModify.id}`,
+                    {
+                      name: modifyForm.name,
+                      url: modifyForm.url,
+                      pingInterval: modifyForm.pingInterval,
+                    },
+                    {
+                      headers: {
+                        "x-auth-token": token,
+                        "Content-Type": "application/json",
+                      },
+                    }
+                  );
+                  setShowModifyDialog(false);
+                  setServerToModify(null);
+                  refetchServers();
+                } catch (err: any) {
+                  let message = "Failed to modify server. Please try again.";
+                  if (
+                    err.response &&
+                    err.response.data &&
+                    err.response.data.message
+                  ) {
+                    message = err.response.data.message;
+                  }
+                  setModifyError(message);
+                } finally {
+                  setIsModifying(false);
+                }
+              }}
+              className="flex flex-col gap-4"
+            >
+              <div className="text-left">
+                <label className="block text-white/80 mb-1 text-sm">
+                  Server Name
+                </label>
+                <input
+                  type="text"
+                  className="w-full px-3 py-2 rounded bg-transparent text-white text-sm border border-gray-700 focus:outline-none"
+                  value={modifyForm.name}
+                  onChange={(e) =>
+                    setModifyForm((f) => ({ ...f, name: e.target.value }))
+                  }
+                  required
+                />
+              </div>
+              <div className="text-left">
+                <label className="block text-white/80 mb-1 text-sm">URL</label>
+                <input
+                  type="url"
+                  className="w-full px-3 py-2 rounded bg-transparent text-white text-sm border border-gray-700 focus:outline-none"
+                  value={modifyForm.url}
+                  onChange={(e) =>
+                    setModifyForm((f) => ({ ...f, url: e.target.value }))
+                  }
+                  required
+                />
+              </div>
+              <div className="text-left">
+                <label className="block text-white/80 mb-1 text-sm">
+                  Ping Interval (seconds)
+                </label>
+                <input
+                  type="number"
+                  min={10}
+                  className="w-full px-3 py-2 rounded bg-transparent text-white text-sm border border-gray-700 focus:outline-none"
+                  value={modifyForm.pingInterval}
+                  onChange={(e) =>
+                    setModifyForm((f) => ({
+                      ...f,
+                      pingInterval: Number(e.target.value),
+                    }))
+                  }
+                  required
+                />
+              </div>
+              {modifyError && (
+                <div className="mt-2 p-2 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
+                  {modifyError}
+                </div>
+              )}
+              <div className="flex gap-2 justify-center mt-2">
+                <button
+                  type="button"
+                  className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                  onClick={() => setShowModifyDialog(false)}
+                  disabled={isModifying}
+                >
+                  Cancel
+                </button>
+                <button
+                  type="submit"
+                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold text-sm cursor-pointer flex items-center justify-center"
+                  disabled={isModifying}
+                >
+                  {isModifying && (
+                    <svg
+                      className="animate-spin h-4 w-4 text-white inline-block mr-2"
+                      xmlns="http://www.w3.org/2000/svg"
+                      fill="none"
+                      viewBox="0 0 24 24"
+                    >
+                      <circle
+                        className="opacity-25"
+                        cx="12"
+                        cy="12"
+                        r="10"
+                        stroke="currentColor"
+                        strokeWidth="4"
+                      ></circle>
+                      <path
+                        className="opacity-75"
+                        fill="currentColor"
+                        d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                      ></path>
+                    </svg>
+                  )}
+                  {isModifying ? "Saving..." : "Confirm"}
+                </button>
+              </div>
+            </form>
+          </div>
+        </div>
+      )}
     </div>
   );
 };
