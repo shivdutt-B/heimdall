@@ -56,9 +56,6 @@ export const useServers = () => {
     }
   };
 
-  useEffect(() => {
-    fetchServers();
-  }, []);
 
   return { refetchServers: fetchServers, fetchServerDetails };
 };

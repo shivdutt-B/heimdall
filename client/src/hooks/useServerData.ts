@@ -27,7 +27,7 @@ export const useServerData = (selectedServer: string | null) => {
       fetchData();
     }
     // else, servers are already in Recoil, no need to fetch
-  }, [servers.length, refetchServers]);
+  }, []);
 
   // Fetch server details when a server is selected and auth is ready
   useEffect(
