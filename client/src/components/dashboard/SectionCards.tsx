@@ -77,6 +77,77 @@ async function handleDeleteServer(serverId: string, token: string | null) {
   }
 }
 
+// Function to handle modifying a server
+async function modifyServer(
+  serverId: string,
+  data: { name: string; url: string; pingInterval: number; failureThreshold: number },
+  token: string | null
+) {
+  try {
+    await axios.put(
+      `http://localhost:5000/api/servers/${serverId}`,
+      data,
+      {
+        headers: {
+          "x-auth-token": token,
+          "Content-Type": "application/json",
+        },
+      }
+    );
+    return { success: true };
+  } catch (err: any) {
+    let message = "Failed to modify server. Please try again.";
+    if (err.response && err.response.data && err.response.data.message) {
+      message = err.response.data.message;
+    }
+    return { success: false, error: message };
+  }
+}
+
+// Function to handle modifying a server and all related state
+async function handleModifyServer({
+  e,
+  serverToModify,
+  modifyForm,
+  setIsModifying,
+  setModifyError,
+  setShowModifyDialog,
+  setServerToModify,
+  refetchServers
+}: {
+  e: React.FormEvent,
+  serverToModify: Server,
+  modifyForm: { name: string; url: string; pingInterval: number; failureThreshold: number },
+  setIsModifying: (v: boolean) => void,
+  setModifyError: (v: string) => void,
+  setShowModifyDialog: (v: boolean) => void,
+  setServerToModify: (v: Server | null) => void,
+  refetchServers: () => void
+}) {
+  e.preventDefault();
+  setIsModifying(true);
+  setModifyError("");
+  const token = localStorage.getItem("token");
+  const result = await modifyServer(
+    serverToModify.id,
+    {
+      name: modifyForm.name,
+      url: modifyForm.url,
+      pingInterval: modifyForm.pingInterval,
+      failureThreshold: modifyForm.failureThreshold,
+    },
+    token
+  );
+  if (result.success) {
+    setShowModifyDialog(false);
+    setServerToModify(null);
+    refetchServers();
+  } else {
+    setModifyError(result.error || "Failed to modify server. Please try again.");
+  }
+  setIsModifying(false);
+}
+
 export const SectionCards: React.FC<SectionCardsProps> = ({
   onServerSelect,
   selectedServer: externalSelectedServer,
@@ -161,12 +232,12 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     { type: "add-new" },
     ...(Array.isArray(servers)
       ? servers.map((server) => ({
-          type: "card" as const,
-          data: {
-            ...server,
-            failureThreshold: (server as any).failureThreshold ?? 3,
-          },
-        }))
+        type: "card" as const,
+        data: {
+          ...server,
+          failureThreshold: (server as any).failureThreshold ?? 3,
+        },
+      }))
       : []),
   ];
 
@@ -205,11 +276,10 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
           <button
             key={index}
             onClick={() => setCurrentPage(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${
-              currentPage === index
-                ? "bg-white w-4"
-                : "bg-gray-600 hover:bg-gray-500"
-            }`}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${currentPage === index
+              ? "bg-white w-4"
+              : "bg-gray-600 hover:bg-gray-500"
+              }`}
             aria-label={`Go to page ${index + 1}`}
           />
         ))}
@@ -220,11 +290,10 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
         <button
           onClick={prevPage}
           disabled={currentPage === 0}
-          className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 -ml-4 sm:-ml-6 text-white rounded-xl transition-all duration-200 ${
-            currentPage === 0
-              ? "opacity-0 cursor-not-allowed"
-              : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
-          }`}
+          className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 -ml-4 sm:-ml-6 text-white rounded-xl transition-all duration-200 ${currentPage === 0
+            ? "opacity-0 cursor-not-allowed"
+            : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
+            }`}
         >
           <svg
             width="20"
@@ -283,22 +352,20 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   <div
                     key={`${item.data.id}-${index}`}
                     onClick={() => handleCardSelect(item.data.name)}
-                    className={`rounded-lg border-white/10 border bg-black/20 p-4 sm:p-6 hover:bg-white/5 transition-all duration-200 group relative cursor-pointer ${
-                      selectedCard === item.data.name
-                        ? "ring-2 ring-blue-500/50 border-blue-500/50 bg-white/5"
-                        : ""
-                    }`}
+                    className={`rounded-lg border-white/10 border bg-black/20 p-4 sm:p-6 hover:bg-white/5 transition-all duration-200 group relative cursor-pointer ${selectedCard === item.data.name
+                      ? "ring-2 ring-blue-500/50 border-blue-500/50 bg-white/5"
+                      : ""
+                      }`}
                   >
                     <div className="flex justify-between items-start">
                       <p className="text-sm font-semibold text-white capitalize hover:text-gray-300 transition-colors">
                         {item.data.name}
                       </p>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${
-                          item.data.isActive
-                            ? "bg-green-500/10 text-green-500"
-                            : "bg-red-500/10 text-red-500"
-                        }`}
+                        className={`px-2 py-1 rounded-full text-xs font-medium ${item.data.isActive
+                          ? "bg-green-500/10 text-green-500"
+                          : "bg-red-500/10 text-red-500"
+                          }`}
                       >
                         {item.data.isActive ? "online" : "offline"}
                       </span>
@@ -325,9 +392,9 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           Last ping:{" "}
                           {item.data.lastPingedAt
                             ? format(
-                                new Date(item.data.lastPingedAt),
-                                "yyyy-MM-dd HH:mm:ss"
-                              )
+                              new Date(item.data.lastPingedAt),
+                              "yyyy-MM-dd HH:mm:ss"
+                            )
                             : "Never"}
                         </span>
                       </p>
@@ -387,11 +454,10 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
         <button
           onClick={nextPage}
           disabled={currentPage === pageCount - 1}
-          className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 -mr-4 sm:-mr-6 text-white rounded-xl transition-all duration-200 ${
-            currentPage === pageCount - 1
-              ? "opacity-0 cursor-not-allowed"
-              : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
-          }`}
+          className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 -mr-4 sm:-mr-6 text-white rounded-xl transition-all duration-200 ${currentPage === pageCount - 1
+            ? "opacity-0 cursor-not-allowed"
+            : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
+            }`}
         >
           <svg
             width="20"
@@ -635,7 +701,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   } else {
                     setDeleteError(
                       result.error ||
-                        "Failed to delete server. Please try again."
+                      "Failed to delete server. Please try again."
                     );
                   }
                   setIsDeleting(false);
@@ -685,44 +751,16 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
               Modify Server
             </h2>
             <form
-              onSubmit={async (e) => {
-                e.preventDefault();
-                setIsModifying(true);
-                setModifyError("");
-                try {
-                  const token = localStorage.getItem("token");
-                  await axios.put(
-                    `http://localhost:5000/api/servers/${serverToModify.id}`,
-                    {
-                      name: modifyForm.name,
-                      url: modifyForm.url,
-                      pingInterval: modifyForm.pingInterval,
-                      failureThreshold: modifyForm.failureThreshold,
-                    },
-                    {
-                      headers: {
-                        "x-auth-token": token,
-                        "Content-Type": "application/json",
-                      },
-                    }
-                  );
-                  setShowModifyDialog(false);
-                  setServerToModify(null);
-                  refetchServers();
-                } catch (err: any) {
-                  let message = "Failed to modify server. Please try again.";
-                  if (
-                    err.response &&
-                    err.response.data &&
-                    err.response.data.message
-                  ) {
-                    message = err.response.data.message;
-                  }
-                  setModifyError(message);
-                } finally {
-                  setIsModifying(false);
-                }
-              }}
+              onSubmit={(e) => handleModifyServer({
+                e,
+                serverToModify,
+                modifyForm,
+                setIsModifying,
+                setModifyError,
+                setShowModifyDialog,
+                setServerToModify,
+                refetchServers
+              })}
               className="flex flex-col gap-4"
             >
               <div className="text-left">

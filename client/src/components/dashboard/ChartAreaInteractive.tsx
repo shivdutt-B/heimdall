@@ -7,17 +7,15 @@ import {
   XAxis,
   YAxis,
 } from "recharts";
-import axios from "axios";
-import { useRecoilState } from "recoil";
-import { pingHistoryAtom } from "../../store/serverAtoms";
 import { ChartAreaSkeleton } from "../../skeletons/dashboard/ChartAreaSkeleton";
-import { useServerPings } from "../../hooks/useServerPings";
 
 interface Props {
   className?: string;
   serverId: string | null;
   selectedDays: number;
   setSelectedDays: (days: number) => void;
+  pings: PingData[];
+  loading: boolean;
 }
 
 interface PingData {
@@ -39,17 +37,15 @@ interface ChartData {
   heap: number | null;
 }
 
-const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes in milliseconds
-
 export const ChartAreaInteractive: React.FC<Props> = ({
   className,
   serverId,
   selectedDays,
   setSelectedDays,
+  pings,
+  loading,
 }) => {
-  const [scrollPosition, setScrollPosition] = useState(0);
   const [daysInput, setDaysInput] = useState(selectedDays.toString());
-  const { data: pings, loading } = useServerPings(serverId, selectedDays);
 
   useEffect(() => {
     setDaysInput(selectedDays.toString());
@@ -123,9 +119,6 @@ export const ChartAreaInteractive: React.FC<Props> = ({
       <div
         id="chart-container"
         className="overflow-x-auto scrollbar scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20 scrollbar-track-gray-900/20 transition-all duration-300 scroll-smooth px-4"
-        onScroll={(e) =>
-          setScrollPosition((e.target as HTMLDivElement).scrollLeft)
-        }
       >
         <div
           className="h-[300px] min-w-[800px] py-4"

@@ -12,9 +12,6 @@ import Profile from "./pages/ProfilePage";
 
 function App() {
   const location = useLocation();
-  // const isDocsPage = location.pathname === "/docs";
-
-  // Call useAuth hook to authenticate user on app load
   useAuth();
 
   return (

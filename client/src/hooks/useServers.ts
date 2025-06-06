@@ -11,7 +11,7 @@ export const useServers = () => {
     try {
       // Add artificial delay for testing
       // await new Promise((resolve) => setTimeout(resolve, 5000));
-      // console.log("Fetching servers======");
+      console.log("Fetching servers======");
       const token = localStorage.getItem("token");
       const response = await axios.get("http://localhost:5000/api/servers", {
         headers: {
@@ -32,6 +32,7 @@ export const useServers = () => {
     }
 
     try {
+      console.log("Fetching servers======info");
       const token = localStorage.getItem("token");
       const response = await axios.get(
         `http://localhost:5000/api/servers/${serverId}`,
@@ -55,9 +56,9 @@ export const useServers = () => {
     }
   };
 
-  // useEffect(() => {
-  //   fetchServers();
-  // }, []);
+  useEffect(() => {
+    fetchServers();
+  }, []);
 
   return { refetchServers: fetchServers, fetchServerDetails };
 };

@@ -2,6 +2,7 @@ import React, { useState, useEffect } from "react";
 import { DashboardLayout } from "../layouts/DashboardLayout";
 import { useRecoilState } from "recoil";
 import { selectedDaysAtom } from "../store/serverAtoms";
+import { useServerPings } from "../hooks/useServerPings";
 
 // Dashboard architecture
 import { SectionCards } from "../components/Dashboard/SectionCards";
@@ -40,6 +41,18 @@ const Dashboard: React.FC = () => {
     isLoading: serversLoading,
   } = useServerData(selectedServer);
 
+  // Get the selected server's ID
+  const selectedServerId = selectedServer
+    ? servers.find((s) => s.name === selectedServer)?.id || null
+    : null;
+
+  // Fetch pings for the selected server
+  const { data: pings, loading: pingsLoading } = useServerPings(
+    selectedServerId,
+    selectedDays,
+    "DashboardPage"
+  );
+
   // Automatically select the first server on mount
   useEffect(() => {
     if (servers.length > 0 && !selectedServer) {
@@ -48,11 +61,6 @@ const Dashboard: React.FC = () => {
   }, [servers, selectedServer]);
 
   // If not authenticated and not loading, redirect to auth page
-
-  // Get the selected server's ID
-  const selectedServerId = selectedServer
-    ? servers.find((s) => s.name === selectedServer)?.id || null
-    : null;
 
   // Get ping counts for the selected server
   const getPingCounts = () => {
@@ -152,6 +160,8 @@ const Dashboard: React.FC = () => {
                 serverId={selectedServerId}
                 selectedDays={selectedDays}
                 setSelectedDays={setSelectedDays}
+                pings={pings}
+                loading={pingsLoading}
               />
             </div>
           </section>
@@ -162,11 +172,10 @@ const Dashboard: React.FC = () => {
               <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
                 <button
                   onClick={() => setStatusFilter("all")}
-                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors ${
-                    statusFilter === "all"
-                      ? "bg-white/20 font-semibold"
-                      : "bg-white/5 hover:bg-white/10"
-                  }`}
+                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors ${statusFilter === "all"
+                    ? "bg-white/20 font-semibold"
+                    : "bg-white/5 hover:bg-white/10"
+                    }`}
                 >
                   All
                   <span className="ml-1.5 bg-white/10 text-xs px-1.5 rounded-full">
@@ -175,11 +184,10 @@ const Dashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setStatusFilter("success")}
-                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${
-                    statusFilter === "success"
-                      ? "bg-white/20 font-semibold"
-                      : "bg-white/5 hover:bg-white/10"
-                  }`}
+                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${statusFilter === "success"
+                    ? "bg-white/20 font-semibold"
+                    : "bg-white/5 hover:bg-white/10"
+                    }`}
                 >
                   Success
                   <span className="bg-green-500/20 text-green-400 text-xs px-1.5 rounded-full">
@@ -188,11 +196,10 @@ const Dashboard: React.FC = () => {
                 </button>
                 <button
                   onClick={() => setStatusFilter("fail")}
-                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${
-                    statusFilter === "fail"
-                      ? "bg-white/20 font-semibold"
-                      : "bg-white/5 hover:bg-white/10"
-                  }`}
+                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${statusFilter === "fail"
+                    ? "bg-white/20 font-semibold"
+                    : "bg-white/5 hover:bg-white/10"
+                    }`}
                 >
                   Fail
                   <span className="bg-red-500/20 text-red-400 text-xs px-1.5 rounded-full">
@@ -203,8 +210,9 @@ const Dashboard: React.FC = () => {
             </div>
             <DataTable
               serverId={selectedServerId}
-              selectedDays={selectedDays}
               statusFilter={statusFilter}
+              pings={pings}
+              loading={pingsLoading}
             />
           </section>
         </div>

@@ -1,14 +1,13 @@
 import React, { useState, useEffect } from "react";
-import axios from "axios";
 import { format } from "date-fns";
 import { DataTableSkeleton } from "../../skeletons/dashboard/DataTableSkeleton";
-import { useServerPings } from "../../hooks/useServerPings";
 
 interface Props {
   className?: string;
   serverId: string | null;
-  selectedDays: number;
   statusFilter: "all" | "success" | "fail";
+  pings: PingData[];
+  loading: boolean;
 }
 
 interface PingData {
@@ -27,14 +26,13 @@ interface PingData {
 export const DataTable: React.FC<Props> = ({
   className,
   serverId,
-  selectedDays,
   statusFilter,
+  pings,
+  loading,
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
   const itemsPerPage = 10;
-
-  const { data: pings, loading } = useServerPings(serverId, selectedDays);
 
   // Filter pings based on status
   const filteredPings = pings.filter((ping) => {
@@ -90,10 +88,9 @@ export const DataTable: React.FC<Props> = ({
                 <td className="p-4 align-middle">
                   <span
                     className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
-                      ${
-                        ping.status
-                          ? "bg-green-500/10 text-green-500"
-                          : "bg-red-500/10 text-red-500"
+                      ${ping.status
+                        ? "bg-green-500/10 text-green-500"
+                        : "bg-red-500/10 text-red-500"
                       }
                     `}
                   >
@@ -109,8 +106,8 @@ export const DataTable: React.FC<Props> = ({
                 <td className="p-4 align-middle text-gray-300">
                   {ping.heapUsage && ping.totalHeap
                     ? `${ping.heapUsage.toFixed(2)}/${ping.totalHeap.toFixed(
-                        2
-                      )} MB`
+                      2
+                    )} MB`
                     : "N/A"}
                 </td>
                 <td className="p-4 align-middle text-gray-300">

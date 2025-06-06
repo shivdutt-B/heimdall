@@ -18,7 +18,7 @@ interface PingData {
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
 
-export const useServerPings = (serverId: string | null, days: number) => {
+export const useServerPings = (serverId: string | null, days: number, msg:string) => {
   const [pingHistory, setPingHistory] = useRecoilState(pingHistoryAtom);
   const [data, setData] = useState<PingData[]>([]);
   const [loading, setLoading] = useState(false);
@@ -43,6 +43,7 @@ export const useServerPings = (serverId: string | null, days: number) => {
       setLoading(true);
       setError(null);
       try {
+        console.log("fetching pings ========)))", msg);
         const token = localStorage.getItem("token");
         const response = await axios.get(
           `http://localhost:5000/api/servers/server-pings?id=${serverId}&days=${days}`,
