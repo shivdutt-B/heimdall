@@ -1,10 +1,10 @@
-import React from 'react'
-import AddServerLayout from '../layouts/AddServer';
+// import React from 'react'
+// import AddServerLayout from '../layouts/AddServer';
 
-function AddServerPage() {
-  return (
-    <AddServerLayout />
-  )
-}
+// function AddServerPage() {
+//   return (
+//     <AddServerLayout />
+//   )
+// }
 
-export default AddServerPage
+// export default AddServerPage
