@@ -16,6 +16,7 @@ interface Props {
   setSelectedDays: (days: number) => void;
   pings: PingData[];
   loading: boolean;
+  hasServers?: boolean;
 }
 
 interface PingData {
@@ -44,6 +45,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
   setSelectedDays,
   pings,
   loading,
+  hasServers = true,
 }) => {
   const [daysInput, setDaysInput] = useState(selectedDays.toString());
 
@@ -51,7 +53,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
     setDaysInput(selectedDays.toString());
   }, [selectedDays]);
 
-  // Calculate the width based on data points (50px per point is a good starting point)
+  // Create chart data
   const chartData: ChartData[] = pings.map((ping) => ({
     date: ping.timestamp,
     rss: ping.rssMemory,
@@ -59,62 +61,82 @@ export const ChartAreaInteractive: React.FC<Props> = ({
   }));
   const chartWidth = Math.max(chartData.length * 50, 800);
 
-  if (!serverId || loading) {
+  if (loading) {
     return <ChartAreaSkeleton className={className} />;
   }
 
-  return (
-    <div
-      className={`rounded-md border border-gray-800 bg-transparent ${className}`}
-    >
-      {/* Chart Header with Navigation */}
-      <div className="flex items-center justify-between p-6 pb-0">
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-blue-500/50"></div>
-            <span className="text-sm font-medium text-white/60">
-              RSS Memory
-            </span>
-          </div>
-          <div className="flex items-center gap-2">
-            <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
-            <span className="text-sm font-medium text-white/60">
-              Heap Memory
-            </span>
-          </div>
+  // Days selection component
+  const DaysSelection = () => (
+    <div className="flex items-center justify-between p-6 pb-0">
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-blue-500/50"></div>
+          <span className="text-sm font-medium text-white/60">RSS Memory</span>
         </div>
-        <div className="flex items-center gap-4">
-          <div className="flex items-center gap-2">
-            <span className="text-sm font-medium text-white/60">Last</span>
-            <input
-              type="number"
-              min="1"
-              max="365"
-              value={daysInput}
-              onChange={(e) => {
-                const value = e.target.value;
-                if (parseInt(value) > 0 && parseInt(value) <= 365) {
-                  setDaysInput(value);
-                }
-              }}
-              className="w-16 px-2 py-1 text-sm font-medium text-white/90 bg-transparent rounded-md border border-gray-700 focus:outline-none"
-            />
-            <span className="text-sm font-medium text-white/60">Days</span>
-            <button
-              onClick={() => {
-                const days = parseInt(daysInput);
-                if (days > 0 && days <= 365) {
-                  setSelectedDays(days);
-                }
-              }}
-              className="px-3 py-1 text-sm font-semibold text-white/90 bg-blue-500 rounded-sm transition-colors cursor-pointer"
-            >
-              Go
-            </button>
-          </div>
+        <div className="flex items-center gap-2">
+          <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
+          <span className="text-sm font-medium text-white/60">Heap Memory</span>
         </div>
       </div>
+      <div className="flex items-center gap-4">
+        <div className="flex items-center gap-2">
+          <span className="text-sm font-medium text-white/60">Last</span>
+          <input
+            type="number"
+            min="1"
+            max="365"
+            value={daysInput}
+            onChange={(e) => {
+              const value = e.target.value;
+              if (parseInt(value) > 0 && parseInt(value) <= 365) {
+                setDaysInput(value);
+              }
+            }}
+            className="w-16 px-2 py-1 text-sm font-medium text-white/90 bg-transparent rounded-md border border-gray-700 focus:outline-none"
+          />
+          <span className="text-sm font-medium text-white/60">Days</span>
+          <button
+            onClick={() => {
+              const days = parseInt(daysInput);
+              if (days > 0 && days <= 365) {
+                setSelectedDays(days);
+              }
+            }}
+            className="px-3 py-1 text-sm font-semibold text-white/90 bg-blue-500 rounded-sm transition-colors cursor-pointer"
+          >
+            Go
+          </button>
+        </div>
+      </div>
+    </div>
+  );
 
+  // Handle empty states
+  const EmptyState = ({ message }: { message: string; showDays?: boolean }) => (
+    <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
+      {/* Only show days selection if we have a server but no data */}
+      {hasServers && serverId && <DaysSelection />}
+      <div className="p-6 text-center">
+        <p className="text-gray-400">{message}</p>
+      </div>
+    </div>
+  );
+
+  if (!hasServers) {
+    return <EmptyState message="No servers found. Add a server to start monitoring memory usage." />;
+  }
+
+  if (!serverId) {
+    return <EmptyState message="Select a server to view memory usage charts" />;
+  }
+
+  if (chartData.length === 0) {
+    return <EmptyState message="No memory usage data available for the selected time period." />;
+  }
+
+  return (
+    <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
+      <DaysSelection />
       {/* Scrollable Chart Container */}
       <div
         id="chart-container"

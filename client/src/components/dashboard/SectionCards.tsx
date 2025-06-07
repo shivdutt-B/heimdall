@@ -23,6 +23,7 @@ interface SectionCardsProps {
   onServerSelect: (serverName: string | null) => void;
   selectedServer?: string | null;
   loading?: boolean;
+  hasServers?: boolean;
 }
 
 // Function to handle adding a new server
@@ -153,6 +154,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   onServerSelect,
   selectedServer: externalSelectedServer,
   loading = false,
+  hasServers = true
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(3);
@@ -229,22 +231,37 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     return <SectionCardsSkeleton />;
   }
 
-  const allItems: CarouselItem[] = [
+  const items: CarouselItem[] = [
     { type: "add-new" },
-    ...(Array.isArray(servers)
-      ? servers.map((server) => ({
-        type: "card" as const,
-        data: {
-          ...server,
-          failureThreshold: (server as any).failureThreshold ?? 3,
-        },
-      }))
-      : []),
+    ...servers.map((server) => ({ type: "card", data: server })),
   ];
 
-  const pageCount = Math.ceil(allItems.length / cardsPerPage);
+  // If there are no servers, show only the add new card with a message
+  if (!hasServers) {
+    return (
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
+        <div
+          onClick={() => { console.log("hi"); setIsDialogOpen(true) }}
+          className="relative flex flex-col items-center justify-center p-6 rounded-lg border border-dashed border-gray-700 bg-black/20 cursor-pointer hover:border-gray-600 transition-colors group"
+        >
+          <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-lg opacity-50 group-hover:opacity-75 transition-opacity" />
+          <div className="relative flex flex-col items-center gap-2">
+            <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
+              <svg className="w-6 h-6 text-gray-400 group-hover:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              </svg>
+            </div>
+            <span className="text-sm font-medium text-gray-400 group-hover:text-gray-300">Add your first server</span>
+            <p className="text-xs text-center text-gray-500 group-hover:text-gray-400">Get started by adding a server to monitor</p>
+          </div>
+        </div>
+      </div >
+    );
+  }
+
+  const pageCount = Math.ceil(items.length / cardsPerPage);
   const startIndex = currentPage * cardsPerPage;
-  const visibleItems = allItems.slice(startIndex, startIndex + cardsPerPage);
+  const visibleItems = items.slice(startIndex, startIndex + cardsPerPage);
 
   const nextPage = () => {
     if (currentPage < pageCount - 1) {

@@ -34,11 +34,11 @@ const Dashboard: React.FC = () => {
     "all"
   );
 
-  // const { isAuthenticated, isLoading: authLoading } = useAuth();
   const {
     servers,
     serverDetails,
     isLoading: serversLoading,
+    hasServers,
   } = useServerData(selectedServer);
 
   // Get the selected server's ID
@@ -53,14 +53,12 @@ const Dashboard: React.FC = () => {
     "DashboardPage"
   );
 
-  // Automatically select the first server on mount
+  // Only auto-select first server if there are servers and none is selected
   useEffect(() => {
     if (servers.length > 0 && !selectedServer) {
       setSelectedServer(servers[0].name);
     }
   }, [servers, selectedServer]);
-
-  // If not authenticated and not loading, redirect to auth page
 
   // Get ping counts for the selected server
   const getPingCounts = () => {
@@ -119,6 +117,7 @@ const Dashboard: React.FC = () => {
                 onServerSelect={setSelectedServer}
                 selectedServer={selectedServer}
                 loading={serversLoading}
+                hasServers={hasServers}
               />
             </div>
           </section>
@@ -144,6 +143,7 @@ const Dashboard: React.FC = () => {
                 selectedServer ? calculateServerStats(selectedServer) : null
               }
               loading={serversLoading}
+              hasServers={hasServers}
             />
           </section>
 
@@ -162,6 +162,7 @@ const Dashboard: React.FC = () => {
                 setSelectedDays={setSelectedDays}
                 pings={pings}
                 loading={pingsLoading}
+                hasServers={hasServers}
               />
             </div>
           </section>
@@ -213,6 +214,7 @@ const Dashboard: React.FC = () => {
               statusFilter={statusFilter}
               pings={pings}
               loading={pingsLoading}
+              hasServers={hasServers}
             />
           </section>
         </div>

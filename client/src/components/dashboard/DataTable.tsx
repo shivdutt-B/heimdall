@@ -8,6 +8,7 @@ interface Props {
   statusFilter: "all" | "success" | "fail";
   pings: PingData[];
   loading: boolean;
+  hasServers?: boolean;
 }
 
 interface PingData {
@@ -29,6 +30,7 @@ export const DataTable: React.FC<Props> = ({
   statusFilter,
   pings,
   loading,
+  hasServers = true
 }) => {
   const [currentPage, setCurrentPage] = useState(1);
   const [totalPages, setTotalPages] = useState(1);
@@ -48,8 +50,29 @@ export const DataTable: React.FC<Props> = ({
     setCurrentPage(1); // Reset to first page when filter changes
   }, [filteredPings.length]);
 
-  if (!serverId || loading) {
+  if (loading) {
     return <DataTableSkeleton className={className} />;
+  }
+
+  // Handle empty states
+  const EmptyState = ({ message }: { message: string }) => (
+    <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
+      <div className="p-6 text-center">
+        <p className="text-gray-400">{message}</p>
+      </div>
+    </div>
+  );
+
+  if (!hasServers) {
+    return <EmptyState message="No servers found. Add a server to view ping history." />;
+  }
+
+  if (!serverId) {
+    return <EmptyState message="Select a server to view ping history" />;
+  }
+
+  if (filteredPings.length === 0) {
+    return <EmptyState message="No ping data available for the selected filter." />;
   }
 
   // Get current page items from filtered data

@@ -18,22 +18,37 @@ interface ServerStats {
 interface ServerStatsCardsProps {
   stats: ServerStats | null;
   loading?: boolean;
+  hasServers?: boolean;
 }
 
 export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
   stats,
   loading = false,
+  hasServers = true,
 }) => {
   if (loading) {
     return <ServerStatsCardsSkeleton />;
   }
 
-  // If no stats are available, show a placeholder state
+  // If no servers are available, show a message
+  if (!hasServers) {
+    return (
+      <div className="grid grid-cols-1 gap-4">
+        <div className="rounded-lg bg-black/20 border border-white/10 p-6 text-center">
+          <p className="text-gray-400">
+            No servers found. Add a server to start monitoring.
+          </p>
+        </div>
+      </div>
+    );
+  }
+
+  // If no stats are available but servers exist, show loading state
   if (!stats) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <div className="rounded-lg bg-black/20 border border-white/10 p-6 text-center">
-          <p className="text-white/60">Select a server to view statistics</p>
+          <p className="text-gray-400">Select a server to view statistics</p>
         </div>
       </div>
     );
