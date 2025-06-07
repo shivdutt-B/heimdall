@@ -26,9 +26,9 @@ interface SectionCardsProps {
 }
 
 // Function to handle adding a new server
-type AddServerParams = { name: string; url: string; pingInterval: number };
+type AddServerParams = { name: string; url: string; pingInterval: number; failureThreshold: number };
 async function addServer(
-  { name, url, pingInterval }: AddServerParams,
+  { name, url, pingInterval, failureThreshold }: AddServerParams,
   token: string | null
 ) {
   try {
@@ -38,6 +38,7 @@ async function addServer(
         name,
         url,
         pingInterval,
+        failureThreshold,
       },
       {
         headers: {
@@ -417,6 +418,14 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           {formatPingInterval(item.data.pingInterval)}
                         </span>
                       </p>
+                      <p className="mt-1 text-[13px] font-medium text-gray-400 flex items-center gap-1">
+                        <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8.37032 11.0726L5.41421 14.0287C4.63317 14.8097 4.63316 16.076 5.41421 16.8571L6.95611 18.399C7.73715 19.18 9.00348 19.18 9.78453 18.399L12.7406 15.4429M11.0726 8.37032L14.0287 5.41421C14.8097 4.63317 16.076 4.63316 16.8571 5.41421L18.399 6.95611C19.18 7.73715 19.18 9.00348 18.399 9.78453L15.4429 12.7406M6.64883 6.64883L4.88296 4.88296M19.0992 19.0992L17.3333 17.3333M9.35119 5.87299V4M14.6488 20V18.127M5.87299 9.35119H4M20 14.6488H18.127" stroke="#99a1af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+
+                        <span className="truncate">
+                          Failure Threshold:{" "}
+                          {item.data.failureThreshold}
+                        </span>
+                      </p>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                       <button
@@ -698,6 +707,17 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     setShowDeleteConfirm(false);
                     setServerToDelete(null);
                     refetchServers();
+                    // Set a new selected server after deletion
+                    setTimeout(() => {
+                      const remainingServers = servers.filter(s => s.id !== serverToDelete.id);
+                      if (remainingServers.length > 0) {
+                        setSelectedCard(remainingServers[0].name);
+                        onServerSelect(remainingServers[0].name);
+                      } else {
+                        setSelectedCard(null);
+                        onServerSelect(null);
+                      }
+                    }, 0);
                   } else {
                     setDeleteError(
                       result.error ||

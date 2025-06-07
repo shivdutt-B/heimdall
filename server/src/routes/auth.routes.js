@@ -2,6 +2,8 @@ const express = require("express");
 const { check } = require("express-validator");
 const authController = require("../controllers/auth.controller");
 const authMiddleware = require("../middleware/auth.middleware");
+// const userController = require("../controllers/user.controller");
+const userController = require("../controllers/user.controller")
 
 const router = express.Router();
 
@@ -37,5 +39,20 @@ router.post(
 // @desc    Get authenticated user
 // @access  Private
 router.get("/me", authMiddleware, authController.getMe);
+
+// Verification code routes
+// router.post(
+//   "/send-code",
+//   [check("email", "Please include a valid email").isEmail()],
+//   userController.sendVerificationCode
+// );
+// router.post(
+//   "/verify-code",
+//   [
+//     check("email", "Please include a valid email").isEmail(),
+//     check("code", "Please include the verification code").not().isEmpty(),
+//   ],
+//   userController.verifyCode
+// );
 
 module.exports = router;

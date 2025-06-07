@@ -5,21 +5,19 @@ const authMiddleware = require("../middleware/auth.middleware");
 
 const router = express.Router();
 
-// All routes require authentication
-router.use(authMiddleware);
-
 // @route   PUT api/users/profile
 // @desc    Update user profile
 // @access  Private
 router.put(
   "/profile",
+  authMiddleware,
   [
     check("name", "Name must not be empty if provided")
       .optional()
       .not()
       .isEmpty(),
     check("email", "Please include a valid email").optional().isEmail(),
-  ],  
+  ],
   userController.updateProfile
 );
 
@@ -28,6 +26,7 @@ router.put(
 // @access  Private
 router.put(
   "/password",
+  authMiddleware,
   [
     check("currentPassword", "Current password is required").exists(),
     check(
@@ -38,5 +37,27 @@ router.put(
   userController.updatePassword
 );
 
+// @route   POST api/users/send-code
+// @desc    Send verification code for email sign in
+// @access  Public
+router.post(
+  "/send-code",
+  [
+    check("email", "Please include a valid email").isEmail(),
+  ],
+  userController.sendVerificationCode
+);
+
+// @route   POST api/users/verify-code
+// @desc    Verify code and sign in
+// @access  Public
+router.post(
+  "/verify-code",
+  [
+    check("email", "Please include a valid email").isEmail(),
+    check("code", "Please include the verification code").not().isEmpty(),
+  ],
+  userController.verifyCodeAndSignIn
+);
 
 module.exports = router;

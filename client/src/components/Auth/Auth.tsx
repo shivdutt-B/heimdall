@@ -1,25 +1,36 @@
-import React from "react";
+import React, { useState } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../Helper/Auth";
 import { useSignIn } from "../../hooks/useSignIn";
 import { useSignUp } from "../../hooks/useSignUp";
-import { useRecoilValue } from "recoil";
+import { useRecoilValue, useSetRecoilState } from "recoil";
 import { authState } from "../../store/auth";
+import { useNavigate } from "react-router-dom";
+import axios from "axios";
 
-const Auth = () => {
+export const Auth = () => {
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
   const auth = useRecoilValue(authState);
+  const setAuth = useSetRecoilState(authState);
+  const navigate = useNavigate();
 
-  const [signInForm, setSignInForm] = React.useState({
+  const [isCodeSignIn, setIsCodeSignIn] = useState(false);
+  const [verificationCode, setVerificationCode] = useState("");
+  const [codeSent, setCodeSent] = useState(false);
+
+  const [signInForm, setSignInForm] = useState({
     email: "",
     password: "",
   });
 
-  const [signUpForm, setSignUpForm] = React.useState({
+  const [signUpForm, setSignUpForm] = useState({
     name: "",
     email: "",
     password: "",
   });
+
+  const [isLoading, setIsLoading] = useState(false);
+  const [error, setError] = useState("");
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
@@ -29,6 +40,79 @@ const Auth = () => {
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
     await signUp(signUpForm);
+  };
+
+
+  const handleSendVerificationCode = async (event: React.FormEvent) => {
+    event.preventDefault();
+    console.log("sending code to", signInForm.email);
+    setIsLoading(true);
+    setError("");
+    setAuth((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/send-code`,
+        { email: signInForm.email }
+      );
+      setCodeSent(true);
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        console.log(err)
+        setError(err.response.data.message);
+      } else {
+        setError("An error occurred while sending the code. Please try again.");
+      }
+    } finally {
+      setIsLoading(false);
+      setAuth((prev) => ({ ...prev, loading: false }));
+    }
+  };
+
+  const handleVerificationCodeSubmit = async (event: React.FormEvent) => {
+    console.log("sending code to");
+    event.preventDefault();
+    setIsLoading(true);
+    setError("");
+    setAuth((prev) => ({ ...prev, loading: true, error: null }));
+
+    try {
+      const response = await axios.post(
+        `${import.meta.env.VITE_BACKEND_URL}/api/users/verify-code`,
+        {
+          email: signInForm.email,
+          code: verificationCode,
+        }
+      );
+
+      if (response.data.token) {
+        localStorage.setItem("token", response.data.token);
+        localStorage.setItem("user", JSON.stringify(response.data.user));
+        setAuth((prev) => ({
+          ...prev,
+          user: response.data.user,
+          token: response.data.token,
+          loading: false,
+          error: null,
+        }));
+        navigate("/dashboard");
+      }
+    } catch (err) {
+      if (axios.isAxiosError(err) && err.response?.data?.message) {
+        setError(err.response.data.message);
+        setAuth((prev) => ({
+          ...prev,
+          loading: false,
+          // error: err.response.data.message,
+        }));
+      } else {
+        const errorMsg = "An error occurred. Please try again.";
+        setError(errorMsg);
+        setAuth((prev) => ({ ...prev, loading: false, error: errorMsg }));
+      }
+    } finally {
+      setIsLoading(false);
+    }
   };
 
   return (
@@ -50,21 +134,33 @@ const Auth = () => {
             </TabsTrigger>
           </TabsList>
 
-          {auth.error && (
+          {error && (
             <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
-              {auth.error}
+              {error}
             </div>
           )}
 
           <TabsContent value="signin" className="animate-fadeIn">
-            <form onSubmit={handleSignIn}>
+            <form
+              onSubmit={
+                isCodeSignIn
+                  ? codeSent
+                    ? handleVerificationCodeSubmit
+                    : handleSendVerificationCode
+                  : handleSignIn
+              }
+            >
               <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px]">
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                     Sign In
                   </h2>
                   <p className="text-sm text-white/60">
-                    Enter your credentials to access your account
+                    {isCodeSignIn
+                      ? codeSent
+                        ? "Enter the verification code sent to your email"
+                        : "Enter your email to receive a verification code"
+                      : "Enter your credentials to access your account"}
                   </p>
                 </div>
                 <div className="space-y-4">
@@ -87,31 +183,73 @@ const Auth = () => {
                       required
                     />
                   </div>
-                  <div className="space-y-2">
-                    <label htmlFor="password" className="text-sm font-medium">
-                      Password
-                    </label>
-                    <input
-                      id="password"
-                      type="password"
-                      value={signInForm.password}
-                      onChange={(e) =>
-                        setSignInForm((prev) => ({
-                          ...prev,
-                          password: e.target.value,
-                        }))
-                      }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
-                      placeholder="••••••••"
-                      required
-                    />
-                  </div>
+                  {!isCodeSignIn && (
+                    <div className="space-y-2">
+                      <label htmlFor="password" className="text-sm font-medium">
+                        Password
+                      </label>
+                      <input
+                        id="password"
+                        type="password"
+                        value={signInForm.password}
+                        onChange={(e) =>
+                          setSignInForm((prev) => ({
+                            ...prev,
+                            password: e.target.value,
+                          }))
+                        }
+                        className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                        placeholder="••••••••"
+                        required
+                      />
+                    </div>
+                  )}
+                  {isCodeSignIn && codeSent && (
+                    <div className="space-y-2">
+                      <label htmlFor="code" className="text-sm font-medium">
+                        Verification Code
+                      </label>
+                      <input
+                        id="code"
+                        type="text"
+                        value={verificationCode}
+                        onChange={(e) => setVerificationCode(e.target.value)}
+                        className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                        placeholder="Enter verification code"
+                        required
+                      />
+                    </div>
+                  )}
                   <button
                     type="submit"
-                    disabled={auth.loading}
+                    disabled={
+                      auth.loading ||
+                      (isCodeSignIn && codeSent && !verificationCode) || // Only check for verification code when code is sent
+                      (!signInForm.email) || // Always require email
+                      (!isCodeSignIn && !signInForm.password) // Require password only for regular sign in
+                    }
                     className="w-full bg-white text-black font-medium py-2 rounded-sm hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
                   >
-                    {auth.loading ? "Signing in..." : "Sign In"}
+                    {auth.loading
+                      ? "Processing..."
+                      : isCodeSignIn
+                        ? codeSent
+                          ? "Verify Code"
+                          : "Send Code"
+                        : "Sign In"}
+                  </button>
+                  <button
+                    type="button" onClick={() => {
+                      setIsCodeSignIn(!isCodeSignIn);
+                      setCodeSent(false);
+                      setVerificationCode("");
+                      setSignInForm(prev => ({ ...prev, password: "" })); // Clear password when switching modes
+                    }}
+                    className="w-full mt-2 bg-transparent border border-white/30 text-white/80 font-medium py-2 rounded-sm hover:bg-white/10 transition-colors"
+                  >
+                    {isCodeSignIn
+                      ? "Sign in with password"
+                      : "Sign in with code"}
                   </button>
                 </div>
               </div>

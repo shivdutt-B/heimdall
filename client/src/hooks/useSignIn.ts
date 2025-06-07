@@ -28,6 +28,7 @@ export const useSignIn = () => {
 
       // Store token in localStorage
       localStorage.setItem("token", token);
+      console.log(response.data);
 
       // Update auth state
       setAuth({
