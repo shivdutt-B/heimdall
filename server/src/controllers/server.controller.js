@@ -164,6 +164,29 @@ exports.updateServer = async (req, res) => {
       return res.status(404).json({ message: "Server not found" });
     }
 
+    // If name or url is being updated, check for duplicates
+    if (name || url) {
+      const duplicateServer = await prisma.server.findFirst({
+        where: {
+          userId: req.user.id,
+          id: { not: req.params.id }, // Exclude current server
+          OR: [
+            { name: name || undefined },
+            { url: url || undefined }
+          ]
+        },
+      });
+
+      if (duplicateServer) {
+        if (duplicateServer.name === name) {
+          return res.status(400).json({ message: "A server with this name already exists" });
+        }
+        if (duplicateServer.url === url) {
+          return res.status(400).json({ message: "A server with this URL already exists" });
+        }
+      }
+    }
+
     // Update server
     const server = await prisma.server.update({
       where: {

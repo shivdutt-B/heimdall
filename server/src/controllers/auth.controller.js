@@ -72,6 +72,7 @@ exports.register = async (req, res) => {
  */
 exports.login = async (req, res) => {
   const errors = validationResult(req);
+  console.log("Login request body:", JSON.stringify(errors));
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
@@ -83,6 +84,8 @@ exports.login = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { email },
     });
+
+    console.log("User found:", user);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });

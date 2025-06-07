@@ -1,4 +1,4 @@
-import React, { useState } from "react";
+import React, { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../Helper/Auth";
 import { useSignIn } from "../../hooks/useSignIn";
 import { useSignUp } from "../../hooks/useSignUp";
@@ -17,6 +17,7 @@ export const Auth = () => {
   const [isCodeSignIn, setIsCodeSignIn] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
+  const [error, setError] = useState("");
 
   const [signInForm, setSignInForm] = useState({
     email: "",
@@ -30,18 +31,33 @@ export const Auth = () => {
   });
 
   const [isLoading, setIsLoading] = useState(false);
-  const [error, setError] = useState("");
+
+  // Auto-clear error messages after 3 seconds
+  useEffect(() => {
+    if (error || auth.error) {
+      const timer = setTimeout(() => {
+        setError("");
+        setAuth((prev) => ({ ...prev, error: null }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, auth.error, setAuth]);
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signIn(signInForm);
+    const result = await signIn(signInForm);
+    if (!result.success) {
+      setError(result.error || "An error occurred during sign in");
+    }
   };
 
   const handleSignUp = async (e: React.FormEvent) => {
     e.preventDefault();
-    await signUp(signUpForm);
+    const result = await signUp(signUpForm);
+    if (!result.success) {
+      setError(result.error || "An error occurred during sign up");
+    }
   };
-
 
   const handleSendVerificationCode = async (event: React.FormEvent) => {
     event.preventDefault();
@@ -58,7 +74,7 @@ export const Auth = () => {
       setCodeSent(true);
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.data?.message) {
-        console.log(err)
+        console.log(err);
         setError(err.response.data.message);
       } else {
         setError("An error occurred while sending the code. Please try again.");
@@ -134,9 +150,9 @@ export const Auth = () => {
             </TabsTrigger>
           </TabsList>
 
-          {error && (
+          {(error || auth.error) && (
             <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
-              {error}
+              {error || auth.error}
             </div>
           )}
 

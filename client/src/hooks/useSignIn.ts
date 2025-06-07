@@ -1,7 +1,8 @@
-import { useSetRecoilState } from "recoil";
+import { useSetRecoilState, useRecoilState } from "recoil";
 import axios, { AxiosError } from "axios";
 import { authState } from "../store/auth";
 import { useNavigate } from "react-router-dom";
+import { useEffect } from "react";
 
 interface SignInCredentials {
   email: string;
@@ -9,8 +10,18 @@ interface SignInCredentials {
 }
 
 export const useSignIn = () => {
-  const setAuth = useSetRecoilState(authState);
+  const [auth, setAuth] = useRecoilState(authState);
   const navigate = useNavigate();
+
+  // Clear error after 3 seconds
+  useEffect(() => {
+    if (auth.error) {
+      const timer = setTimeout(() => {
+        setAuth((prev) => ({ ...prev, error: null }));
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [auth.error, setAuth]);
 
   const signIn = async ({ email, password }: SignInCredentials) => {
     try {
@@ -23,6 +34,10 @@ export const useSignIn = () => {
           password,
         }
       );
+
+      console.log("hii",response.data);
+
+
 
       const { token, user } = response.data;
 
@@ -41,11 +56,14 @@ export const useSignIn = () => {
       // Redirect to dashboard if sign in is successful
       navigate("/dashboard");
 
-      return { success: true };
-    } catch (error) {
-      const errorMessage =
-        (error as AxiosError<{ message: string }>).response?.data?.message ||
-        "An error occurred during sign in";
+      return { success: true };    } catch (error) {
+      let errorMessage = "An error occurred during sign in";
+      
+      // Handle axios error with response
+      if (axios.isAxiosError(error) && error.response?.data) {
+        errorMessage = error.response.data.message || errorMessage;
+      }
+
       setAuth((prev) => ({
         ...prev,
         loading: false,

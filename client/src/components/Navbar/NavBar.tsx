@@ -2,6 +2,7 @@ import React from "react";
 import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue, useResetRecoilState } from "recoil";
 import { authState } from "../../store/auth";
+import { serversAtom, serverDetailsAtom, pingHistoryAtom, selectedDaysAtom } from "../../store/serverAtoms";
 
 const NavBar: React.FC = () => {
   const auth = useRecoilValue(authState);
@@ -9,6 +10,10 @@ const NavBar: React.FC = () => {
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
   const navigate = useNavigate();
   const resetAuth = useResetRecoilState(authState);
+  const resetServers = useResetRecoilState(serversAtom);
+  const resetServerDetails = useResetRecoilState(serverDetailsAtom);
+  const resetPingHistory = useResetRecoilState(pingHistoryAtom);
+  const resetSelectedDays = useResetRecoilState(selectedDaysAtom);
 
   // Close dialog on outside click
   React.useEffect(() => {
@@ -267,6 +272,10 @@ const NavBar: React.FC = () => {
                 onClick={() => {
                   localStorage.removeItem("token");
                   resetAuth();
+                  resetServers();
+                  resetServerDetails();
+                  resetPingHistory();
+                  resetSelectedDays();
                   setShowLogoutConfirm(false);
                   setShowUserDialog(false);
                   navigate("/");

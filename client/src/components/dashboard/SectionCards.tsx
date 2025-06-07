@@ -192,7 +192,6 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
       return () => clearTimeout(timer);
     }
   }, [formError]);
-
   // Automatically clear delete error after 3 seconds
   useEffect(() => {
     if (deleteError) {
@@ -200,6 +199,14 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
       return () => clearTimeout(timer);
     }
   }, [deleteError]);
+
+  // Automatically clear modify error after 3 seconds
+  useEffect(() => {
+    if (modifyError) {
+      const timer = setTimeout(() => setModifyError(""), 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [modifyError]);
 
   // Update cards per page based on screen size
   useEffect(() => {
@@ -241,7 +248,11 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-4">
         <div
-          onClick={() => { console.log("hi"); setIsDialogOpen(true) }}
+          onClick={(e) => {
+            e.preventDefault();
+            e.stopPropagation();
+            setIsDialogOpen(true);
+          }}
           className="relative flex flex-col items-center justify-center p-6 rounded-lg border border-dashed border-gray-700 bg-black/20 cursor-pointer hover:border-gray-600 transition-colors group"
         >
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-lg opacity-50 group-hover:opacity-75 transition-opacity" />
@@ -255,6 +266,189 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
             <p className="text-xs text-center text-gray-500 group-hover:text-gray-400">Get started by adding a server to monitor</p>
           </div>
         </div>
+
+        {/* Make sure the dialog is rendered even in empty state */}
+        {isDialogOpen && (
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-bg-[#27272a] p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px] backdrop-blur-sm">
+            <div className="bg-[#181A20] rounded-lg p-0 w-full max-w-md shadow-lg">
+              <form
+                onSubmit={async (e) => {
+                  e.preventDefault();
+                  setFormError("");
+                  setIsSubmitting(true);
+                  const token = localStorage.getItem("token");
+                  const result = await addServer(form, token);
+                  if (result.success) {
+                    setIsDialogOpen(false);
+                    setForm({
+                      name: "",
+                      url: "",
+                      pingInterval: 60,
+                      failureThreshold: 3,
+                    });
+                    refetchServers();
+                    setIsSubmitting(false);
+                  } else {
+                    setFormError(
+                      result.error || "Failed to add server. Please try again."
+                    );
+                    setIsSubmitting(false);
+                  }
+                }}
+                className="bg-black p-6 border border-gray-700 shadow-lg rounded-lg min-h-[400px]"
+              >
+                <div className="mb-4">
+                  <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
+                    Add New Server
+                  </h2>
+                  <p className="text-sm text-white/60">
+                    Enter the details to add a new server to your dashboard
+                  </p>
+                </div>
+                <div className="space-y-4">
+                  <div className="space-y-2">
+                    <label
+                      className="text-sm font-sm text-white"
+                      htmlFor="server-name"
+                    >
+                      Server Name
+                    </label>
+                    <input
+                      id="server-name"
+                      type="text"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                      value={form.name}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, name: e.target.value }))
+                      }
+                      placeholder="My Server"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      className="text-sm font-sm text-white"
+                      htmlFor="server-url"
+                    >
+                      URL
+                    </label>
+                    <input
+                      id="server-url"
+                      type="url"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                      value={form.url}
+                      onChange={(e) =>
+                        setForm((f) => ({ ...f, url: e.target.value }))
+                      }
+                      placeholder="https://example.com"
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      className="text-sm font-sm text-white"
+                      htmlFor="ping-interval"
+                    >
+                      Ping Interval (seconds)
+                    </label>
+                    <input
+                      id="ping-interval"
+                      type="number"
+                      min={10}
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                      value={form.pingInterval}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          pingInterval: Number(e.target.value),
+                        }))
+                      }
+                      required
+                    />
+                  </div>
+                  <div className="space-y-2">
+                    <label
+                      className="text-sm font-sm text-white flex items-center gap-1"
+                      htmlFor="failure-threshold"
+                    >
+                      Failure Threshold
+                      <div className="relative group cursor-pointer mb-1">
+                        <span className="text-white font-bold border-[1px] py-[1px] px-[6px] rounded-full text-[10px]">
+                          !
+                        </span>
+                        <div className="absolute z-10 hidden group-hover:block w-56 p-2 bg-gray-800 text-white text-xs rounded shadow-lg top-full left-1/2 -translate-x-1/2 mt-1">
+                          Alerts you after this many consecutive server failures.
+                        </div>
+                      </div>
+                    </label>
+
+                    <select
+                      id="failure-threshold"
+                      className="w-full p-2 border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm bg-black"
+                      value={form.failureThreshold}
+                      onChange={(e) =>
+                        setForm((f) => ({
+                          ...f,
+                          failureThreshold: Number(e.target.value),
+                        }))
+                      }
+                      required
+                    >
+                      {[...Array(10)].map((_, i) => (
+                        <option key={i + 1} value={i + 1}>
+                          {i + 1}
+                        </option>
+                      ))}
+                    </select>
+                  </div>
+                  {formError && (
+                    <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
+                      {formError}
+                    </div>
+                  )}
+                  <div className="flex justify-end gap-2 mt-6">
+                    <button
+                      type="button"
+                      className="px-4 py-2 bg-red-500 text-white rounded-sm hover:bg-red-700 transition-colors cursor-pointer text-[15px] font-semibold"
+                      onClick={() => setIsDialogOpen(false)}
+                    >
+                      Cancel
+                    </button>
+                    <button
+                      type="submit"
+                      className="px-4 py-2 bg-white text-black font-medium rounded-sm hover:bg-white/90 transition-colors transform duration-200 text-sm cursor-pointer flex items-center justify-center gap-2"
+                      disabled={isSubmitting}
+                    >
+                      {isSubmitting && (
+                        <svg
+                          className="animate-spin h-5 w-5 text-black"
+                          xmlns="http://www.w3.org/2000/svg"
+                          fill="none"
+                          viewBox="0 0 24 24"
+                        >
+                          <circle
+                            className="opacity-25"
+                            cx="12"
+                            cy="12"
+                            r="10"
+                            stroke="currentColor"
+                            strokeWidth="4"
+                          ></circle>
+                          <path
+                            className="opacity-75"
+                            fill="currentColor"
+                            d="M4 12a8 8 0 018-8v4a4 4 0 00-4 4H4z"
+                          ></path>
+                        </svg>
+                      )}
+                      {isSubmitting ? "Adding..." : "Add Server"}
+                    </button>
+                  </div>
+                </div>
+              </form>
+            </div>
+          </div>
+        )}
       </div >
     );
   }
@@ -539,11 +733,6 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                 <p className="text-sm text-white/60">
                   Enter the details to add a new server to your dashboard
                 </p>
-                {formError && (
-                  <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
-                    {formError}
-                  </div>
-                )}
               </div>
               <div className="space-y-4">
                 <div className="space-y-2">
@@ -621,7 +810,6 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                       </div>
                     </div>
                   </label>
-
                   <select
                     id="failure-threshold"
                     className="w-full p-2 border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm bg-black"
@@ -641,6 +829,11 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     ))}
                   </select>
                 </div>
+                {formError && (
+                  <div className="mt-3 p-2 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
+                    {formError}
+                  </div>
+                )}
                 <div className="flex justify-end gap-2 mt-6">
                   <button
                     type="button"

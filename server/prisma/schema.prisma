@@ -23,7 +23,7 @@ model Server {
   id           String        @id @default(uuid())
   userId       String        @map("user_id")
   url          String
-  name         String
+  name         String        @unique
   isActive     Boolean       @default(true) @map("is_active")
   pingInterval Int           @default(300) @map("ping_interval") // in seconds
   createdAt    DateTime      @default(now()) @map("created_at")
