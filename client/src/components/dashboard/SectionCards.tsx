@@ -161,10 +161,11 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const [selectedCard, setSelectedCard] = useState<string | null>(null);
   const servers = useRecoilValue(serversAtom);
   const [isDialogOpen, setIsDialogOpen] = useState(false);
+  // Initialize forms with 300 seconds (5 minutes) as default
   const [form, setForm] = useState({
     name: "",
     url: "",
-    pingInterval: 60,
+    pingInterval: 300,
     failureThreshold: 3,
   });
   const [formError, setFormError] = useState("");
@@ -179,7 +180,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const [modifyForm, setModifyForm] = useState({
     name: "",
     url: "",
-    pingInterval: 60,
+    pingInterval: 300,
     failureThreshold: 3,
   });
   const [isModifying, setIsModifying] = useState(false);
@@ -350,19 +351,27 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                       htmlFor="ping-interval"
                     >
                       Ping Interval (seconds)
+                      <span className="text-xs ml-1 text-gray-400">(Minimum: 5 minutes / 300 seconds)</span>
                     </label>
                     <input
                       id="ping-interval"
                       type="number"
-                      min={10}
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
-                      value={form.pingInterval}
-                      onChange={(e) =>
+                      min={300}
+                      onKeyDown={(e) => {
+                        // Prevent typing negative numbers
+                        if (e.key === "-" || e.key === "e") {
+                          e.preventDefault();
+                        }
+                      }}
+                      onChange={(e) => {
+                        const value = Number(e.target.value);
                         setForm((f) => ({
                           ...f,
-                          pingInterval: Number(e.target.value),
-                        }))
-                      }
+                          pingInterval: value < 300 ? 300 : value,
+                        }));
+                      }}
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                      value={form.pingInterval}
                       required
                     />
                   </div>
@@ -478,6 +487,22 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     if (seconds < 60) return `${seconds}s`;
     const minutes = Math.floor(seconds / 60);
     return `${minutes}m`;
+  };
+
+  // Update the handler for ping interval changes
+  const handlePingIntervalChange = (value: number, setter: typeof setForm | typeof setModifyForm) => {
+    const minInterval = 300; // 5 minutes in seconds
+    setter(prev => ({
+      ...prev,
+      pingInterval: value < minInterval ? minInterval : value
+    }));
+  };
+
+  // Prevent invalid input in ping interval field
+  const handlePingIntervalKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
+    if (e.key === "-" || e.key === "e") {
+      e.preventDefault();
+    }
   };
 
   return (
@@ -779,19 +804,27 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     htmlFor="ping-interval"
                   >
                     Ping Interval (seconds)
+                    <span className="text-xs ml-1 text-gray-400">(Minimum: 5 minutes / 300 seconds)</span>
                   </label>
                   <input
                     id="ping-interval"
                     type="number"
-                    min={10}
-                    className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
-                    value={form.pingInterval}
-                    onChange={(e) =>
+                    min={300}
+                    onKeyDown={(e) => {
+                      // Prevent typing negative numbers
+                      if (e.key === "-" || e.key === "e") {
+                        e.preventDefault();
+                      }
+                    }}
+                    onChange={(e) => {
+                      const value = Number(e.target.value);
                       setForm((f) => ({
                         ...f,
-                        pingInterval: Number(e.target.value),
-                      }))
-                    }
+                        pingInterval: value < 300 ? 300 : value,
+                      }));
+                    }}
+                    className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm"
+                    value={form.pingInterval}
                     required
                   />
                 </div>
@@ -1019,21 +1052,27 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   required
                 />
               </div>
-              <div className="text-left">
-                <label className="block text-white/80 mb-1 text-sm">
-                  Ping Interval (seconds)
-                </label>
+              <div className="text-left">                <label className="block text-white/80 mb-1 text-sm">
+                Ping Interval (seconds)
+                <span className="text-xs ml-1 text-gray-400">(Minimum: 5 minutes / 300 seconds)</span>
+              </label>
                 <input
                   type="number"
-                  min={10}
+                  min={300}
                   className="w-full px-3 py-2 rounded bg-transparent text-white text-sm border border-gray-700 focus:outline-none"
                   value={modifyForm.pingInterval}
-                  onChange={(e) =>
+                  onKeyDown={(e) => {
+                    if (e.key === "-" || e.key === "e") {
+                      e.preventDefault();
+                    }
+                  }}
+                  onChange={(e) => {
+                    const value = Number(e.target.value);
                     setModifyForm((f) => ({
                       ...f,
-                      pingInterval: Number(e.target.value),
-                    }))
-                  }
+                      pingInterval: value < 300 ? 300 : value,
+                    }));
+                  }}
                   required
                 />
               </div>

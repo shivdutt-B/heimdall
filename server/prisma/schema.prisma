@@ -29,6 +29,7 @@ model Server {
   createdAt    DateTime      @default(now()) @map("created_at")
   updatedAt    DateTime      @updatedAt @map("updated_at")
   lastPingedAt DateTime?     @map("last_pinged_at")
+  nextPingAt   DateTime      @default(now()) @map("next_ping_at")
   user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   pingHistory  PingHistory[]
   failureThreshold Int @default(3) @map("failure_threshold") // min 1, max 10

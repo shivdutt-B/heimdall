@@ -104,18 +104,19 @@ exports.createServer = async (req, res) => {
   const { url, name, pingInterval, failureThreshold } = req.body;
   console.log(req.body);
 
-  try {
-    // Prevent duplicate servers (by url or name for this user)
+  try {    // Prevent duplicate servers (by url or name across all users)
     const existingServer = await prisma.server.findFirst({
       where: {
-        userId: req.user.id,
         OR: [{ url: url }, { name: name }],
       },
     });
     if (existingServer) {
-      return res
-        .status(400)
-        .json({ message: "A server with this URL or name already exists." });
+      if (existingServer.name === name) {
+        return res.status(400).json({ message: "This server name is already in use." });
+      }
+      if (existingServer.url === url) {
+        return res.status(400).json({ message: "This server URL is already being monitored." });
+      }
     }
 
     // Create server with default alert settings
@@ -162,13 +163,10 @@ exports.updateServer = async (req, res) => {
 
     if (!existingServer) {
       return res.status(404).json({ message: "Server not found" });
-    }
-
-    // If name or url is being updated, check for duplicates
+    }    // If name or url is being updated, check for duplicates across all users
     if (name || url) {
       const duplicateServer = await prisma.server.findFirst({
         where: {
-          userId: req.user.id,
           id: { not: req.params.id }, // Exclude current server
           OR: [
             { name: name || undefined },
@@ -179,10 +177,10 @@ exports.updateServer = async (req, res) => {
 
       if (duplicateServer) {
         if (duplicateServer.name === name) {
-          return res.status(400).json({ message: "A server with this name already exists" });
+          return res.status(400).json({ message: "This server name is already in use by another user" });
         }
         if (duplicateServer.url === url) {
-          return res.status(400).json({ message: "A server with this URL already exists" });
+          return res.status(400).json({ message: "This server URL is already being monitored by another user" });
         }
       }
     }

@@ -1,0 +1,24 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model Server {
+  id              String        @id @default(uuid())
+  userId          String        @map("user_id")
+  url             String
+  name            String        @unique
+  isActive        Boolean       @default(true) @map("is_active")
+  pingInterval    Int           @default(300) @map("ping_interval")
+  createdAt       DateTime      @default(now()) @map("created_at")
+  updatedAt       DateTime      @updatedAt @map("updated_at")
+  lastPingedAt    DateTime?     @map("last_pinged_at")
+  nextPingAt      DateTime      @default(now()) @map("next_ping_at")
+  failureThreshold Int          @default(3) @map("failure_threshold")
+
+  @@map("servers")
+}
