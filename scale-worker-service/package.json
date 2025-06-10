@@ -1,0 +1,20 @@
+{
+    "name": "scale-worker-service",
+    "version": "1.0.0",
+    "description": "Auto-scales BullMQ worker containers based on queue load",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "bullmq": "^4.12.0",
+        "dotenv": "^16.3.1"
+    },
+    "devDependencies": {
+        "@types/node": "^20.4.0",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.1.6"
+    }
+}

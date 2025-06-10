@@ -1,0 +1,24 @@
+{
+    "name": "alert-service",
+    "version": "1.0.0",
+    "description": "Email alert service for Heimdall monitoring",
+    "main": "dist/index.js",
+    "scripts": {
+        "build": "tsc",
+        "start": "node dist/index.js",
+        "dev": "ts-node src/index.ts"
+    },
+    "dependencies": {
+        "@prisma/client": "^5.0.0",
+        "bullmq": "^4.12.0",
+        "dotenv": "^16.3.1",
+        "nodemailer": "^6.9.3",
+        "prisma": "^5.0.0"
+    },
+    "devDependencies": {
+        "@types/node": "^20.4.0",
+        "@types/nodemailer": "^6.4.8",
+        "ts-node": "^10.9.1",
+        "typescript": "^5.1.6"
+    }
+}

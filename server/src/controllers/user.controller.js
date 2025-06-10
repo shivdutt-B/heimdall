@@ -75,11 +75,11 @@ exports.updateProfile = async (req, res) => {
 
       // Send verification email
       try {
-        await sendEmail({
-          to: email,
-          subject: 'Verify Your New Email',
-          text: `Please verify your new email address by entering this code: ${verificationCode}. This code will expire in ${VERIFICATION_CODE_EXPIRY / 60000} minutes.`,
-        });
+        // await sendEmail({
+        //   to: email,
+        //   subject: 'Verify Your New Email',
+        //   text: `Please verify your new email address by entering this code: ${verificationCode}. This code will expire in ${VERIFICATION_CODE_EXPIRY / 60000} minutes.`,
+        // });
       } catch (emailError) {
         console.error('Error sending email verification:', emailError);
         throw new Error('Failed to send verification email');

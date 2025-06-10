@@ -15,25 +15,27 @@ model User {
   createdAt DateTime @default(now()) @map("created_at")
   updatedAt DateTime @updatedAt @map("updated_at")
   Server    Server[]
+  Alert     Alert[]
 
   @@map("users")
 }
 
 model Server {
-  id           String        @id @default(uuid())
-  userId       String        @map("user_id")
-  url          String
-  name         String        @unique
-  isActive     Boolean       @default(true) @map("is_active")
-  pingInterval Int           @default(300) @map("ping_interval") // in seconds
-  createdAt    DateTime      @default(now()) @map("created_at")
-  updatedAt    DateTime      @updatedAt @map("updated_at")
-  lastPingedAt DateTime?     @map("last_pinged_at")
-  nextPingAt   DateTime      @default(now()) @map("next_ping_at")
-  user         User          @relation(fields: [userId], references: [id], onDelete: Cascade)
-  pingHistory  PingHistory[]
-  failureThreshold Int @default(3) @map("failure_threshold") // min 1, max 10
-  consecutiveFailures Int @default(0) @map("consecutive_failures")
+  id                  String        @id @default(uuid())
+  userId              String        @map("user_id")
+  url                 String
+  name                String        @unique
+  isActive            Boolean       @default(true) @map("is_active")
+  pingInterval        Int           @default(300) @map("ping_interval") // in seconds
+  createdAt           DateTime      @default(now()) @map("created_at")
+  updatedAt           DateTime      @updatedAt @map("updated_at")
+  lastPingedAt        DateTime?     @map("last_pinged_at")
+  nextPingAt          DateTime      @default(now()) @map("next_ping_at")
+  user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
+  pingHistory         PingHistory[]
+  failureThreshold    Int           @default(3) @map("failure_threshold") // min 1, max 10
+  consecutiveFailures Int           @default(0) @map("consecutive_failures")
+  alert               Alert?
 
   @@map("servers")
 }
@@ -62,4 +64,18 @@ model VerificationCode {
   createdAt DateTime @default(now()) @map("created_at")
 
   @@map("verification_codes")
+}
+
+model Alert {
+  id          String   @id @default(uuid())
+  serverId    String   @unique @map("server_id")
+  userId      String   @map("user_id")
+  lastAlertAt DateTime @map("last_alert_at")
+  nextAlertAt DateTime @map("next_alert_at")
+  createdAt   DateTime @default(now()) @map("created_at")
+
+  server Server @relation(fields: [serverId], references: [id], onDelete: Cascade)
+  user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
+
+  @@map("alerts")
 }

@@ -1,6 +1,6 @@
 const { PrismaClient } = require("@prisma/client");
 const { validationResult } = require("express-validator");
-const { refreshServerCache } = require("../utils/scheduler");
+// const { refreshServerCache } = require("../utils/scheduler");
 
 const prisma = new PrismaClient();
 
@@ -201,7 +201,7 @@ exports.updateServer = async (req, res) => {
     });
 
     // Refresh the server cache to update the server's properties
-    await refreshServerCache();
+    // await refreshServerCache();
 
     res.json(server);
   } catch (err) {
@@ -236,7 +236,7 @@ exports.deleteServer = async (req, res) => {
     });
 
     // Refresh the server cache to remove the deleted server
-    await refreshServerCache();
+    // await refreshServerCache();
 
     res.json({ message: "Server removed" });
   } catch (err) {

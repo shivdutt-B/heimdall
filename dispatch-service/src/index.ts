@@ -1,17 +1,33 @@
 import { PrismaClient } from '@prisma/client';
-import { Queue, Job } from 'bullmq';
+import { Queue, Job, QueueEvents } from 'bullmq';
 import * as dotenv from 'dotenv';
 
 dotenv.config();
 
 const prisma = new PrismaClient();
-const pingQueue = new Queue('ping-queue', {
-    connection: {
-        host: process.env.REDIS_HOST || 'localhost',
-        port: parseInt(process.env.REDIS_PORT || '6379'),
-        username: process.env.REDIS_USERNAME,
-        password: process.env.REDIS_PASSWORD
-    },
+
+interface PingJob {
+    serverId: string;
+    url: string;
+    userId: string;
+}
+
+// Enhanced Redis configuration
+const redisConfig = {
+    host: process.env.REDIS_HOST || 'localhost',
+    port: parseInt(process.env.REDIS_PORT || '6379'),
+    username: process.env.REDIS_USERNAME,
+    password: process.env.REDIS_PASSWORD,
+    maxRetriesPerRequest: 3,
+    retryStrategy: (times: number) => {
+        const delay = Math.min(times * 1000, 5000);
+        console.log(`[${new Date().toISOString()}] Retrying Redis connection in ${delay}ms... (attempt ${times})`);
+        return delay;
+    }
+};
+
+const pingQueue = new Queue<PingJob>('ping-queue', {
+    connection: redisConfig,
     defaultJobOptions: {
         attempts: 3,                    // Try each job up to 3 times
         backoff: {                     // Exponential backoff between retries
@@ -27,18 +43,18 @@ const pingQueue = new Queue('ping-queue', {
     }
 });
 
-interface PingJob {
-    serverId: string;
-    url: string;
-    userId: string;
-}
+// Create queue events instance
+const queueEvents = new QueueEvents('ping-queue', {
+    connection: redisConfig
+});
 
 async function findServersToDispatch() {
     try {
         /*
             This function finds all active servers that need to be pinged.
             It checks for servers that are active and whose nextPingAt time is less than or equal to the current time.
-        */        const servers = await prisma.server.findMany({
+        */       
+        const servers = await prisma.server.findMany({
         where: {
             nextPingAt: { lte: new Date() }
         }
@@ -75,7 +91,8 @@ async function findServersToDispatch() {
 }
 
 // Get dispatch interval from env or default to 60 seconds
-const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '60000');
+// const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '60000');
+const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '10000');
 
 // Run the dispatcher every DISPATCH_INTERVAL milliseconds
 setInterval(findServersToDispatch, DISPATCH_INTERVAL);
@@ -83,22 +100,66 @@ setInterval(findServersToDispatch, DISPATCH_INTERVAL);
 // Initial run
 findServersToDispatch();
 
-// Handle Redis connection errors
-pingQueue.on('error', (error) => {
-    console.error('Redis Queue Error:', error);
+// Enhanced queue event handling
+queueEvents.on('error', (error) => {
+    console.error(`[${new Date().toISOString()}] Redis Queue Error:`, error);
 });
+
+queueEvents.on('waiting', ({ jobId }) => {
+    console.log(`[${new Date().toISOString()}] Job ${jobId} is waiting to be processed`);
+});
+
+queueEvents.on('failed', ({ jobId, failedReason }) => {
+    console.error(`[${new Date().toISOString()}] Job ${jobId} failed:`, failedReason);
+});
+
+queueEvents.on('removed', ({ jobId }) => {
+    console.log(`[${new Date().toISOString()}] Job ${jobId} was removed`);
+});
+
+// Cleanup function for graceful shutdown
+async function cleanup() {
+    console.log(`[${new Date().toISOString()}] Starting cleanup...`);
+    try {
+        // Close database connection
+        await prisma.$disconnect();
+        console.log('Database connection closed');
+
+        // Close queue and events connections
+        await Promise.all([
+            pingQueue.close(),
+            queueEvents.close()
+        ]);
+        console.log('Queue connections closed');
+    } catch (error) {
+        console.error('Error during cleanup:', error);
+        process.exit(1);
+    }
+}
 
 // Handle process termination
 process.on('SIGTERM', async () => {
-    await prisma.$disconnect();
-    await pingQueue.close();
+    console.log('Received SIGTERM. Shutting down gracefully...');
+    await cleanup();
+    process.exit(0);
+});
+
+process.on('SIGINT', async () => {
+    console.log('Received SIGINT. Shutting down gracefully...');
+    await cleanup();
     process.exit(0);
 });
 
 // Handle uncaught exceptions
 process.on('uncaughtException', async (error) => {
     console.error('Uncaught Exception:', error);
-    await prisma.$disconnect();
-    await pingQueue.close();
+    await cleanup();
+    process.exit(1);
+});
+
+// Handle unhandled promise rejections
+process.on('unhandledRejection', async (reason, promise) => {
+    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
+    await cleanup();
     process.exit(1);
 });

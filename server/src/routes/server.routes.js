@@ -31,7 +31,7 @@ router.get("/:id", serverController.getServerById);
 // @access  Private
 router.post(
   "/", [
-  check("url", "Valid URL is required").isURL(),
+  // check("url", "Valid URL is required").isURL(),
   check("name", "Name is required").not().isEmpty(),
   check("pingInterval", "Ping interval must be at least 300 seconds (5 minutes)")
     .optional()
