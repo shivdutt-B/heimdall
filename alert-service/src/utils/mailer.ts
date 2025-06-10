@@ -15,38 +15,132 @@ export async function sendImmediateAlert(server: Server, user: User) {
         to: user.email,
         subject: `🚨 Alert: ${server.name} is down!`,
         html: `
-        <div style="width:100%; background-color: #040506;">
-            <div style="font-family: Arial, sans-serif; max-width:600px; margin: 0 auto; background-color: #040506; color: #e2e8f0; padding: 30px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.4);">
-                <!-- Logo -->
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="https://raw.githubusercontent.com/shivdutt-B/heimdall/refs/heads/main/server/assets/logo/heimdall-logo.png" width="60" height="60" alt="Heimdall Logo" style="margin: 0 auto;" />
-                </div>
-
-                <!-- Alert Box -->
-                <div style="background-color: #101112; padding: 25px; border-radius: 8px; margin: 20px 0;">
-                    <h2 style="color: #ef4444; margin-top: 0; font-weight: 550">Server Down Alert</h2>
-                    <p style="color: #e2e8f0;">Your server <strong style="color: #ffffff;">${server.name}</strong> has failed to respond after ${server.failureThreshold} consecutive attempts.</p>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Heimdall Server Alert</title>
+        </head>
+        <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #000000 0%, #111827 50%, #1f2937 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; min-height: 100vh;">
+            
+            <!-- Outer Container -->
+            <div style="width: 100%; padding: 40px 20px; background: linear-gradient(135deg, #000000 0%, #111827 50%, #1f2937 100%);">
+                
+                <!-- Main Email Container -->
+                <div style="max-width: 600px; margin: 0 auto; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(75, 85, 99, 0.3);">
                     
-                    <div style="background-color: #27272a; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                        <h3 style="color: #e2e8f0; margin-top: 0;">Server Details</h3>
-                        <ul style="list-style: none; padding: 0; margin: 0;">
-                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">URL:</strong> <span style="color: #e2e8f0;">${server.url}</span></li>
-                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Last Checked:</strong> <span style="color: #e2e8f0;">${server.lastPingedAt?.toLocaleString()}</span></li>
-                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Consecutive Failures:</strong> <span style="color: #ef4444;">${server.consecutiveFailures}</span></li>
-                        </ul>
+                    <!-- Header with Logo -->
+                    <div style="background: linear-gradient(135deg, #000000 0%, #1f2937 100%); padding: 32px 10px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        
+                        <div style="position: relative; z-index: 2; flex-direction:column; justify-content:center; align-items:center;">
+                            <img src="https://raw.githubusercontent.com/shivdutt-B/heimdall/refs/heads/main/server/assets/logo/heimdall-logo-transparent.png" 
+                                 width="90" height="90" alt="Heimdall Logo" 
+                                 style="margin-bottom: 16px;display:block;margin:auto; border-radius: 50%;" />
+                            <h1 style="color: #ffffff;display:block; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.025em;">Server Alert</h1>
+                            <p style="color: rgba(255, 255, 255, 0.7); display:block; margin: 8px 0 0 0; font-size: 16px; font-weight: 500;">Critical Monitoring Notification</p>
+                        </div>
                     </div>
                     
-                    <p style="color: #94a3b8; font-size: 14px;">We'll continue monitoring and send you updates every 24 hours until the server recovers.</p>
+                    <!-- Main Content -->
+                    <div style="padding: 40px;">
+                        
+                        <!-- Alert Status -->
+                        <div style="background: rgba(239, 68, 68, 0.1); border: 2px solid #ef4444; border-radius: 12px; padding: 28px; margin-bottom: 32px; position: relative; overflow: hidden;">
+                            
+                            <!-- Alert Icon & Title -->
+                            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                                
+                                    <span style="margin-right: 14px; font-size: 22px;">🚨</span>
+                                <div>
+                                    <h2 style="color: #ef4444; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.025em;">Server Down Detected</h2>
+                                    <p style="color: #9ca3af; margin: 4px 0 0 0; font-size: 15px; font-weight: 500;">Immediate attention required</p>
+                                </div>
+                            </div>
+                            
+                            <p style="color: #e5e7eb; margin: 0; font-size: 17px; line-height: 1.6;">
+                                Your server <strong style="color: #ffffff; background: rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 5px; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.2);">${server.name}</strong> has failed to respond after <strong style="color: #ef4444; font-size: 18px;">${server.failureThreshold}</strong> consecutive monitoring attempts.
+                            </p>
+                        </div>
+                        
+                        <!-- Server Details Card -->
+                        <div style="background: linear-gradient(135deg, #111827 0%, #1f2937 100%); border-radius: 12px; padding: 32px; margin-bottom: 32px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); border: 1px solid rgba(75, 85, 99, 0.3);">
+                            <h3 style="color: #f9fafb; margin: 0 0 24px 0; font-size: 22px; font-weight: 700; display: flex; align-items: center;">
+                                <span style="margin-right: 14px; font-size: 22px;">🖥️</span>
+                                Server Information
+                            </h3>
+                            
+                            <div style="space-y: 18px;">
+                                <!-- URL -->
+                                <div style="padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 10px; margin-bottom: 18px; border-left: 5px solid #ffffff; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Server URL</span>
+                                    </div>
+                                    <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.url}</p>
+                                </div>
+                                
+                                <!-- Last Checked -->
+                                <div style="padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 10px; margin-bottom: 18px; border-left: 5px solid #9ca3af; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Last Checked</span>
+                                    </div>
+                                     <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.lastPingedAt?.toLocaleString()}</p>
+                                </div>
+                                
+                                <!-- Consecutive Failures -->
+                                <div style="padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 10px; margin-bottom: 0; border-left: 5px solid #ef4444; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Consecutive Failures</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-top: 10px;">
+                                        <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.consecutiveFailures}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Message -->
+                        <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                <div>
+                                    <span style="margin-right: 14px; font-size: 22px;">🔁</span>
+                                </div>
+                                <h4 style="color: #f9fafb; margin-top: 8px; font-size: 18px; font-weight: 700;">Monitoring Status</h4>
+                            </div>
+                            <p style="color: #d1d5db; margin: 0; font-size: 15px; line-height: 1.6;">
+                                We'll continue monitoring your server and send you status updates every <strong style="color: #ffffff;">24 hours</strong> until the server recovers. You'll receive an immediate notification as soon as your server is back online.
+                            </p>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div style="text-align: center; margin-bottom: 32px;">
+                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard" 
+                               style="display: block; background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%); color: #000000; padding: 18px 36px; text-decoration: none; border-radius: 9px; font-weight: 700; font-size: 17px; letter-spacing: 0.025em; box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1); margin-right: 16px; border: 2px solid rgba(255, 255, 255, 0.3);">
+                                🚀 Go To Dashboard
+                            </a>
+                        </div>
+                        
+                        <!-- Divider -->
+                        <div style="height: 2px; background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%); margin: 32px 0;"></div>
+                        
+                        <!-- Footer -->
+                        <div style="text-align: center;">
+                            <p style="color: #9ca3af; margin: 0 0 8px 0; font-size: 15px; line-height: 1.6;">
+                                This alert was generated by <strong style="color: #ffffff;">Heimdall Server Monitor</strong><br>
+                                Keeping your infrastructure secure and monitored 24/7
+                            </p>
+                            <p style="color: #6b7280; margin: 0; font-size: 13px;">
+                                Generated at ${new Date().toLocaleTimeString()}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard" 
-                       style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: 500;">
-                        View Dashboard
-                    </a>
-                </div>
+                
+                <!-- Bottom Spacing -->
+                <div style="height: 40px;"></div>
             </div>
-        </div>
+        </body>
+        </html>
         `
     };
 
@@ -60,44 +154,146 @@ export async function sendImmediateAlert(server: Server, user: User) {
 }
 
 export async function sendRecurringAlert(server: Server, user: User, downtime: string) {
+    const alertId = `HMD-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
     const mailOptions = {
         from: process.env.FROM_EMAIL,
         to: user.email,
         subject: `⚠️ Reminder: ${server.name} is still down`,
         html: `
-        <div style="width:100%; background-color: #040506;">
-            <div style="font-family: Arial, sans-serif; max-width:600px; margin: 0 auto; background-color: #040506; color: #e2e8f0; padding: 30px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.4);">
-                <!-- Logo -->
-                <div style="text-align: center; margin-bottom: 20px;">
-                    <img src="https://raw.githubusercontent.com/shivdutt-B/heimdall/refs/heads/main/server/assets/logo/heimdall-logo.png" width="60" height="60" alt="Heimdall Logo" style="margin: 0 auto;" />
-                </div>
-
-                <!-- Alert Box -->
-                <div style="background-color: #101112; padding: 25px; border-radius: 8px; margin: 20px 0;">
-                    <h2 style="color: #eab308; margin-top: 0;">Server Still Down</h2>
-                    <p style="color: #e2e8f0;">Your server <strong style="color: #ffffff;">${server.name}</strong> is still unresponsive.</p>
+        <!DOCTYPE html>
+        <html lang="en">
+        <head>
+            <meta charset="UTF-8">
+            <meta name="viewport" content="width=device-width, initial-scale=1.0">
+            <title>Heimdall Server Alert</title>
+        </head>
+        <body style="margin: 0; padding: 0; background: linear-gradient(135deg, #000000 0%, #111827 50%, #1f2937 100%); font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif; min-height: 100vh;">
+            
+            <!-- Outer Container -->
+            <div style="width: 100%; padding: 40px 20px; background: linear-gradient(135deg, #000000 0%, #111827 50%, #1f2937 100%);">
+                
+                <!-- Main Email Container -->
+                <div style="max-width: 600px; margin: 0 auto; background: rgba(17, 24, 39, 0.95); backdrop-filter: blur(15px); border-radius: 20px; overflow: hidden; box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.8), 0 0 0 1px rgba(75, 85, 99, 0.3);">
                     
-                    <div style="background-color: #27272a; padding: 15px; border-radius: 5px; margin: 20px 0;">
-                        <h3 style="color: #e2e8f0; margin-top: 0;">Server Details</h3>
-                        <ul style="list-style: none; padding: 0; margin: 0;">
-                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">URL:</strong> <span style="color: #e2e8f0;">${server.url}</span></li>
-                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Last Checked:</strong> <span style="color: #e2e8f0;">${server.lastPingedAt?.toLocaleString()}</span></li>
-                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Total Downtime:</strong> <span style="color: #eab308;">${downtime}</span></li>
-                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Consecutive Failures:</strong> <span style="color: #ef4444;">${server.consecutiveFailures}</span></li>
-                        </ul>
+                    <!-- Header with Logo -->
+                    <div style="background: linear-gradient(135deg, #000000 0%, #1f2937 100%); padding: 32px 40px; text-align: center; position: relative; overflow: hidden; border-bottom: 1px solid rgba(255, 255, 255, 0.1);">
+                        <!-- Decorative Elements -->
+                        <div style="position: absolute; top: -50px; right: -50px; width: 100px; height: 100px; background: rgba(255, 255, 255, 0.05); border-radius: 50%; opacity: 0.7;"></div>
+                        <div style="position: absolute; bottom: -30px; left: -30px; width: 60px; height: 60px; background: rgba(255, 255, 255, 0.03); border-radius: 50%; opacity: 0.5;"></div>
+                        <div style="position: absolute; top: 20px; left: 20px; width: 40px; height: 40px; background: rgba(255, 255, 255, 0.03); border-radius: 50%; opacity: 0.3;"></div>
+                        
+                        <div style="position: relative; z-index: 2; display:flex; flex-direction:column; justify-content:center; align-items:center;">
+                            <img src="https://raw.githubusercontent.com/shivdutt-B/heimdall/refs/heads/main/server/assets/logo/heimdall-logo-transparent.png" 
+                                 width="90" height="90" alt="Heimdall Logo" 
+                                 style="margin-bottom: 16px; border-radius: 50%;" />
+                            <h1 style="color: #ffffff; margin: 0; font-size: 32px; font-weight: 800; letter-spacing: -0.025em;">Server Status Update</h1>
+                            <p style="color: rgba(255, 255, 255, 0.7); margin: 8px 0 0 0; font-size: 16px; font-weight: 500;">Ongoing Monitoring Notification</p>
+                        </div>
                     </div>
                     
-                    <p style="color: #94a3b8; font-size: 14px;">We'll continue monitoring and send you another update in 24 hours if the server remains down.</p>
+                    <!-- Main Content -->
+                    <div style="padding: 40px;">
+                        
+                        <!-- Alert Status -->
+                        <div style="background: rgba(234, 179, 8, 0.1); border: 2px solid #eab308; border-radius: 12px; padding: 28px; margin-bottom: 32px; position: relative; overflow: hidden;">
+                            
+                            <!-- Alert Icon & Title -->
+                            <div style="display: flex; align-items: center; margin-bottom: 20px;">
+                                <div style="width: 52px; height: 52px; background: #eab308; border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 18px; box-shadow: 0 6px 20px rgba(234, 179, 8, 0.4);">
+                                    <span style="color: white; font-size: 26px;">⚠️</span>
+                                </div>
+                                <div>
+                                    <h2 style="color: #eab308; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.025em;">Server Still Down</h2>
+                                    <p style="color: #9ca3af; margin: -3px 0 0 2px; font-size: 15px; font-weight: 500;">Extended downtime detected</p>
+                                </div>
+                            </div>
+                            
+                            <p style="color: #e5e7eb; margin: 0; font-size: 17px; line-height: 1.6;">
+                                Your server <strong style="color: #ffffff; background: rgba(255, 255, 255, 0.1); padding: 4px 12px; border-radius: 5px; font-weight: 700; border: 1px solid rgba(255, 255, 255, 0.2);">${server.name}</strong> has been down for <strong style="color: #eab308; font-size: 18px;">${downtime}</strong>.
+                            </p>
+                        </div>
+                        
+                        <!-- Server Details Card -->
+                        <div style="background: linear-gradient(135deg, #111827 0%, #1f2937 100%); border-radius: 12px; padding: 32px; margin-bottom: 32px; box-shadow: 0 8px 25px rgba(0, 0, 0, 0.4); border: 1px solid rgba(75, 85, 99, 0.3);">
+                            <h3 style="color: #f9fafb; margin: 0 0 24px 0; font-size: 22px; font-weight: 700; display: flex; align-items: center;">
+                                <span style="margin-right: 14px; font-size: 22px;">🖥️</span>
+                                Server Information
+                            </h3>
+                            
+                            <div style="space-y: 18px;">
+                                <!-- URL -->
+                                <div style="padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 10px; margin-bottom: 18px; border-left: 5px solid #ffffff; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Server URL</span>
+                                        <span style="color: #ffffff; font-size: 16px; font-weight: 500;">🌐</span>
+                                    </div>
+                                    <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.url}</p>
+                                </div>
+                                
+                                <!-- Last Checked -->
+                                <div style="padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 10px; margin-bottom: 18px; border-left: 5px solid #9ca3af; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Last Checked</span>
+                                        <span style="color: #9ca3af; font-size: 16px; font-weight: 500;">⏰</span>
+                                    </div>
+                                    <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 17px; font-weight: 600;">${server.lastPingedAt?.toLocaleString()}</p>
+                                </div>
+                                
+                                <!-- Consecutive Failures -->
+                                <div style="padding: 20px; background: rgba(0, 0, 0, 0.4); border-radius: 10px; margin-bottom: 0; border-left: 5px solid #ef4444; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                    <div style="display: flex; justify-content: space-between; align-items: center;">
+                                        <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Consecutive Failures</span>
+                                    </div>
+                                    <div style="display: flex; align-items: center; margin-top: 10px;">
+                                         <p style="color: #f3f4f6; display:inline-block; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.consecutiveFailures}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Status Message -->
+                        <div style="background: rgba(255, 255, 255, 0.05); border: 2px solid rgba(255, 255, 255, 0.2); border-radius: 12px; padding: 24px; margin-bottom: 32px;">
+                            <div style="display: flex; align-items: center; margin-bottom: 16px;">
+                                <div style="width: 40px; height: 40px; background: rgba(255, 255, 255, 0.1); border-radius: 50%; display: flex; align-items: center; justify-content: center; margin-right: 16px; border: 1px solid rgba(255, 255, 255, 0.2);">
+                                    <span style="color: white; font-size: 18px;">ℹ️</span>
+                                </div>
+                                <h4 style="color: #f9fafb; margin: 0; font-size: 18px; font-weight: 700;">Monitoring Status</h4>
+                            </div>
+                            <p style="color: #d1d5db; margin: 0; font-size: 15px; line-height: 1.6;">
+                                We'll continue monitoring your server and send you another status update in <strong style="color: #ffffff;">24 hours</strong> if the server remains down. You'll receive an immediate notification as soon as your server is back online.
+                            </p>
+                        </div>
+                        
+                        <!-- Action Buttons -->
+                        <div style="text-align: center; margin-bottom: 32px;">
+                            <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard" 
+                               style="display: block; background: linear-gradient(135deg, #ffffff 0%, #e5e7eb 100%); color: #000000; padding: 18px 36px; text-decoration: none; border-radius: 9px; font-weight: 700; font-size: 17px; letter-spacing: 0.025em; box-shadow: 0 8px 25px rgba(255, 255, 255, 0.1); margin-right: 16px; border: 2px solid rgba(255, 255, 255, 0.3);">
+                                🚀 Go To Dashboard
+                            </a>
+                        </div>
+                        
+                        <!-- Divider -->
+                        <div style="height: 2px; background: linear-gradient(90deg, transparent 0%, rgba(255, 255, 255, 0.2) 50%, transparent 100%); margin: 32px 0;"></div>
+                        
+                        <!-- Footer -->
+                        <div style="text-align: center;">
+                            <p style="color: #9ca3af; margin: 0 0 8px 0; font-size: 15px; line-height: 1.6;">
+                                This alert was generated by <strong style="color: #ffffff;">Heimdall Server Monitor</strong><br>
+                                Keeping your infrastructure secure and monitored 24/7
+                            </p>
+                            <p style="color: #6b7280; margin: 0; font-size: 13px;">
+                                Alert ID: <code style="background: rgba(255, 255, 255, 0.1); padding: 2px 6px; border-radius: 4px; color: #d1d5db; border: 1px solid rgba(255, 255, 255, 0.2);">${alertId}</code> | 
+                                Generated at ${new Date().toLocaleTimeString()}
+                            </p>
+                        </div>
+                    </div>
                 </div>
-
-                <div style="text-align: center; margin-top: 20px;">
-                    <a href="${process.env.FRONTEND_URL || 'http://localhost:3000'}/dashboard" 
-                       style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: 500;">
-                        View Dashboard
-                    </a>
-                </div>
+                
+                <!-- Bottom Spacing -->
+                <div style="height: 40px;"></div>
             </div>
-        </div>
+        </body>
+        </html>
         `
     };
 
