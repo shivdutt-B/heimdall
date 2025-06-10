@@ -71,7 +71,7 @@ app.use((err, req, res, next) => {
 });
 
 // Start servers on 5 consecutive ports
-const BASE_PORT = parseInt(process.env.PORT || 3000);
+const BASE_PORT = parseInt(process.env.PORT || 3001);
 const NUM_SERVERS = 5;
 
 for (let i = 0; i < NUM_SERVERS; i++) {

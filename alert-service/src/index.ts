@@ -25,12 +25,12 @@ function formatDowntime(startDate: Date): string {
 }
 
 async function checkForNewFailures() {
+    console.log("running 1m check for immediate alerts");
     try {
-        // Find servers that just hit their failure threshold
+        // Find servers that hit their failure threshold
         const failedServers = await prisma.server.findMany({
             where: {
                 isActive: false,
-                alert: null, // No alert record exists yet
                 consecutiveFailures: {
                     not: 0 // Must have at least one failure
                 }
@@ -42,25 +42,14 @@ async function checkForNewFailures() {
 
         // Process each failed server that has hit its threshold
         for (const server of failedServers) {
-            // Only create alert if consecutive failures equals threshold
+            // Only send alert if consecutive failures equals threshold
             if (server.consecutiveFailures === server.failureThreshold) {
                 try {
-                    // Send immediate alert
+                    // Send immediate alert email only
                     await sendImmediateAlert(server, server.user);
-
-                    // Create alert record
-                    await prisma.alert.create({
-                        data: {
-                            serverId: server.id,
-                            userId: server.userId,
-                            lastAlertAt: new Date(),
-                            nextAlertAt: new Date(Date.now() + ALERT_RECURRING_INTERVAL)
-                        }
-                    });
-
-                    console.log(`Created new alert for server ${server.name} (${server.consecutiveFailures}/${server.failureThreshold} failures)`);
+                    console.log(`Sent alert email for server ${server.name} (${server.consecutiveFailures}/${server.failureThreshold} failures)`);
                 } catch (error) {
-                    console.error(`Error processing immediate alert for server ${server.name}:`, error);
+                    console.error(`Error sending alert email for server ${server.name}:`, error);
                 }
             }
         }
@@ -70,12 +59,13 @@ async function checkForNewFailures() {
 }
 
 async function checkForRecurringAlerts() {
+    console.log("running 24hr check for recurring alerts");
     try {
-        // Find alerts that need to be sent
+        // Find existing alerts that need to be sent (created by worker service)
         const pendingAlerts = await prisma.alert.findMany({
             where: {
                 nextAlertAt: {
-                    lte: new Date()
+                    lte: new Date() // Only get alerts that are due
                 }
             },
             include: {
@@ -93,13 +83,23 @@ async function checkForRecurringAlerts() {
                 const { server } = alert;
                 if (!server || !server.user) continue;
 
-                // Calculate downtime
+                // Verify alert still exists and get latest data
+                const alertStillExists = await prisma.alert.findUnique({
+                    where: { id: alert.id }
+                });
+
+                if (!alertStillExists) {
+                    console.log(`Alert ${alert.id} no longer exists, skipping`);
+                    continue;
+                }
+
+                // Calculate downtime since alert was created
                 const downtime = formatDowntime(alert.createdAt);
 
-                // Send recurring alert
+                // Send recurring alert email
                 await sendRecurringAlert(server, server.user, downtime);
 
-                // Update alert timestamps
+                // Update next alert time (24 hours from now)
                 await prisma.alert.update({
                     where: { id: alert.id },
                     data: {
@@ -108,7 +108,7 @@ async function checkForRecurringAlerts() {
                     }
                 });
 
-                console.log(`Sent recurring alert for server ${server.name}`);
+                console.log(`Sent recurring alert for server ${server.name}, next alert in 24 hours`);
             } catch (error) {
                 console.error(`Error processing recurring alert for alert ${alert.id}:`, error);
             }
@@ -117,7 +117,7 @@ async function checkForRecurringAlerts() {
         console.error('Error in checkForRecurringAlerts:', error);
     }
 }
-
+ 
 // Start the service
 console.log('🚀 Alert service starting...');
 

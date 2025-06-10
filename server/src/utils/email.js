@@ -91,28 +91,43 @@ const sendServerDownAlert = async ({ to, serverName, serverUrl, downtime }) => {
     to,
     subject: `🚨 Alert: ${serverName} is down!`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #e53e3e;">Server Alert: ${serverName} is Down</h2>
-        <p>Heimdall has detected that your server <strong>${serverName}</strong> is currently down.</p>
-        
-        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #e53e3e; margin: 20px 0;">
-          <p><strong>Server URL:</strong> ${serverUrl}</p>
-          <p><strong>Downtime:</strong> ${downtime} minutes</p>
-          <p><strong>Status:</strong> Unreachable</p>
+        <div style="width:100%; background-color: #040506;">
+            <div style="font-family: Arial, sans-serif; max-width:600px; margin: 0 auto; background-color: #040506; color: #e2e8f0; padding: 30px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.4);">
+                <!-- Logo -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://raw.githubusercontent.com/shivdutt-B/heimdall/refs/heads/main/server/assets/logo/heimdall-logo.png" width="60" height="60" alt="Heimdall Logo" style="margin: 0 auto;" />
+                </div>
+
+                <!-- Alert Box -->
+                <div style="background-color: #101112; padding: 25px; border-radius: 8px; margin: 20px 0;">
+                    <h2 style="color: #ef4444; margin-top: 0;">Server Alert: ${serverName} is Down</h2>
+                    <p style="color: #e2e8f0;">Heimdall has detected that your server <strong style="color: #ffffff;">${serverName}</strong> is currently down.</p>
+                    
+                    <div style="background-color: #27272a; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <h3 style="color: #e2e8f0; margin-top: 0;">Server Details</h3>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">URL:</strong> <span style="color: #e2e8f0;">${serverUrl}</span></li>
+                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Downtime:</strong> <span style="color: #eab308;">${downtime} minutes</span></li>
+                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Status:</strong> <span style="color: #ef4444;">Unreachable</span></li>
+                        </ul>
+                    </div>
+                    
+                    <p style="color: #94a3b8;">Please check your server as soon as possible. You can view more details in your Heimdall dashboard.</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="${process.env.FRONTEND_URL || "http://localhost:3000"}/dashboard" 
+                       style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: 500;">
+                        View Dashboard
+                    </a>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 12px; color: #718096; text-align: center;">
+                    This is an automated alert from the Heimdall monitoring system. If you no longer wish to receive these alerts, 
+                    you can adjust your notification settings in your Heimdall dashboard.
+                </p>
+            </div>
         </div>
-        
-        <p>Please check your server as soon as possible. You can view more details in your Heimdall dashboard.</p>
-        
-        <a href="${process.env.FRONTEND_URL || "http://localhost:3000"
-      }/dashboard" style="display: inline-block; background-color: #3182ce; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px;">
-          View Dashboard
-        </a>
-        
-        <p style="margin-top: 30px; font-size: 12px; color: #718096;">
-          This is an automated alert from the Heimdall monitoring system. If you no longer wish to receive these alerts, 
-          you can adjust your notification settings in your Heimdall dashboard.
-        </p>
-      </div>
     `,
   };
 
@@ -139,28 +154,43 @@ const sendServerRecoveredAlert = async ({
     to,
     subject: `✅ Server Recovered: ${serverName} is back online`,
     html: `
-      <div style="font-family: Arial, sans-serif; max-width: 600px; margin: 0 auto;">
-        <h2 style="color: #38a169;">Server Recovered: ${serverName} is Back Online</h2>
-        <p>Good news! Heimdall has detected that your server <strong>${serverName}</strong> is back online.</p>
-        
-        <div style="background-color: #f8f9fa; padding: 15px; border-left: 4px solid #38a169; margin: 20px 0;">
-          <p><strong>Server URL:</strong> ${serverUrl}</p>
-          <p><strong>Total Downtime:</strong> ${downtime} minutes</p>
-          <p><strong>Status:</strong> Online</p>
+        <div style="width:100%; background-color: #040506;">
+            <div style="font-family: Arial, sans-serif; max-width:600px; margin: 0 auto; background-color: #040506; color: #e2e8f0; padding: 30px; border-radius: 5px; box-shadow: 0 0 10px rgba(0,0,0,0.4);">
+                <!-- Logo -->
+                <div style="text-align: center; margin-bottom: 20px;">
+                    <img src="https://raw.githubusercontent.com/shivdutt-B/heimdall/refs/heads/main/server/assets/logo/heimdall-logo.png" width="60" height="60" alt="Heimdall Logo" style="margin: 0 auto;" />
+                </div>
+
+                <!-- Alert Box -->
+                <div style="background-color: #101112; padding: 25px; border-radius: 8px; margin: 20px 0;">
+                    <h2 style="color: #22c55e; margin-top: 0;">Server Recovered: ${serverName} is Back Online</h2>
+                    <p style="color: #e2e8f0;">Good news! Heimdall has detected that your server <strong style="color: #ffffff;">${serverName}</strong> is back online.</p>
+                    
+                    <div style="background-color: #27272a; padding: 15px; border-radius: 5px; margin: 20px 0;">
+                        <h3 style="color: #e2e8f0; margin-top: 0;">Server Details</h3>
+                        <ul style="list-style: none; padding: 0; margin: 0;">
+                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">URL:</strong> <span style="color: #e2e8f0;">${serverUrl}</span></li>
+                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Total Downtime:</strong> <span style="color: #eab308;">${downtime} minutes</span></li>
+                            <li style="margin: 10px 0;"><strong style="color: #94a3b8;">Status:</strong> <span style="color: #22c55e;">Online</span></li>
+                        </ul>
+                    </div>
+                    
+                    <p style="color: #94a3b8;">You can view more details and performance metrics in your Heimdall dashboard.</p>
+                </div>
+
+                <div style="text-align: center; margin-top: 20px;">
+                    <a href="${process.env.FRONTEND_URL || "http://localhost:3000"}/dashboard" 
+                       style="display: inline-block; background-color: #3b82f6; color: white; padding: 12px 25px; text-decoration: none; border-radius: 5px; font-weight: 500;">
+                        View Dashboard
+                    </a>
+                </div>
+
+                <p style="margin-top: 30px; font-size: 12px; color: #718096; text-align: center;">
+                    This is an automated alert from the Heimdall monitoring system. If you no longer wish to receive these alerts, 
+                    you can adjust your notification settings in your Heimdall dashboard.
+                </p>
+            </div>
         </div>
-        
-        <p>You can view more details and performance metrics in your Heimdall dashboard.</p>
-        
-        <a href="${process.env.FRONTEND_URL || "http://localhost:3000"
-      }/dashboard" style="display: inline-block; background-color: #3182ce; color: white; padding: 10px 20px; text-decoration: none; border-radius: 4px; margin-top: 10px;">
-          View Dashboard
-        </a>
-        
-        <p style="margin-top: 30px; font-size: 12px; color: #718096;">
-          This is an automated alert from the Heimdall monitoring system. If you no longer wish to receive these alerts, 
-          you can adjust your notification settings in your Heimdall dashboard.
-        </p>
-      </div>
     `,
   };
 
