@@ -1,127 +1,312 @@
-# Heimdall - Server Monitoring & Keep-Alive Platform
+<div style="font-family: Arial, sans-serif;">
 
-Heimdall is a full-stack web application that monitors your servers, keeps them alive, and provides analytics on their performance.
+# 🛡️ Heimdall
+### Server Uptime & Cold Start Monitoring Platform
 
-## Features
+<div align="center">
 
-- **User Authentication**: Secure login and registration system
-- **Server Management**: Add, edit, and remove servers to monitor
-- **Keep-Alive Service**: Automatically ping your servers to prevent them from going to sleep
-- **Performance Metrics**: Track response times, uptime percentages, and more
-- **Alert System**: Get notified when your servers go down
-- **Analytics Dashboard**: Visualize server performance with interactive charts
+[![Node.js](https://img.shields.io/badge/Built%20With-Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+[![BullMQ](https://img.shields.io/badge/Queue-BullMQ-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://docs.bullmq.io/)
+[![Prisma](https://img.shields.io/badge/ORM-Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
+[![Nodemailer](https://img.shields.io/badge/Email-Nodemailer-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://nodemailer.com/)
+[![License](https://img.shields.io/github/license/yourusername/heimdall?style=for-the-badge)](LICENSE)
 
-## Tech Stack
+</div>
 
-- **Frontend**: React, Tailwind CSS
-- **Backend**: Node.js, Express
-- **Database**: PostgreSQL with Prisma ORM
-- **Authentication**: JWT
-- **Job Scheduling**: Node-cron
-- **Email Alerts**: Nodemailer
+---
 
-## Getting Started
+## 🌟 Overview
 
-### Prerequisites
+**Heimdall** is a comprehensive ping and uptime monitoring platform designed to eliminate cold starts on free hosting platforms like **Render**, **Railway**, and **Fly.io**. By intelligently pinging your backend servers at customizable intervals, Heimdall ensures optimal performance while providing detailed analytics and instant alerts.
 
-- Node.js (v14+)
-- PostgreSQL
-- npm or yarn
+> **🎯 Mission**: Keep your servers warm, your users happy, and your deployments reliable.
 
-### Installation
+---
 
-1. Clone the repository:
+## ✨ Key Features
 
-   ```
-   git clone https://github.com/yourusername/heimdall.git
-   cd heimdall
-   ```
+<table>
+<tr>
+<td width="50%">
 
-2. Install dependencies:
+### 🚀 **Performance Optimization**
+- **Cold Start Prevention** — Reduce delays by 30-50 seconds
+- **Intelligent Pinging** — Customizable intervals per server
+- **Smart Resource Management** — Heap & RSS memory tracking
 
-   ```
-   # Install backend dependencies
-   cd backend
-   npm install
+</td>
+<td width="50%">
 
-   # Install frontend dependencies
-   cd ../frontend
-   npm install
-   ```
+### 📊 **Advanced Monitoring**
+- **Real-time Metrics** — Response time, uptime %, status codes
+- **Interactive Dashboard** — Visual latency trends and history
+- **Performance Analytics** — Comprehensive server health insights
 
-3. Set up environment variables:
+</td>
+</tr>
+<tr>
+<td width="50%">
 
-   ```
-   # Create .env file in the backend directory
-   cd ../backend
-   cp .env.example .env
-   ```
+### 🔔 **Intelligent Alerting**
+- **Email Notifications** — Instant failure alerts
+- **Smart Spam Prevention** — Configurable thresholds
+- **24/7 Monitoring** — Continuous health checks
 
-4. Update the `.env` file with your database credentials and JWT secret.
+</td>
+<td width="50%">
 
-5. Set up the database:
+### 🏗️ **Scalable Architecture**
+- **6-Microservice Design** — Clean separation of concerns
+- **Queue-Based Processing** — BullMQ + Redis integration
+- **Horizontal Scaling** — Load balancer ready
 
-   ```
-   npx prisma migrate dev
-   ```
+</td>
+</tr>
+</table>
 
-6. Start the development servers:
+---
 
-   ```
-   # Start backend (from backend directory)
-   npm run dev
+## 🏛️ Architecture Overview
 
-   # Start frontend (from frontend directory)
-   cd ../frontend
-   npm start
-   ```
+<div align="center">
+<img src="./readme.assets/architecture.jpg" alt="Heimdall Architecture" width="400px" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+</div>
 
-## Project Structure
+### 🧱 Microservices Breakdown
+
+| 🎯 Service | 📝 Description | 🔧 Technology |
+|------------|-----------------|---------------|
+| **🌐 API Service** | User management, authentication, server CRUD operations | Express.js, Prisma |
+| **⚡ Queue Service** | Job scheduling and Redis queue management | BullMQ, Redis |
+| **🔍 Ping Worker** | Server pinging, performance metrics collection | Node.js, HTTP clients |
+| **📧 Alert Service** | Email notifications and alert management | Nodemailer, SMTP |
+| **⚖️ Load Balancer** | Worker distribution and scaling (Optional) | Custom Node.js |
+| **💻 Client Dashboard** | Interactive monitoring interface | React, TailwindCSS |
+
+---
+
+## 🛠️ Technology Stack
+
+### 🖥️ **Backend Infrastructure**
+| Technology | Badge | Purpose |
+|------------|-------|---------|
+| **Node.js** | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white) | Runtime Environment |
+| **Express.js** | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white) | Web Framework |
+| **Prisma** | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white) | ORM & Database Client |
+
+### 🗄️ **Database & Storage**
+| Technology | Badge | Purpose |
+|------------|-------|---------|
+| **PostgreSQL** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white) | Primary Database |
+| **Redis** | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) | Caching & Queue Storage |
+
+### 📬 **Queue System**
+| Technology | Badge | Purpose |
+|------------|-------|---------|
+| **BullMQ** | ![BullMQ](https://img.shields.io/badge/BullMQ-FF6B6B?style=flat-square&logo=redis&logoColor=white) | Job Queue Management |
+| **Redis Queue** | ![Redis](https://img.shields.io/badge/Redis_Queue-DC382D?style=flat-square&logo=redis&logoColor=white) | Queue Backend |
+
+### 🎨 **Frontend**
+| Technology | Badge | Purpose |
+|------------|-------|---------|
+| **React** | ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black) | UI Library |
+| **TailwindCSS** | ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | Styling Framework |
+
+### 📧 **Communication**
+| Technology | Badge | Purpose |
+|------------|-------|---------|
+| **Nodemailer** | ![Nodemailer](https://img.shields.io/badge/Nodemailer-EA4335?style=flat-square&logo=gmail&logoColor=white) | Email Service |
+| **SMTP** | ![SMTP](https://img.shields.io/badge/SMTP-FF6B35?style=flat-square&logo=mail.ru&logoColor=white) | Email Protocol |
+
+### 🚀 **DevOps & Deployment**
+| Technology | Badge | Purpose |
+|------------|-------|---------|
+| **Docker** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | Containerization |
+| **Render** | ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white) | Cloud Platform |
+| **Railway** | ![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white) | Hosting Platform |
+| **AWS EC2** | ![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=flat-square&logo=amazon-aws&logoColor=white) | Cloud Compute |
+| **AWS Services** | ![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat-square&logo=amazon-aws&logoColor=white) | Cloud Infrastructure |
+
+---
+
+## 🚀 Quick Start Guide
+
+### 📋 Prerequisites
+
+Ensure you have the following installed:
+- **Node.js** (v18 or higher)
+- **pnpm** (Package manager)
+- **Docker** (For Redis & PostgreSQL)
+- **Git**
+
+### ⚡ Installation Steps
+
+```bash
+# 1️⃣ Clone the repository
+git clone https://github.com/yourusername/heimdall.git
+cd heimdall
+
+# 2️⃣ Install dependencies across all services
+pnpm install
+
+# 3️⃣ Start infrastructure services
+docker-compose up -d
+
+# 4️⃣ Configure environment variables
+cp .env.example .env
+# Edit .env with your configuration
+
+# 5️⃣ Initialize database
+pnpm prisma migrate dev
+pnpm prisma generate
+
+# 6️⃣ Start all services concurrently
+pnpm dev
+```
+
+### 🔧 Individual Service Commands
+
+```bash
+# Start specific services
+pnpm --filter api-service dev      # 🌐 API Server
+pnpm --filter worker dev           # 🔍 Ping Worker
+pnpm --filter alert-service dev    # 📧 Alert Service
+pnpm --filter queue-service dev    # ⚡ Queue Service
+pnpm --filter client dev           # 💻 Dashboard
+```
+
+---
+
+## 📁 Project Structure
 
 ```
 heimdall/
-├── backend/            # Backend Node.js/Express API
-│   ├── prisma/         # Prisma schema and migrations
-│   └── src/
-│       ├── config/     # Configuration files
-│       ├── controllers/# Route controllers
-│       ├── middleware/ # Custom middleware
-│       ├── models/     # Data models
-│       ├── routes/     # API routes
-│       └── utils/      # Utility functions
-├── frontend/           # React frontend
-│   └── src/
-│       ├── components/ # React components
-│       ├── contexts/   # React contexts
-│       ├── hooks/      # Custom hooks
-│       ├── pages/      # Page components
-│       └── services/   # API service functions
-└── README.md           # Project documentation
+├── 🌐 api-service/           # REST API & Authentication
+│   ├── src/
+│   │   ├── controllers/      # Route handlers
+│   │   ├── middleware/       # Auth & validation
+│   │   └── routes/          # API endpoints
+│   └── package.json
+│
+├── 🔍 worker/               # Ping Processing Engine
+│   ├── src/
+│   │   ├── jobs/            # Job processors
+│   │   └── utils/           # Helper functions
+│   └── package.json
+│
+├── 📧 alert-service/        # Notification System
+│   ├── src/
+│   │   ├── templates/       # Email templates
+│   │   └── mailer/          # SMTP configuration
+│   └── package.json
+│
+├── ⚡ queue-service/        # Job Queue Management
+│   ├── src/
+│   │   ├── queues/          # BullMQ setup
+│   │   └── schedulers/      # Job scheduling
+│   └── package.json
+│
+├── 💻 client/               # React Dashboard
+│   ├── src/
+│   │   ├── components/      # UI components
+│   │   ├── pages/           # Route pages
+│   │   └── hooks/           # Custom hooks
+│   └── package.json
+│
+└── ⚖️ scale-worker-service/  # Load Balancer (Optional)
+    └── src/
+        └── balancer/        # Worker distribution
 ```
 
-## API Endpoints
+---
 
-### Authentication
+## 🎨 Dashboard Preview
 
-- `POST /api/auth/register` - Register a new user
-- `POST /api/auth/login` - Authenticate user and get token
-- `GET /api/auth/me` - Get authenticated user
+### 📊 Real-time Monitoring Interface
 
-### Servers
+*Coming Soon: Dashboard screenshots showcasing uptime metrics, response times, and alert configurations*
 
-- `GET /api/servers` - Get all servers for authenticated user
-- `GET /api/servers/:id` - Get server by ID
-- `POST /api/servers` - Create a new server
-- `PUT /api/servers/:id` - Update server
-- `DELETE /api/servers/:id` - Delete server
-- `PUT /api/servers/:id/alerts` - Update alert settings for a server
+**Key Dashboard Features:**
+- 📈 Interactive latency graphs
+- 🟢 Real-time server status indicators
+- ⚙️ Customizable ping intervals
+- 📋 Historical performance data
+- 🔔 Alert configuration panel
 
-### Users
+---
 
-- `PUT /api/users/profile` - Update user profile
-- `PUT /api/users/password` - Update user password
-- `PUT /api/users/settings` - Update user settings
+## 🔧 Configuration
 
-## License
+### Environment Variables
 
-This project is licensed under the MIT License.
+Create a `.env` file in the root directory:
+
+```bash
+# Database Configuration
+DATABASE_URL="postgresql://username:password@localhost:5432/heimdall"
+
+# Redis Configuration
+REDIS_URL="redis://localhost:6379"
+
+# Email Configuration (SMTP)
+SMTP_HOST="smtp.gmail.com"
+SMTP_PORT=587
+SMTP_USER="your-email@gmail.com"
+SMTP_PASS="your-app-password"
+
+# JWT Configuration
+JWT_SECRET="your-super-secret-jwt-key"
+JWT_EXPIRES_IN="7d"
+
+# Application Settings
+NODE_ENV="development"
+PORT=3000
+```
+
+---
+
+## 🤝 Contributing
+
+We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
+
+### 📝 Development Workflow
+
+1. **Fork** the repository
+2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
+3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
+4. **Push** to the branch (`git push origin feature/amazing-feature`)
+5. **Open** a Pull Request
+
+---
+
+## 📄 License
+
+This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
+
+---
+
+## 🆘 Support & Community
+
+<div align="center">
+
+**Need Help?** | **Stay Connected**
+--- | ---
+🐛 [Report Issues](https://github.com/yourusername/heimdall/issues) | 💬 [Discussions](https://github.com/yourusername/heimdall/discussions)
+📧 [Email Support](mailto:support@heimdall.dev) | 🐦 [Twitter Updates](https://twitter.com/heimdall_dev)
+📖 [Documentation](https://docs.heimdall.dev) | ⭐ [Star on GitHub](https://github.com/yourusername/heimdall)
+
+</div>
+
+---
+
+<div align="center">
+
+### 🌟 Show Your Support
+
+If Heimdall helps keep your servers running smoothly, please consider giving it a ⭐!
+
+**Made with ❤️ by the Heimdall Team**
+
+*Keeping your servers awake so you can sleep peacefully* 😴
+
+</div>
