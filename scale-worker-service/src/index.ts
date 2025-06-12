@@ -1,4 +1,4 @@
-import { Queue } from 'bullmq';
+import { Queue, QueueEvents } from 'bullmq';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as dotenv from 'dotenv';
@@ -29,7 +29,7 @@ const SCALE_CHECK_INTERVAL = parseInt(process.env.SCALE_CHECK_INTERVAL || '30000
 const SCALE_COOLDOWN = parseInt(process.env.SCALE_COOLDOWN || '60000');
 
 // BullMQ queue instance
-let queue: Queue;
+let queue: Queue<any, any, string> | null;
 async function initializeQueue() {
     try {
         if (queue) {
@@ -37,16 +37,15 @@ async function initializeQueue() {
         }
         queue = new Queue('ping-queue', {
             connection: REDIS_CONFIG
-        });        // Set up Redis error handling
-        const connection = queue.connection;
-        
-        // Remove any existing listeners to prevent memory leaks
-        connection.removeAllListeners('error');
-        connection.removeAllListeners('connect');
-        
-        connection.on('error', async (error) => {
+        });
+
+        // Use QueueEvents for Redis connection handling
+        const queueEvents = new QueueEvents('ping-queue', {
+            connection: REDIS_CONFIG
+        });
+
+        queueEvents.on('error', async (error) => {
             console.error('Redis connection error:', error);
-            // Close the existing queue before reconnecting
             if (queue) {
                 try {
                     await queue.close();
@@ -55,14 +54,13 @@ async function initializeQueue() {
                 }
                 queue = null;
             }
-            // Try to reconnect after a short delay
             setTimeout(() => {
                 console.log('Attempting to reconnect to Redis...');
                 initializeQueue();
             }, 5000);
         });
 
-        connection.on('connect', () => {
+        queueEvents.on('waiting', () => {
             console.log(`[${new Date().toISOString()}] Successfully connected to Redis`);
         });
 
@@ -161,6 +159,10 @@ async function startWorker(workerNumber: number) {
             await execAsync(
                 `docker run -d --env-file .env --name ${containerName} --restart unless-stopped ${WORKER_IMAGE}`
             );
+            // await execAsync(
+            //     `docker run heimdall-worker`
+            // );
+
             console.log(`[${new Date().toISOString()}] Started new worker: ${containerName}`);
         } else {
             console.log(`[${new Date().toISOString()}] Worker ${containerName} is already running`);
