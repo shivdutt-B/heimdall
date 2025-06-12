@@ -276,3 +276,30 @@ exports.verifyCodeAndSignIn = async (req, res) => {
     res.status(500).send('Server error');
   }
 };
+
+/**
+ * Delete user account
+ * @route DELETE /api/users/delete-account
+ */
+exports.deleteAccount = async (req, res) => {
+  try {
+    const userId = req.user.id;
+
+    // Delete all verification codes associated with the user's email
+    await prisma.verificationCode.deleteMany({
+      where: { email: req.user.email }
+    });
+
+    // Delete the user
+    await prisma.user.delete({
+      where: { id: userId }
+    });
+
+    res.json({ message: 'Account deleted successfully' });
+  } catch (err) {
+    console.error('Delete account error:', err.message);
+    res.status(500).json({ message: 'Failed to delete account' });
+  }
+};
+
+module.exports = exports;

@@ -60,4 +60,9 @@ router.post(
   userController.verifyCodeAndSignIn
 );
 
+// @route   DELETE api/users/delete-account
+// @desc    Delete user account
+// @access  Private
+router.delete('/delete-account', authMiddleware, userController.deleteAccount);
+
 module.exports = router;

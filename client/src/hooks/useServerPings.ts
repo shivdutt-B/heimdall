@@ -43,7 +43,6 @@ export const useServerPings = (serverId: string | null, days: number, msg:string
       setLoading(true);
       setError(null);
       try {
-        console.log("fetching pings ========)))", msg);
         const token = localStorage.getItem("token");
         const response = await axios.get(
           `http://localhost:5000/api/servers/server-pings?id=${serverId}&days=${days}`,
@@ -60,6 +59,9 @@ export const useServerPings = (serverId: string | null, days: number, msg:string
             lastFetched: now,
           },
         }));
+
+        console.log("fetching pings ========)))", response.data.pings);
+
         setData(response.data.pings);
       } catch (err: any) {
         setError(err);

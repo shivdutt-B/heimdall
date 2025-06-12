@@ -1,19 +1,22 @@
-import React from "react";
-import { Link, useNavigate } from "react-router-dom";
 import { useRecoilValue, useResetRecoilState } from "recoil";
+import { Link, useNavigate } from "react-router-dom";
 import { authState } from "../../store/auth";
 import { serversAtom, serverDetailsAtom, pingHistoryAtom, selectedDaysAtom } from "../../store/serverAtoms";
+import useDeleteAccount from "../../hooks/useDeleteAccount";
+import React from "react";
 
 const NavBar: React.FC = () => {
   const auth = useRecoilValue(authState);
   const [showUserDialog, setShowUserDialog] = React.useState(false);
   const [showLogoutConfirm, setShowLogoutConfirm] = React.useState(false);
+  const [showDeleteConfirm, setShowDeleteConfirm] = React.useState(false);
   const navigate = useNavigate();
   const resetAuth = useResetRecoilState(authState);
   const resetServers = useResetRecoilState(serversAtom);
   const resetServerDetails = useResetRecoilState(serverDetailsAtom);
   const resetPingHistory = useResetRecoilState(pingHistoryAtom);
   const resetSelectedDays = useResetRecoilState(selectedDaysAtom);
+  const { deleteAccount, loading, error, setError } = useDeleteAccount();
 
   // Close dialog on outside click
   React.useEffect(() => {
@@ -29,6 +32,16 @@ const NavBar: React.FC = () => {
     document.addEventListener("mousedown", handleClick);
     return () => document.removeEventListener("mousedown", handleClick);
   }, [showUserDialog]);
+
+  // Auto-clear error after 3 seconds
+  React.useEffect(() => {
+    if (error) {
+      const timer = setTimeout(() => {
+        setError(null);
+      }, 3000);
+      return () => clearTimeout(timer);
+    }
+  }, [error, setError]);
 
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-sm text-white shadow-sm bg-transparent transition-all duration-200">
@@ -184,9 +197,9 @@ const NavBar: React.FC = () => {
                     onClick={(e) => {
                       if (auth.user) {
                         e.preventDefault();
-                        setShowUserDialog((v) => !v);
+                        setShowUserDialog(!showUserDialog);
                       } else {
-                        navigate("/auth");
+                        navigate('/auth');
                       }
                     }}
                   >
@@ -213,29 +226,26 @@ const NavBar: React.FC = () => {
                         style={{ top: "50px", position: "absolute", right: 0 }}
                       >
                         <div className="mb-2">
-                          <span className="block text-sm text-white font-semibold">
-                            {auth.user.name}
-                          </span>
-                          <span className="block text-xs text-white/70">
+                          <div className="text-white text-sm font-semibold">
                             {auth.user.email}
-                          </span>
+                          </div>
+                          <div className="text-white/70 text-xs">{auth.user.name}</div>
                         </div>
                         <div className="flex flex-col gap-2 mt-4">
                           <button
-                            className="w-full px-3 py-1 bg-white text-black rounded hover:bg-white/90 text-sm cursor-pointer"
-                            type="button"
-                            onClick={() => {
-                              setShowUserDialog(false);
-                            }}
-                          >
-                            Close
-                          </button>
-                          <button
-                            className="w-full px-3 py-1 bg-red-600 text-white rounded hover:bg-red-700 text-sm cursor-pointer"
-                            type="button"
                             onClick={() => setShowLogoutConfirm(true)}
+                            className="w-full text-white text-sm px-3 py-2 rounded hover:bg-gray-800 text-left"
                           >
                             Logout
+                          </button>
+                          <button
+                            onClick={() => {
+                              setShowDeleteConfirm(true);
+                              setShowUserDialog(false);
+                            }}
+                            className="w-full text-red-500 text-sm px-3 py-2 rounded hover:bg-gray-800 text-left"
+                          >
+                            Delete Account
                           </button>
                         </div>
                       </div>
@@ -282,6 +292,62 @@ const NavBar: React.FC = () => {
                 }}
               >
                 Logout
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
+      {/* Delete Account Confirmation Dialog */}
+      {showDeleteConfirm && (
+        <div
+          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          style={{ minHeight: "100vh", minWidth: "100vw" }}
+        >
+          <div className="bg-black rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
+            <h2 className="text-md font-semibold text-white mb-2">
+              Delete Account
+            </h2>
+            <p className="text-white/70 mb-4 text-sm">
+              Are you sure you want to delete your account? This action cannot be undone.
+            </p>            {error && (
+              <div className="bg-red-500/10 border border-red-500/50 rounded-md p-3 mb-4 transition-all duration-300 animate-in fade-in">
+                <div className="flex items-center gap-2">
+                  <svg
+                    xmlns="http://www.w3.org/2000/svg"
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    className="h-5 w-5 text-red-500 shrink-0"
+                  >
+                    <circle cx="12" cy="12" r="10" />
+                    <line x1="12" y1="8" x2="12" y2="12" />
+                    <line x1="12" y1="16" x2="12.01" y2="16" />
+                  </svg>
+                  <span className="text-red-500 text-sm font-medium">{error}</span>
+                </div>
+              </div>
+            )}
+            <div className="flex gap-2 justify-center">
+              <button
+                className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                onClick={() => {
+                  setShowDeleteConfirm(false);
+                  setError(null);
+                }}
+                disabled={loading}
+              >
+                Cancel
+              </button>
+              <button
+                className={`px-4 py-2 bg-red-600 text-white rounded font-semibold text-sm cursor-pointer ${loading ? 'opacity-50' : 'hover:bg-red-700'
+                  }`}
+                onClick={() => deleteAccount(() => setShowDeleteConfirm(false))}
+                disabled={loading}
+              >
+                {loading ? 'Deleting...' : 'Delete Account'}
               </button>
             </div>
           </div>
