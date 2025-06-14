@@ -146,21 +146,6 @@ const Profile: React.FC = () => {
                   </button>
 
                   <div className="flex space-x-4">
-                    {/* {isEditing && (
-                      <button
-                        type="button"
-                        onClick={() => {
-                          setFormData({
-                            name: auth?.user?.name || "",
-                            email: auth?.user?.email || "",
-                          });
-                          toast.success("Form reset to original values");
-                        }}
-                        className="px-4 py-2 text-sm font-medium text-gray-300 bg-black/20 border border-gray-800 rounded-md hover:bg-black/30 focus:outline-none focus:ring-2 focus:ring-gray-500 focus:ring-offset-2 focus:ring-offset-gray-900"
-                      >
-                        Reset
-                      </button>
-                    )} */}
                     {isEditing && (
                       <button
                         type="submit"

@@ -35,15 +35,10 @@ export const useSignIn = () => {
         }
       );
 
-      console.log("hii",response.data);
-
-
-
       const { token, user } = response.data;
 
       // Store token in localStorage
       localStorage.setItem("token", token);
-      console.log(response.data);
 
       // Update auth state
       setAuth({

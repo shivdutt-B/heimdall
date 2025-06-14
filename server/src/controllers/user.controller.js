@@ -10,6 +10,7 @@ const prisma = new PrismaClient();
 /**
  * Update user profile
  * @route PUT /api/users/profile
+ * NOTE IN USE
  */
 exports.updateProfile = async (req, res) => {
   const errors = validationResult(req);
@@ -102,6 +103,7 @@ exports.updateProfile = async (req, res) => {
 /**
  * Update user password
  * @route PUT /api/users/password
+ * NOTE IN USE
  */
 exports.updatePassword = async (req, res) => {
   const errors = validationResult(req);
@@ -180,8 +182,6 @@ exports.sendVerificationCode = async (req, res) => {
       }
     });
 
-    console.log('Sending verification code email to:', email);
-
     try {
       // Send the code via email
       const emailResult = await sendEmail({
@@ -190,7 +190,6 @@ exports.sendVerificationCode = async (req, res) => {
         text: `${verificationCode}`,
       });
 
-      console.log('Email sent successfully:', emailResult);
       res.json({ message: 'Verification code sent successfully' });
     } catch (emailError) {
       console.error('Error sending email:', emailError);

@@ -15,7 +15,6 @@ export const useServers = () => {
           "x-auth-token": token,
         },
       });
-      // console.log("Servers fetched:", response.data);
       setServers(response.data);
     } catch (error) {
       console.error("Error fetching servers:", error);
@@ -29,7 +28,6 @@ export const useServers = () => {
     }
 
     try {
-      console.log("Fetching servers======info");
       const token = localStorage.getItem("token");
       const response = await axios.get(
         `${import.meta.env.VITE_BACKEND_URL}/api/servers/${serverId}`,

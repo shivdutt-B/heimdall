@@ -2,7 +2,6 @@ const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
 const { PrismaClient } = require("@prisma/client");
-// const { initializeScheduler, shutdownScheduler } = require("./utils/scheduler");
 require("dotenv").config();
 
 // Import routes
@@ -42,22 +41,11 @@ app.use((err, req, res, next) => {
 const PORT = process.env.PORT || 5000;
 const server = app.listen(PORT, async () => {
   console.log(`Server running on port ${PORT}`);
-
-  // Initialize the scheduler after server starts
-  try {
-    // await initializeScheduler();
-    console.log("Server ping scheduler initialized successfully");
-  } catch (error) {
-    console.error("Failed to initialize scheduler:", error);
-  }
 });
 
 // Handle shutdown gracefully
 process.on("SIGINT", async () => {
   console.log("Shutting down server...");
-
-  // Stop the scheduler
-  // shutdownScheduler();
 
   // Disconnect from Prisma
   await prisma.$disconnect();

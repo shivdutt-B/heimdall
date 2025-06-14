@@ -37,10 +37,6 @@ function HeroOnRipple() {
           </p>
           <div className="flex justify-center mt-5">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
-              {/* <AnimatedSubscribeButton
-                className="bg-white hover:bg-white/80 transition-all duration-300 text-black px-6 py-2 rounded-sm shadow-md text-sm"
-                onClick={() => // console.log("Get Started clicked")}
-              > */}
               {auth.loading ? (
                 <div className="bg-white px-6 py-2 rounded-sm shadow-md text-sm flex items-center gap-2 font-semibold">
                   <svg
@@ -97,7 +93,6 @@ function HeroOnRipple() {
                   initial={{ opacity: 0 }}
                   animate={{ opacity: 1 }}
                   transition={{ delay: 0.5 }}
-                  onClick={() => console.log("Live Demo clicked")}
                 >
                   Demo
                   <motion.svg

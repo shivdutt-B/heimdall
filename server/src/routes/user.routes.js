@@ -8,6 +8,8 @@ const router = express.Router();
 // @route   PUT api/users/profile
 // @desc    Update user profile
 // @access  Private
+// NOT IN USE
+/*
 router.put(
   "/profile",
   authMiddleware,
@@ -20,10 +22,13 @@ router.put(
   ],
   userController.updateProfile
 );
+*/
 
 // @route   PUT api/users/password
 // @desc    Update user password
 // @access  Private
+// NOT IN USE
+/*
 router.put(
   "/password",
   authMiddleware,
@@ -36,6 +41,7 @@ router.put(
   ],
   userController.updatePassword
 );
+*/
 
 // @route   POST api/users/send-code
 // @desc    Send verification code for email sign in

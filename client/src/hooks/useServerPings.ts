@@ -60,7 +60,6 @@ export const useServerPings = (serverId: string | null, days: number, msg:string
           },
         }));
 
-        console.log("fetching pings ========)))", response.data.pings);
 
         setData(response.data.pings);
       } catch (err: any) {

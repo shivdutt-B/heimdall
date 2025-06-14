@@ -1,16 +1,11 @@
 const { PrismaClient } = require("@prisma/client");
 const { validationResult } = require("express-validator");
-// const { refreshServerCache } = require("../utils/scheduler");
 
 const prisma = new PrismaClient();
 
 /**
  * Get all servers for authenticated user
  * @route GET /api/servers
- */
-
-/*
- * In response don't send whole ping history, send only last 10 pings, and each ping object should only have id, status, timestamp, responseTime.
  */
 exports.getServers = async (req, res) => {
   try {
@@ -96,13 +91,11 @@ exports.getServerById = async (req, res) => {
  */
 exports.createServer = async (req, res) => {
   const errors = validationResult(req);
-  console.log(errors);
   if (!errors.isEmpty()) {
     return res.status(400).json({ errors: errors.array() });
   }
 
   const { url, name, pingInterval, failureThreshold } = req.body;
-  console.log(req.body);
 
   try {    // Prevent duplicate servers (by url or name across all users)
     const existingServer = await prisma.server.findFirst({
@@ -129,9 +122,6 @@ exports.createServer = async (req, res) => {
         userId: req.user.id,
       },
     });
-
-    // Refresh the server cache to include the new server
-    // await refreshServerCache();
 
     res.status(201).json(server);
   } catch (err) {
@@ -200,9 +190,6 @@ exports.updateServer = async (req, res) => {
       },
     });
 
-    // Refresh the server cache to update the server's properties
-    // await refreshServerCache();
-
     res.json(server);
   } catch (err) {
     console.error("Update server error:", err.message);
@@ -234,9 +221,6 @@ exports.deleteServer = async (req, res) => {
         id: req.params.id,
       },
     });
-
-    // Refresh the server cache to remove the deleted server
-    // await refreshServerCache();
 
     res.json({ message: "Server removed" });
   } catch (err) {

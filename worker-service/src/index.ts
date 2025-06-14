@@ -7,8 +7,6 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-console.log('🔗 Connecting to DOCKER STARTED =======', process.env.REDIS_PORT);
-
 // Interface for ping response
 interface PingResponse {
     status: string;
@@ -106,11 +104,6 @@ async function handlePing(job: Job<PingJob>) {
         ]);
 
         console.log(`✅ Successfully pinged ${url} (${responseTime}ms, Heap: ${memory.heapUsed}MB/${memory.heapTotal}MB)`);
-        
-        // If this was a retry, log it
-        if (job.attemptsMade > 0) {
-            console.log(`🔄 Success after ${job.attemptsMade + 1} attempts`);
-        }
 
     } catch (error: any) {
         // Use transaction for failure handling

@@ -34,8 +34,8 @@ const {
     REDIS_PASSWORD,
     WORKER_IMAGE = 'heimdall-worker:latest',
     MIN_WORKERS = '1',
-    MAX_WORKERS = '10',
-    JOBS_PER_WORKER = '100',
+    MAX_WORKERS = '5',
+    JOBS_PER_WORKER = '20',
     SCALE_CHECK_INTERVAL = '30000',
     SCALE_COOLDOWN = '60000'
 } = process.env;

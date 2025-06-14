@@ -61,7 +61,6 @@ export const Auth = () => {
 
   const handleSendVerificationCode = async (event: React.FormEvent) => {
     event.preventDefault();
-    console.log("sending code to", signInForm.email);
     setIsLoading(true);
     setError("");
     setAuth((prev) => ({ ...prev, loading: true, error: null }));
@@ -74,7 +73,6 @@ export const Auth = () => {
       setCodeSent(true);
     } catch (err) {
       if (axios.isAxiosError(err) && err.response?.data?.message) {
-        console.log(err);
         setError(err.response.data.message);
       } else {
         setError("An error occurred while sending the code. Please try again.");
@@ -86,7 +84,6 @@ export const Auth = () => {
   };
 
   const handleVerificationCodeSubmit = async (event: React.FormEvent) => {
-    console.log("sending code to");
     event.preventDefault();
     setIsLoading(true);
     setError("");

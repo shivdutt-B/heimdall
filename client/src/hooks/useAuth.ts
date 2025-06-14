@@ -11,10 +11,6 @@ export const useAuth = () => {
   useEffect(() => {
     const fetchUser = async () => {
       try {
-        // Add 5 second delay for testing purposes
-        // await new Promise((resolve) => setTimeout(resolve, 5000));
-        // console.log("Fetching user", auth);
-        // console.log('auth loaidng', auth.loading)
         setAuth((prev) => ({ ...prev, loading: true }));
 
         const response = await axios.get(
