@@ -1,76 +1,55 @@
+// worker-scaler.ts
 import { Queue, QueueEvents } from 'bullmq';
 import { exec } from 'child_process';
 import { promisify } from 'util';
 import * as dotenv from 'dotenv';
+import { Redis } from 'ioredis';
+import { v4 as uuidv4 } from 'uuid';
+import winston from 'winston';
 
+// Load environment variables
 dotenv.config();
+dotenv.config({ path: '.env.worker-service' });
 
 const execAsync = promisify(exec);
 
-// Constants from environment variables
+// Winston logger
+const logger = winston.createLogger({
+    level: 'info',
+    format: winston.format.combine(
+        winston.format.timestamp(),
+        winston.format.json()
+    ),
+    transports: [
+        new winston.transports.Console(),
+        new winston.transports.File({ filename: 'scale-worker-service.log' })
+    ]
+});
+
+// Environment variables
+const {
+    REDIS_HOST = 'localhost',
+    REDIS_PORT = '6379',
+    REDIS_USERNAME,
+    REDIS_PASSWORD,
+    WORKER_IMAGE = 'heimdall-worker:latest',
+    MIN_WORKERS = '1',
+    MAX_WORKERS = '10',
+    JOBS_PER_WORKER = '100',
+    SCALE_CHECK_INTERVAL = '30000',
+    SCALE_COOLDOWN = '60000'
+} = process.env;
+
 const REDIS_CONFIG = {
-    host: process.env.REDIS_HOST || 'localhost',
-    port: parseInt(process.env.REDIS_PORT || '6379'),
-    username: process.env.REDIS_USERNAME,
-    password: process.env.REDIS_PASSWORD,
+    host: REDIS_HOST,
+    port: parseInt(REDIS_PORT),
+    username: REDIS_USERNAME,
+    password: REDIS_PASSWORD,
     maxRetriesPerRequest: 3,
-    retryStrategy: (times: number) => {
-        const delay = Math.min(times * 1000, 5000);
-        console.log(`[${new Date().toISOString()}] Retrying Redis connection in ${delay}ms... (attempt ${times})`);
-        return delay;
-    }
+    retryStrategy: (times: number) => Math.min(times * 1000, 5000)
 };
 
-const WORKER_IMAGE = process.env.WORKER_IMAGE || 'heimdall-worker:latest';
-const MIN_WORKERS = parseInt(process.env.MIN_WORKERS || '1');
-const MAX_WORKERS = parseInt(process.env.MAX_WORKERS || '10');
-const JOBS_PER_WORKER = parseInt(process.env.JOBS_PER_WORKER || '100');
-const SCALE_CHECK_INTERVAL = parseInt(process.env.SCALE_CHECK_INTERVAL || '30000');
-const SCALE_COOLDOWN = parseInt(process.env.SCALE_COOLDOWN || '60000');
-
-// BullMQ queue instance
-let queue: Queue<any, any, string> | null;
-async function initializeQueue() {
-    try {
-        if (queue) {
-            await queue.close();
-        }
-        queue = new Queue('ping-queue', {
-            connection: REDIS_CONFIG
-        });
-
-        // Use QueueEvents for Redis connection handling
-        const queueEvents = new QueueEvents('ping-queue', {
-            connection: REDIS_CONFIG
-        });
-
-        queueEvents.on('error', async (error) => {
-            console.error('Redis connection error:', error);
-            if (queue) {
-                try {
-                    await queue.close();
-                } catch (err) {
-                    console.error('Error closing queue:', err);
-                }
-                queue = null;
-            }
-            setTimeout(() => {
-                console.log('Attempting to reconnect to Redis...');
-                initializeQueue();
-            }, 5000);
-        });
-
-        queueEvents.on('waiting', () => {
-            console.log(`[${new Date().toISOString()}] Successfully connected to Redis`);
-        });
-
-        return true;
-    } catch (error) {
-        console.error('Failed to initialize queue:', error);
-        return false;
-    }
-}
-
+let queue: Queue | null;
 let lastScaleTime = 0;
 
 interface WorkerContainer {
@@ -80,262 +59,154 @@ interface WorkerContainer {
     state?: string;
 }
 
-// Helper functions
-async function getQueueMetrics(): Promise<number> {
-    try {
-        if (!queue) {
-            console.error('Queue not initialized');
-            return 0;
-        }
-        const counts = await queue.getJobCounts();
-        return (counts.waiting || 0) + (counts.delayed || 0);
-    } catch (error) {
-        console.error('Error getting queue metrics:', error);
-        return 0;
-    }
-}
+const isWorkerRunning = (state?: string): boolean =>
+    !!state && (state.toLowerCase().startsWith('up') || state.toLowerCase().includes('running'));
 
-async function listRunningWorkers(): Promise<WorkerContainer[]> {    try {
-        const { stdout } = await execAsync(
-            'docker ps -a --filter name=worker- --format "{{.ID}}\t{{.Names}}\t{{.CreatedAt}}\t{{.Status}}"'
+const initializeQueue = async (): Promise<boolean> => {
+    try {
+        if (queue) await queue.close();
+
+        queue = new Queue('ping-queue', { connection: REDIS_CONFIG });
+
+        const queueEvents = new QueueEvents('ping-queue', { connection: REDIS_CONFIG });
+
+        queueEvents.on('error', async (err) => {
+            logger.error('Redis connection error:', err);
+            if (queue) await queue.close();
+            queue = null;
+            setTimeout(() => initializeQueue(), 5000);
+        });
+
+        queueEvents.on('waiting', () =>
+            logger.info(`[${new Date().toISOString()}] Successfully connected to Redis`)
         );
 
-        if (!stdout.trim()) {
-            return [];
-        }
-
-        return stdout.trim().split('\n')
-            .filter(Boolean)
-            .map(line => {
-                const [id, name, created, state] = line.split('\t');
-                return { 
-                    id, 
-                    name, 
-                    created: new Date(created), 
-                    state 
-                };
-            });
-    } catch (error) {
-        console.error('Error listing workers:', error);
-        return [];
+        return true;
+    } catch (err) {
+        logger.error('Failed to initialize queue:', err);
+        return false;
     }
-}
+};
 
-async function cleanupStoppedWorkers(name: string): Promise<void> {
-    try {
-        // Find stopped containers with this name
-        const { stdout } = await execAsync(
-            `docker ps -a -q --filter name=${name} --filter status=exited`
-        );
-        
-        if (stdout.trim()) {
-            // Remove any found containers
-            await execAsync(`docker rm -f ${stdout.trim()}`);
-            console.log(`[${new Date().toISOString()}] Cleaned up stopped container(s) with name: ${name}`);
-        }    } catch (error: any) {
-        // Only log if it's not a "no such container" error
-        if (error && typeof error.message === 'string' && !error.message.includes('No such container')) {
-            console.error(`Error cleaning up stopped containers for ${name}:`, error);
-        }
-    }
-}
+const getQueueMetrics = async (): Promise<number> => {
+    if (!queue) return 0;
+    const counts = await queue.getJobCounts();
+    return (counts.waiting || 0) + (counts.delayed || 0);
+};
 
-async function startWorker(workerNumber: number) {
-    const containerName = `worker-${workerNumber}`;
-    try {
-        // First, cleanup any existing stopped containers with this name
-        await cleanupStoppedWorkers(containerName);
-
-        // Check if a container with this name is already running
-        const existingWorkers = await listRunningWorkers();     
-        
-        const isRunning = existingWorkers.some(w => 
-            w.name === containerName && 
-            (w.state?.toLowerCase().startsWith('up') || w.state?.toLowerCase().includes('running'))
-        );
-        
-        if (!isRunning) {
-            // Start the new container
-            await execAsync(
-                `docker run -d --env-file .env --name ${containerName} --restart unless-stopped ${WORKER_IMAGE}`
-            );
-            // await execAsync(
-            //     `docker run heimdall-worker`
-            // );
-
-            console.log(`[${new Date().toISOString()}] Started new worker: ${containerName}`);
-        } else {
-            console.log(`[${new Date().toISOString()}] Worker ${containerName} is already running`);
-        }    } catch (error: any) {
-        console.error(`Error starting worker ${containerName}:`, error);
-        if (error && typeof error.message === 'string' && !error.message.includes('is already in use')) {
-            throw error;
-        }
-    }
-}
-
-async function stopWorker(container: WorkerContainer) {
-    try {
-        // Force remove the container to ensure it's gone
-        await execAsync(`docker rm -f ${container.id}`);
-        console.log(`[${new Date().toISOString()}] Stopped and removed worker: ${container.name}`);
-    } catch (error: any) {
-        // If the container doesn't exist anymore, that's okay
-        if (error && typeof error.message === 'string' && !error.message.includes('No such container')) {
-            console.error(`Error stopping worker ${container.name}:`, error);
-            throw error;
-        }
-    }
-}
-
-async function scaleWorkers() {
-    try {
-        // Check cooldown period
-        const now = Date.now();
-        if (now - lastScaleTime < SCALE_COOLDOWN) {
-            return;
-        }
-
-        // Get current metrics
-        const pendingJobs = await getQueueMetrics();
-        const runningWorkers = await listRunningWorkers();
-        
-        // Calculate desired number of workers
-        const desiredWorkers = Math.min(
-            Math.max(
-                Math.ceil(pendingJobs / JOBS_PER_WORKER),
-                MIN_WORKERS
-            ),
-            MAX_WORKERS
-        );
-
-        // Log current state
-        console.log(`[${new Date().toISOString()}] Current state:`, {
-            pendingJobs,
-            runningWorkers: runningWorkers.length,
-            desiredWorkers
-        });        // Get count of actually running workers
-        const runningCount = runningWorkers.filter(w => 
-            w.state?.toLowerCase().startsWith('up') || 
-            w.state?.toLowerCase().includes('running')
-        ).length;
-
-        // Scale up or down if needed
-        if (desiredWorkers > runningCount) {
-            // Scale up
-            // Find the highest numbered worker to avoid name conflicts
-            const maxWorkerNum = Math.max(0, ...runningWorkers
-                .map(w => parseInt(w.name.replace('worker-', '')) || 0));
-            
-            for (let i = 1; i <= desiredWorkers - runningCount; i++) {
-                await startWorker(maxWorkerNum + i);
-            }
-            lastScaleTime = now;
-        } else if (desiredWorkers < runningCount) {
-            // Scale down - remove oldest containers first
-            const containersToRemove = runningWorkers
-                .filter(w => w.state === 'running')
-                .sort((a, b) => a.created.getTime() - b.created.getTime())
-                .slice(0, runningCount - desiredWorkers);
-
-            for (const container of containersToRemove) {
-                await stopWorker(container);
-            }
-            lastScaleTime = now;
-        }
-    } catch (error) {
-        console.error('Error in scaling operation:', error);
-    }
-}
-
-// Main scaling loop
-async function startScalingService() {
-    console.log(`[${new Date().toISOString()}] Worker scaling service started`);
-    console.log('Configuration:', {
-        MIN_WORKERS,
-        MAX_WORKERS,
-        JOBS_PER_WORKER,
-        SCALE_CHECK_INTERVAL,
-        SCALE_COOLDOWN
+const listRunningWorkers = async (): Promise<WorkerContainer[]> => {
+    const { stdout } = await execAsync('docker ps -a --filter name=worker- --format "{{.ID}}\t{{.Names}}\t{{.CreatedAt}}\t{{.Status}}"');
+    return stdout.trim().split('\n').filter(Boolean).map(line => {
+        const [id, name, created, state] = line.split('\t');
+        return { id, name, created: new Date(created), state };
     });
+};
 
-    // Initial scale to ensure minimum workers
+const cleanupStoppedWorkers = async (name: string) => {
+    const { stdout } = await execAsync(`docker ps -a -q --filter name=${name} --filter status=exited`);
+    if (stdout.trim()) await execAsync(`docker rm -f ${stdout.trim()}`);
+};
+
+const startWorker = async () => {
+    const name = `worker-${uuidv4()}`;
+    await cleanupStoppedWorkers(name);
+    const workers = await listRunningWorkers();
+    const isRunning = workers.some(w => w.name === name && isWorkerRunning(w.state));
+    if (!isRunning) {
+        await execAsync(`docker run -d --name ${name} --restart unless-stopped ${WORKER_IMAGE}`);
+        logger.info(`[${new Date().toISOString()}] Started new worker: ${name}`);
+    }
+};
+
+const stopWorker = async (worker: WorkerContainer) => {
+    await execAsync(`docker rm -f ${worker.id}`);
+    logger.info(`[${new Date().toISOString()}] Stopped worker: ${worker.name}`);
+};
+
+const acquireLock = async (key: string, ttl: number): Promise<boolean> => {
+    const client = new Redis(REDIS_CONFIG);
+    const res = await client.set(key, 'locked', 'PX', ttl, 'NX');
+    client.quit();
+    return res === 'OK';
+};
+
+const releaseLock = async (key: string) => {
+    const client = new Redis(REDIS_CONFIG);
+    await client.del(key);
+    client.quit();
+};
+
+const scaleWorkers = async () => {
+    const lockKey = 'scale-workers-lock';
+    const lockTTL = parseInt(SCALE_COOLDOWN);
+    if (!(await acquireLock(lockKey, lockTTL))) return;
+
+    const now = Date.now();
+    if (now - lastScaleTime < lockTTL) return;
+
+    const pending = await getQueueMetrics();
+    const workers = await listRunningWorkers();
+    const runningCount = workers.filter(w => isWorkerRunning(w.state)).length;
+
+    const desired = Math.min(
+        Math.max(Math.ceil(pending / parseInt(JOBS_PER_WORKER)), parseInt(MIN_WORKERS)),
+        parseInt(MAX_WORKERS)
+    );
+
+    logger.info('Scaling check:', { pending, runningCount, desired });
+
+    if (desired > runningCount) {
+        for (let i = 0; i < desired - runningCount; i++) await startWorker();
+    } else if (desired < runningCount) {
+        const toRemove = workers
+            .filter(w => isWorkerRunning(w.state))
+            .sort((a, b) => a.created.getTime() - b.created.getTime())
+            .slice(0, runningCount - desired);
+        for (const worker of toRemove) await stopWorker(worker);
+    }
+
+    lastScaleTime = now;
+};
+
+const startScalingService = async () => {
+    logger.info('Worker scaler started');
     await scaleWorkers();
+    setInterval(scaleWorkers, parseInt(SCALE_CHECK_INTERVAL));
+};
 
-    // Start periodic scaling checks
-    setInterval(scaleWorkers, SCALE_CHECK_INTERVAL);
-}
+const cleanup = async () => {
+    logger.info('Cleanup started');
+    if (queue) await queue.close();
+    const workers = await listRunningWorkers();
+    for (const w of workers.filter(w => isWorkerRunning(w.state))) await stopWorker(w);
+};
 
-// Cleanup function
-async function cleanup() {
-    console.log('Starting cleanup...');
-    try {
-        // Close queue connection
-        if (queue) {
-            await queue.close();
-        }
+['SIGTERM', 'SIGINT'].forEach(sig => {
+    process.on(sig, async () => {
+        logger.info(`Received ${sig}, shutting down...`);
+        await cleanup();
+        process.exit(0);
+    });
+});
 
-        // Stop all running workers
-        const workers = await listRunningWorkers();
-        const runningWorkers = workers.filter(w => w.state === 'running');
-        
-        if (runningWorkers.length > 0) {
-            console.log(`Stopping ${runningWorkers.length} running workers...`);
-            await Promise.all(runningWorkers.map(w => stopWorker(w)));
-        }
-    } catch (error) {
-        console.error('Error during cleanup:', error);
+process.on('uncaughtException', async err => {
+    logger.error('Uncaught Exception:', err);
+    await cleanup();
+    process.exit(1);
+});
+
+process.on('unhandledRejection', async (reason, p) => {
+    logger.error('Unhandled Rejection at:', p, 'reason:', reason);
+    await cleanup();
+    process.exit(1);
+});
+
+(async () => {
+    for (let i = 0; i < 5; i++) {
+        if (await initializeQueue()) return startScalingService();
+        const delay = Math.min(i * 5000, 30000);
+        await new Promise(res => setTimeout(res, delay));
     }
-}
-
-// Error handling
-process.on('SIGTERM', async () => {
-    console.log('Received SIGTERM signal. Shutting down...');
-    await cleanup();
-    process.exit(0);
-});
-
-process.on('SIGINT', async () => {
-    console.log('Received SIGINT signal. Shutting down...');
-    await cleanup();
-    process.exit(0);
-});
-
-process.on('uncaughtException', async (error) => {
-    console.error('Uncaught Exception:', error);
-    await cleanup();
+    logger.error('Failed to initialize queue after retries');
     process.exit(1);
-});
-
-process.on('unhandledRejection', async (reason, promise) => {
-    console.error('Unhandled Rejection at:', promise, 'reason:', reason);
-    await cleanup();
-    process.exit(1);
-});
-
-// Start the service with retries
-async function start() {
-    let retries = 0;
-    const maxRetries = 5;
-
-    while (retries < maxRetries) {
-        if (await initializeQueue()) {
-            startScalingService().catch(error => {
-                console.error('Failed to start scaling service:', error);
-                process.exit(1);
-            });
-            return;
-        }
-        retries++;
-        if (retries < maxRetries) {
-            const delay = Math.min(retries * 5000, 30000);
-            console.log(`[${new Date().toISOString()}] Retrying initialization in ${delay}ms... (attempt ${retries}/${maxRetries})`);
-            await new Promise(resolve => setTimeout(resolve, delay));
-        }
-    }
-    
-    console.error(`Failed to initialize after ${maxRetries} attempts`);
-    process.exit(1);
-}
-
-start();
+})();

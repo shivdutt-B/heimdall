@@ -34,7 +34,7 @@ async function addServer(
 ) {
   try {
     const response = await axios.post(
-      "http://localhost:5000/api/servers",
+      `${import.meta.env.VITE_BACKEND_URL}/api/servers`,
       {
         name,
         url,
@@ -64,7 +64,7 @@ async function addServer(
 // Function to handle deleting a server
 async function handleDeleteServer(serverId: string, token: string | null) {
   try {
-    await axios.delete(`http://localhost:5000/api/servers/${serverId}`, {
+    await axios.delete(`${import.meta.env.VITE_BACKEND_UR}/api/servers/${serverId}`, {
       headers: {
         "x-auth-token": token,
       },
@@ -87,7 +87,7 @@ async function modifyServer(
 ) {
   try {
     await axios.put(
-      `http://localhost:5000/api/servers/${serverId}`,
+      `${import.meta.env.VITE_BACKEND_URL}/${serverId}`,
       data,
       {
         headers: {

@@ -9,11 +9,8 @@ export const useServers = () => {
 
   const fetchServers = async () => {
     try {
-      // Add artificial delay for testing
-      // await new Promise((resolve) => setTimeout(resolve, 5000));
-      console.log("Fetching servers======");
       const token = localStorage.getItem("token");
-      const response = await axios.get("http://localhost:5000/api/servers", {
+      const response = await axios.get(`${import.meta.env.VITE_BACKEND_URL}/api/servers`, {
         headers: {
           "x-auth-token": token,
         },
@@ -35,7 +32,7 @@ export const useServers = () => {
       console.log("Fetching servers======info");
       const token = localStorage.getItem("token");
       const response = await axios.get(
-        `http://localhost:5000/api/servers/${serverId}`,
+        `${import.meta.env.VITE_BACKEND_URL}/api/servers/${serverId}`,
         {
           headers: {
             "x-auth-token": token,

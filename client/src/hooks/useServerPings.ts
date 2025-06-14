@@ -45,7 +45,7 @@ export const useServerPings = (serverId: string | null, days: number, msg:string
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `http://localhost:5000/api/servers/server-pings?id=${serverId}&days=${days}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/servers/server-pings?id=${serverId}&days=${days}`,
           {
             headers: {
               "x-auth-token": token,

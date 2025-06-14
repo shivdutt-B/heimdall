@@ -27,8 +27,8 @@ const StepsHero: React.FC = () => {
     },
     {
       number: 2,
-      title: "Create a new server",
-      description: "and start monitoring.",
+      title: "Code Snippet",
+      description: "Past Code Snippet In Your Code.",
     },
     {
       number: 3,

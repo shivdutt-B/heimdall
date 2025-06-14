@@ -7,7 +7,7 @@ dotenv.config();
 
 const prisma = new PrismaClient();
 
-console.log('🔗 Connecting to DOCKER STARTED =======');
+console.log('🔗 Connecting to DOCKER STARTED =======', process.env.REDIS_PORT);
 
 // Interface for ping response
 interface PingResponse {

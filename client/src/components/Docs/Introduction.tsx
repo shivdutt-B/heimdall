@@ -805,19 +805,19 @@ const Faq: React.FC = () => (
     <div className="space-y-4 my-6">
       <FaqItem
         question="How often does Heimdall ping my servers?"
-        answer="By default, Heimdall pings your servers every 5 minutes. You can customize this interval to be as frequent as every 1 minute or as infrequent as every 60 minutes."
+        answer="By default, Heimdall pings your servers every 5 minutes. You can customize and increase this interval"
       />
       <FaqItem
         question="Does Heimdall work with any type of server?"
-        answer="Yes, Heimdall works with any HTTP/HTTPS endpoint. This includes web servers, API servers, and any other service that can respond to HTTP requests."
+        answer="Yes, Heimdall works with any HTTPS endpoint. This includes web servers, API servers, and any other service that can respond to HTTP requests."
       />
       <FaqItem
-        question="How do I set up alerts?"
-        answer="You can set up alerts in your Heimdall dashboard. Go to the server settings and configure email alerts, webhook notifications, or integrate with services like Slack or Discord."
+        question="Does Heimdall works with localhost?"
+        answer="No, Heimdall is designed to monitor remote servers. It cannot ping localhost or local network addresses directly."
       />
       <FaqItem
         question="Is there a limit to how many servers I can monitor?"
-        answer="The free plan allows you to monitor up to 3 servers. Our paid plans offer monitoring for 10, 50, or unlimited servers depending on your needs."
+        answer="You can monitor as many servers as you want."
       />
     </div>
   </section>
