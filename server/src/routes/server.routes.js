@@ -1,11 +1,8 @@
 const express = require("express");
 const { check } = require("express-validator");
-const { PrismaClient } = require("@prisma/client");
 const serverController = require("../controllers/server.controller");
 const authMiddleware = require("../middleware/auth.middleware");
-const { triggerPing } = require("../utils/scheduler");
 
-const prisma = new PrismaClient();
 const router = express.Router();
 
 // All routes require authentication
