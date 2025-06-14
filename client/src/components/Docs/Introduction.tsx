@@ -397,6 +397,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   language,
 }) => {
   const [copied, setCopied] = useState(false);
+  const [installCopied, setInstallCopied] = useState(false);
 
   const handleCopy = () => {
     navigator.clipboard.writeText(code);
@@ -411,6 +412,10 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
         return "bg-green-600";
       case "django":
         return "bg-emerald-600";
+      case "fastapi":
+        return "bg-cyan-600";
+      case "flask":
+        return "bg-orange-600";
       case "spring":
         return "bg-blue-600";
       case "ruby":
@@ -425,33 +430,56 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   const methodBgColor = getThemeColor(language);
   const borderColor = methodBgColor.replace("bg-", "border-");
 
+  // Installation command for each framework
+  const getInstallCommand = (lang: string) => {
+    switch (lang) {
+      case "nodejs":
+        return {
+          cmd: "npm install heimdall-nodejs-sdk",
+          color: "text-green-300 bg-green-950/40 border border-green-700"
+        };
+      case "django":
+        return {
+          cmd: "pip install heimdall-python-sdk",
+          color: "text-emerald-300 bg-emerald-950/40 border border-emerald-700"
+        };
+      case "fastapi":
+        return {
+          cmd: "pip install heimdall-python-sdk",
+          color: "text-cyan-300 bg-cyan-950/40 border border-cyan-700"
+        };
+      case "flask":
+        return {
+          cmd: "pip install heimdall-python-sdk",
+          color: "text-orange-300 bg-orange-950/40 border border-orange-700"
+        };
+      default:
+        return null;
+    }
+  };
+
+  const install = getInstallCommand(language);
+
   return (
-    <div className="relative">
-      <div
-        className={`rounded-md bg-[#0d1117] p-4 border ${borderColor.replace(
-          "600",
-          "800"
-        )} border-opacity-40`}
-      >
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex h-6 items-center gap-1 text-sm">
-            <div
-              className={`rounded px-2 py-1 font-mono text-xs font-medium text-white ${methodBgColor}`}
-            >
-              {method}
-            </div>
-            <span className="text-white/60 ml-2">{endpoint}</span>
-          </div>
+    <>
+      {install && (
+        <div className="flex items-center justify-between mb-4 bg-[#0d1117] py-2 pl-1 pr-[15px]">
+          <span className={`font-mono bg-[#151b23] text-sm rounded px-3 py-2 shadow-sm`}>{install.cmd}</span>
           <Button
             variant="outline"
             size="sm"
-            onClick={handleCopy}
-            className="h-8 px-3 border border-gray-600 hover:bg-gray-600 text-black rounded-sm bg-white/10 transition duration-200 ease-in-out"
+            onClick={() => {
+              navigator.clipboard.writeText(install.cmd);
+              setInstallCopied(true);
+              setTimeout(() => setInstallCopied(false), 1800);
+            }}
+            className="inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-[#040506] border border-white/20 text-white hover:bg-white/10 h-9 px-3 rounded-md text-sm h-8 px-3 border border-gray-600 hover:bg-gray-600 text-black rounded-sm bg-white/10 transition duration-200 ease-in-out"
+            style={{ minWidth: 65 }}
           >
-            {copied ? (
+            {installCopied ? (
               <>
-                <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-green-400" />
-                <span className="text-xs">Copied</span>
+                <CheckCircle2 className="h-4 w-4 mr-1 text-green-400" />
+                <span className="text-xs">Copied!</span>
               </>
             ) : (
               <>
@@ -461,63 +489,101 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
             )}
           </Button>
         </div>
-        <pre
-          className={`p-4 font-mono text-sm overflow-x-auto rounded-md bg-[#161b22]  ${borderColor.replace(
-            "600",
-            "500"
-          )}`}
+      )}
+      <div className="relative">
+        <div className={`rounded-md bg-[#0d1117] p-4 border ${borderColor.replace(
+          "600",
+          "800"
+        )} border-opacity-40`}
         >
-          <code className="leading-relaxed">
-            {colorizeKeywords(code, language)}
-          </code>
-        </pre>
+          <div className="flex items-center justify-between mb-3">
+            <div className="flex h-6 items-center gap-1 text-sm">
+              <div
+                className={`rounded px-2 py-1 font-mono text-xs font-medium text-white ${methodBgColor}`}
+              >
+                {method}
+              </div>
+              <span className="text-white/60 ml-2">{endpoint}</span>
+            </div>
+            <Button
+              variant="outline"
+              size="sm"
+              onClick={handleCopy}
+              className="h-8 px-3 border border-gray-600 hover:bg-gray-600 text-black rounded-sm bg-white/10 transition duration-200 ease-in-out"
+            >
+              {copied ? (
+                <>
+                  <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-green-400" />
+                  <span className="text-xs">Copied</span>
+                </>
+              ) : (
+                <>
+                  <Copy className="h-3.5 w-3.5 mr-1" />
+                  <span className="text-xs">Copy</span>
+                </>
+              )}
+            </Button>
+          </div>
+          <pre
+            className={`p-4 font-mono text-sm overflow-x-auto rounded-md bg-[#161b22]  ${borderColor.replace(
+              "600",
+              "500"
+            )}`}
+          >
+            <code className="leading-relaxed">
+              {colorizeKeywords(code, language)}
+            </code>
+          </pre>
+        </div>
       </div>
-    </div>
+    </>
   );
 };
 
 // API code examples
 const nodeJsCode = `// Express.js endpoint
-app.get('/__ping__', (req, res) => {
-  // Log the ping request
-  // console.log('Ping received at:', new Date().toISOString());
-  
-  // Return a simple response with timestamp and memory usage
-  res.json({
-    status: 'ok',
-    message: 'Ping successful',
-    timestamp: new Date().toISOString(),
-    memory: {
-      heapUsed: Math.round(process.memoryUsage().heapUsed / 1024 / 1024 * 100) / 100,
-      rss: Math.round(process.memoryUsage().rss / 1024 / 1024 * 100) / 100
-    }
-  });
-});`;
+const express = require('express');
+const cors = require('cors');
+const heimdall = require('heimdall-nodejs-sdk');
 
-const djangoCode = `# views.py
-import json
-import datetime
-import psutil
-from django.http import JsonResponse
+const app = express();
 
-def ping(request):
-    """Endpoint for Heimdall to ping"""
-    # Log ping request
-    print(f"Ping received at: {datetime.datetime.now().isoformat()}")
-    
-    # Get memory usage
-    process = psutil.Process()
-    memory_info = process.memory_info()
-    
-    return JsonResponse({
-        'status': 'ok',
-        'message': 'Ping successful',
-        'timestamp': datetime.datetime.now().isoformat(),
-        'memory': {
-            'rss': round(memory_info.rss / 1024 / 1024, 2),  # MB
-            'vms': round(memory_info.vms / 1024 / 1024, 2)  # MB
-        }
-    })`;
+const allowedOrigins = ['https://user-frontend.com', 'https://heimdall.com'];
+app.use(cors({ origin: allowedOrigins }));
+
+// Add Heimdall ping endpoint - no need to pass CORS options again
+heimdall.ping(app);
+
+app.listen(3000, () => console.log("Server running on port 3000"));`;
+
+const djangoCode = `from django.urls import path
+from heimdall_python_sdk import register_ping, heimdall_ping_point
+
+urlpatterns = [
+    path(heimdall_ping_point, register_ping(framework="django")),
+    # your other URL patterns...
+]`;
+
+const fastapiCode = `from fastapi import FastAPI
+from heimdall_python_sdk import register_ping
+import uvicorn
+
+app = FastAPI()
+register_ping(app)
+
+if __name__ == "__main__":
+    uvicorn.run(app, host="localhost", port=8000)
+`;
+
+const flaskCode = `from heimdall_python_sdk import register_ping
+from flask import Flask
+
+app = Flask(__name__)
+register_ping(app)
+
+if __name__ == "__main__":
+    app.run(port=5000, debug=True)
+`;
 
 const springCode = `// PingController.java
 import org.springframework.web.bind.annotation.GetMapping;
@@ -630,6 +696,10 @@ const ApiReference: React.FC = () => {
         return "data-[state=active]:bg-green-600";
       case "django":
         return "data-[state=active]:bg-emerald-600";
+      case "fastapi":
+        return "data-[state=active]:bg-cyan-600";
+      case "flask":
+        return "data-[state=active]:bg-orange-600";
       case "spring":
         return "data-[state=active]:bg-blue-600";
       case "ruby":
@@ -647,6 +717,10 @@ const ApiReference: React.FC = () => {
         return "bg-gradient-to-br from-green-950/30 to-transparent";
       case "django":
         return "bg-gradient-to-br from-emerald-950/30 to-transparent";
+      case "fastapi":
+        return "bg-gradient-to-br from-cyan-950/30 to-transparent";
+      case "flask":
+        return "bg-gradient-to-br from-orange-950/30 to-transparent";
       case "spring":
         return "bg-gradient-to-br from-blue-950/30 to-transparent";
       case "ruby":
@@ -688,28 +762,28 @@ const ApiReference: React.FC = () => {
             Django
           </TabsTrigger>
           <TabsTrigger
+            value="fastapi"
+            className={`text-white ${getTabStyles(
+              "fastapi"
+            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
+          >
+            FastAPI
+          </TabsTrigger>
+          <TabsTrigger
+            value="flask"
+            className={`text-white ${getTabStyles(
+              "flask"
+            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
+          >
+            Flask
+          </TabsTrigger>
+          <TabsTrigger
             value="spring"
             className={`text-white ${getTabStyles(
               "spring"
             )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
           >
             Spring Boot
-          </TabsTrigger>
-          <TabsTrigger
-            value="ruby"
-            className={`text-white ${getTabStyles(
-              "ruby"
-            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
-          >
-            Ruby
-          </TabsTrigger>
-          <TabsTrigger
-            value="php"
-            className={`text-white ${getTabStyles(
-              "php"
-            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
-          >
-            PHP
           </TabsTrigger>
         </TabsList>
 
@@ -738,39 +812,36 @@ const ApiReference: React.FC = () => {
         </TabsContent>
 
         <TabsContent
+          value="fastapi"
+          className={`mt-4 rounded-md p-1 ${getTabContentBackground("fastapi")}`}
+        >
+          <CodeBlock
+            method="GET"
+            endpoint="/__ping__"
+            code={fastapiCode}
+            language="fastapi"
+          />
+        </TabsContent>
+
+        <TabsContent
+          value="flask"
+          className={`mt-4 rounded-md p-1 ${getTabContentBackground("flask")}`}
+        >
+          <CodeBlock
+            method="GET"
+            endpoint="/__ping__"
+            code={flaskCode}
+            language="flask"
+          />
+        </TabsContent>
+
+        <TabsContent
           value="spring"
           className={`mt-4 rounded-md p-1 ${getTabContentBackground("spring")}`}
         >
-          <CodeBlock
-            method="GET"
-            endpoint="/__ping__"
-            code={springCode}
-            language="spring"
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="ruby"
-          className={`mt-4 rounded-md p-1 ${getTabContentBackground("ruby")}`}
-        >
-          <CodeBlock
-            method="GET"
-            endpoint="/__ping__"
-            code={rubyCode}
-            language="ruby"
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="php"
-          className={`mt-4 rounded-md p-1 ${getTabContentBackground("php")}`}
-        >
-          <CodeBlock
-            method="GET"
-            endpoint="/__ping__"
-            code={phpCode}
-            language="php"
-          />
+          <div className="p-6 text-white/80 text-base">
+            We are working on the Spring Boot SDK. It will be released soon.
+          </div>
         </TabsContent>
       </Tabs>
     </section>
