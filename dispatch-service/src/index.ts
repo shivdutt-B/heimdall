@@ -1,6 +1,7 @@
 import { PrismaClient } from '@prisma/client';
 import { Queue, Job, QueueEvents } from 'bullmq';
 import * as dotenv from 'dotenv';
+const express = require('express');
 
 dotenv.config();
 
@@ -114,6 +115,14 @@ queueEvents.on('failed', ({ jobId, failedReason }) => {
 
 queueEvents.on('removed', ({ jobId }) => {
     console.log(`[${new Date().toISOString()}] Job ${jobId} was removed`);
+});
+
+// Express server setup for Render deployment
+const app = express();
+const PORT = parseInt(process.env.PORT || '3000');
+
+app.listen(PORT, () => {
+    console.log(`Express server listening on port ${PORT}`);
 });
 
 // Cleanup function for graceful shutdown
