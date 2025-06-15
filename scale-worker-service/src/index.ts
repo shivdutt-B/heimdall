@@ -5,26 +5,12 @@ import { promisify } from 'util';
 import * as dotenv from 'dotenv';
 import { Redis } from 'ioredis';
 import { v4 as uuidv4 } from 'uuid';
-import winston from 'winston';
 
 // Load environment variables
 dotenv.config();
 dotenv.config({ path: '.env.worker-service' });
 
 const execAsync = promisify(exec);
-
-// Winston logger
-const logger = winston.createLogger({
-    level: 'info',
-    format: winston.format.combine(
-        winston.format.timestamp(),
-        winston.format.json()
-    ),
-    transports: [
-        new winston.transports.Console(),
-        new winston.transports.File({ filename: 'scale-worker-service.log' })
-    ]
-});
 
 // Environment variables
 const {
@@ -45,11 +31,12 @@ const REDIS_CONFIG = {
     port: parseInt(REDIS_PORT),
     username: REDIS_USERNAME,
     password: REDIS_PASSWORD,
-    maxRetriesPerRequest: 3,
+    maxRetriesPerRequest: null, // Set to null for BullMQ compatibility
     retryStrategy: (times: number) => Math.min(times * 1000, 5000)
 };
 
 let queue: Queue | null;
+let queueEvents: QueueEvents | null = null;
 let lastScaleTime = 0;
 
 interface WorkerContainer {
@@ -65,25 +52,31 @@ const isWorkerRunning = (state?: string): boolean =>
 const initializeQueue = async (): Promise<boolean> => {
     try {
         if (queue) await queue.close();
+        if (queueEvents) await queueEvents.close();
 
         queue = new Queue('ping-queue', { connection: REDIS_CONFIG });
+        queueEvents = new QueueEvents('ping-queue', { connection: REDIS_CONFIG });
 
-        const queueEvents = new QueueEvents('ping-queue', { connection: REDIS_CONFIG });
-
+        let hasLogged = false;
         queueEvents.on('error', async (err) => {
-            logger.error('Redis connection error:', err);
+            console.error('Redis connection error:', err);
             if (queue) await queue.close();
+            if (queueEvents) await queueEvents.close();
             queue = null;
+            queueEvents = null;
             setTimeout(() => initializeQueue(), 5000);
         });
 
-        queueEvents.on('waiting', () =>
-            logger.info(`[${new Date().toISOString()}] Successfully connected to Redis`)
-        );
+        queueEvents.on('waiting', () => {
+            if (!hasLogged) {
+                console.log(`[${new Date().toISOString()}] Successfully connected to Redis`);
+                hasLogged = true;
+            }
+        });
 
         return true;
     } catch (err) {
-        logger.error('Failed to initialize queue:', err);
+        console.error('Failed to initialize queue:', err);
         return false;
     }
 };
@@ -114,13 +107,13 @@ const startWorker = async () => {
     const isRunning = workers.some(w => w.name === name && isWorkerRunning(w.state));
     if (!isRunning) {
         await execAsync(`docker run -d --name ${name} --restart unless-stopped ${WORKER_IMAGE}`);
-        logger.info(`[${new Date().toISOString()}] Started new worker: ${name}`);
+        console.log(`[${new Date().toISOString()}] Started new worker: ${name}`);
     }
 };
 
 const stopWorker = async (worker: WorkerContainer) => {
     await execAsync(`docker rm -f ${worker.id}`);
-    logger.info(`[${new Date().toISOString()}] Stopped worker: ${worker.name}`);
+    console.log(`[${new Date().toISOString()}] Stopped worker: ${worker.name}`);
 };
 
 const acquireLock = async (key: string, ttl: number): Promise<boolean> => {
@@ -153,50 +146,67 @@ const scaleWorkers = async () => {
         parseInt(MAX_WORKERS)
     );
 
-    logger.info('Scaling check:', { pending, runningCount, desired });
+    console.log(`[${new Date().toISOString()}] Scaling check: pending jobs = ${pending}, running containers = ${runningCount}, desired containers = ${desired}`);
+
+    let started = 0;
+    let stopped = 0;
 
     if (desired > runningCount) {
-        for (let i = 0; i < desired - runningCount; i++) await startWorker();
+        for (let i = 0; i < desired - runningCount; i++) {
+            await startWorker();
+            started++;
+        }
     } else if (desired < runningCount) {
         const toRemove = workers
             .filter(w => isWorkerRunning(w.state))
             .sort((a, b) => a.created.getTime() - b.created.getTime())
             .slice(0, runningCount - desired);
-        for (const worker of toRemove) await stopWorker(worker);
+        for (const worker of toRemove) {
+            await stopWorker(worker);
+            stopped++;
+        }
+    }
+
+    if (started > 0) {
+        console.log(`[${new Date().toISOString()}] Started ${started} container(s).`);
+    }
+    if (stopped > 0) {
+        console.log(`[${new Date().toISOString()}] Stopped ${stopped} container(s).`);
     }
 
     lastScaleTime = now;
 };
 
 const startScalingService = async () => {
-    logger.info('Worker scaler started');
+    // Worker scaler started
     await scaleWorkers();
     setInterval(scaleWorkers, parseInt(SCALE_CHECK_INTERVAL));
 };
 
 const cleanup = async () => {
-    logger.info('Cleanup started');
+    // Cleanup started
     if (queue) await queue.close();
+    if (queueEvents) await queueEvents.close();
     const workers = await listRunningWorkers();
     for (const w of workers.filter(w => isWorkerRunning(w.state))) await stopWorker(w);
 };
 
 ['SIGTERM', 'SIGINT'].forEach(sig => {
     process.on(sig, async () => {
-        logger.info(`Received ${sig}, shutting down...`);
+        // Received signal, shutting down...
         await cleanup();
         process.exit(0);
     });
 });
 
 process.on('uncaughtException', async err => {
-    logger.error('Uncaught Exception:', err);
+    // Uncaught Exception
     await cleanup();
     process.exit(1);
 });
 
 process.on('unhandledRejection', async (reason, p) => {
-    logger.error('Unhandled Rejection at:', p, 'reason:', reason);
+    // Unhandled Rejection
     await cleanup();
     process.exit(1);
 });
@@ -207,6 +217,6 @@ process.on('unhandledRejection', async (reason, p) => {
         const delay = Math.min(i * 5000, 30000);
         await new Promise(res => setTimeout(res, delay));
     }
-    logger.error('Failed to initialize queue after retries');
+    // Failed to initialize queue after retries
     process.exit(1);
 })();
