@@ -91,8 +91,7 @@ async function findServersToDispatch() {
 }
 
 // Get dispatch interval from env or default to 60 seconds
-// const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '60000');
-const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '10000');
+const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '60000');
 
 // Run the dispatcher every DISPATCH_INTERVAL milliseconds
 setInterval(findServersToDispatch, DISPATCH_INTERVAL);
