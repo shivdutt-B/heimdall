@@ -51,9 +51,8 @@ export const DataTable: React.FC<Props> = ({
   });
 
   const totalPages = Math.ceil(totalPings / ITEMS_PER_PAGE) || 1;
-  const startIdx = (page - 1) * ITEMS_PER_PAGE;
-  const endIdx = startIdx + ITEMS_PER_PAGE;
-  const currentItems = filteredPings.slice(startIdx, endIdx);
+  // Remove frontend slicing: just use filteredPings
+  const currentItems = filteredPings;
 
   if (loading && !pings.length) {
     return <DataTableSkeleton className={className} />;
