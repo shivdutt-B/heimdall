@@ -47,7 +47,6 @@ async function checkForNewFailures() {
         // Process each failed server that has hit its threshold
         for (const server of failedServers) {
             // Only send alert if consecutive failures equals threshold and not alerted yet
-            console.log("DATE: ", new Date().toISOString());
             if (server.consecutiveFailures === server.failureThreshold) {
                 try {
                     // Send immediate alert email only
