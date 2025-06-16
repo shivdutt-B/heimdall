@@ -33,6 +33,7 @@ const Dashboard: React.FC = () => {
   const [statusFilter, setStatusFilter] = useState<"all" | "success" | "fail">(
     "all"
   );
+  const [page, setPage] = useState(1);
 
   const {
     servers,
@@ -46,11 +47,16 @@ const Dashboard: React.FC = () => {
     ? servers.find((s) => s.name === selectedServer)?.id || null
     : null;
 
-  // Fetch pings for the selected server
-  const { data: pings, loading: pingsLoading } = useServerPings(
+  // Fetch pings for the selected server and page
+  const {
+    data: pings,
+    loading: pingsLoading,
+    hasMore,
+    total: totalPings,
+  } = useServerPings(
     selectedServerId,
     selectedDays,
-    "DashboardPage"
+    page
   );
 
   // Only auto-select first server if there are servers and none is selected
@@ -60,15 +66,17 @@ const Dashboard: React.FC = () => {
     }
   }, [servers, selectedServer]);
 
-  // Get ping counts for the selected server
+  // Reset page when server, days, or filter changes
+  useEffect(() => {
+    setPage(1);
+  }, [selectedServerId, selectedDays, statusFilter]);
+
+  // Calculate ping counts from all fetched pings for the current filter/days
   const getPingCounts = () => {
-    if (!selectedServerId || !serverDetails[selectedServerId]) {
-      return { success: 0, fail: 0 };
-    }
-    const { pingStats } = serverDetails[selectedServerId];
+    if (!pings || !Array.isArray(pings)) return { success: 0, fail: 0 };
     return {
-      success: pingStats.successful,
-      fail: pingStats.failed,
+      success: pings.filter((p) => p.status === true).length,
+      fail: pings.filter((p) => p.status === false).length,
     };
   };
 
@@ -215,6 +223,10 @@ const Dashboard: React.FC = () => {
               pings={pings}
               loading={pingsLoading}
               hasServers={hasServers}
+              page={page}
+              setPage={setPage}
+              hasMore={hasMore}
+              totalPings={totalPings}
             />
           </section>
         </div>

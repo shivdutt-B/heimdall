@@ -17,27 +17,31 @@ interface PingData {
 }
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes
+const PAGE_SIZE = 10;
 
-export const useServerPings = (serverId: string | null, days: number, msg:string) => {
+export const useServerPings = (serverId: string | null, days: number, page: number) => {
   const [pingHistory, setPingHistory] = useRecoilState(pingHistoryAtom);
   const [data, setData] = useState<PingData[]>([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<Error | null>(null);
+  const [hasMore, setHasMore] = useState(true);
+  const [total, setTotal] = useState(0);
 
-  const cacheKey = serverId ? `${serverId}-${days}` : null;
+  const cacheKey = serverId ? `${serverId}-${days}-page-${page}` : null;
 
   const fetchPings = useCallback(
-    async (force = false) => {
+    async () => {
       if (!serverId) return;
       const now = Date.now();
       const cachedData = cacheKey ? pingHistory[cacheKey] : undefined;
       if (
-        !force &&
         cachedData &&
         cachedData.lastFetched &&
         now - cachedData.lastFetched < CACHE_DURATION
       ) {
         setData(cachedData.data);
+        setTotal((cachedData as any).total || cachedData.data.length);
+        setHasMore((cachedData as any).hasMore !== undefined ? (cachedData as any).hasMore : (cachedData.data.length === PAGE_SIZE));
         return;
       }
       setLoading(true);
@@ -45,36 +49,48 @@ export const useServerPings = (serverId: string | null, days: number, msg:string
       try {
         const token = localStorage.getItem("token");
         const response = await axios.get(
-          `${import.meta.env.VITE_BACKEND_URL}/api/servers/server-pings?id=${serverId}&days=${days}`,
+          `${import.meta.env.VITE_BACKEND_URL}/api/servers/server-pings?id=${serverId}&days=${days}&page=${page}&limit=${PAGE_SIZE}`,
           {
             headers: {
               "x-auth-token": token,
             },
           }
         );
+        const { pings, totalPings, hasMore: more } = response.data;
         setPingHistory((prev) => ({
           ...prev,
           [cacheKey!]: {
-            data: response.data.pings,
+            data: pings,
             lastFetched: now,
+            total: totalPings,
+            hasMore: more,
           },
         }));
-
-
-        setData(response.data.pings);
+        setData(pings);
+        setTotal(totalPings);
+        setHasMore(more);
       } catch (err: any) {
         setError(err);
       } finally {
         setLoading(false);
       }
     },
-    [serverId, days, cacheKey, pingHistory, setPingHistory]
+    [serverId, days, page, cacheKey, pingHistory, setPingHistory]
   );
 
   useEffect(() => {
-    fetchPings();
+    setData([]);
+    setHasMore(true);
+    setTotal(0);
+    if (serverId) fetchPings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serverId, days]);
+  }, [serverId, days, page]);
 
-  return { data, loading, error, refetch: () => fetchPings(true) };
+  return {
+    data,
+    loading,
+    error,
+    hasMore,
+    total,
+  };
 };

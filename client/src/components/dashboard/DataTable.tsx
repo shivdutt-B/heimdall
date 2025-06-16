@@ -9,6 +9,10 @@ interface Props {
   pings: PingData[];
   loading: boolean;
   hasServers?: boolean;
+  page: number;
+  setPage: (page: number) => void;
+  hasMore: boolean;
+  totalPings: number;
 }
 
 interface PingData {
@@ -24,18 +28,20 @@ interface PingData {
   totalRss: number | null;
 }
 
+const ITEMS_PER_PAGE = 10;
+
 export const DataTable: React.FC<Props> = ({
   className,
   serverId,
   statusFilter,
   pings,
   loading,
-  hasServers = true
+  hasServers = true,
+  page,
+  setPage,
+  hasMore,
+  totalPings,
 }) => {
-  const [currentPage, setCurrentPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const itemsPerPage = 10;
-
   // Filter pings based on status
   const filteredPings = pings.filter((ping) => {
     if (statusFilter === "all") return true;
@@ -44,13 +50,12 @@ export const DataTable: React.FC<Props> = ({
     return true;
   });
 
-  // Update total pages based on filtered items
-  useEffect(() => {
-    setTotalPages(Math.ceil(filteredPings.length / itemsPerPage));
-    setCurrentPage(1); // Reset to first page when filter changes
-  }, [filteredPings.length]);
+  const totalPages = Math.ceil(totalPings / ITEMS_PER_PAGE) || 1;
+  const startIdx = (page - 1) * ITEMS_PER_PAGE;
+  const endIdx = startIdx + ITEMS_PER_PAGE;
+  const currentItems = filteredPings.slice(startIdx, endIdx);
 
-  if (loading) {
+  if (loading && !pings.length) {
     return <DataTableSkeleton className={className} />;
   }
 
@@ -75,15 +80,8 @@ export const DataTable: React.FC<Props> = ({
     return <EmptyState message="No ping data available for the selected filter." />;
   }
 
-  // Get current page items from filtered data
-  const indexOfLastItem = currentPage * itemsPerPage;
-  const indexOfFirstItem = indexOfLastItem - itemsPerPage;
-  const currentItems = filteredPings.slice(indexOfFirstItem, indexOfLastItem);
-
   return (
-    <div
-      className={`rounded-md border border-gray-800 bg-transparent ${className}`}
-    >
+    <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
       <div className="relative w-full overflow-auto">
         <table className="w-full caption-bottom text-sm">
           <thead>
@@ -128,9 +126,7 @@ export const DataTable: React.FC<Props> = ({
                 </td>
                 <td className="p-4 align-middle text-gray-300">
                   {ping.heapUsage && ping.totalHeap
-                    ? `${ping.heapUsage.toFixed(2)}/${ping.totalHeap.toFixed(
-                      2
-                    )} MB`
+                    ? `${ping.heapUsage.toFixed(2)}/${ping.totalHeap.toFixed(2)} MB`
                     : "N/A"}
                 </td>
                 <td className="p-4 align-middle text-gray-300">
@@ -141,53 +137,24 @@ export const DataTable: React.FC<Props> = ({
           </tbody>
         </table>
       </div>
-
-      {/* Pagination */}
+      {/* Pagination Controls */}
       <div className="flex items-center justify-center px-4 py-3 border-t border-gray-800 gap-4">
         <button
-          onClick={() => setCurrentPage((prev) => Math.max(prev - 1, 1))}
-          disabled={currentPage === 1}
+          onClick={() => setPage(page - 1)}
+          disabled={page === 1}
           className="px-3 py-1.5 text-sm font-semibold text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M15 19l-7-7 7-7"
-            />
-          </svg>
+          Prev
         </button>
         <span className="text-sm text-gray-400">
-          {currentPage} of {totalPages}
+          {page} of {totalPages}
         </span>
         <button
-          onClick={() =>
-            setCurrentPage((prev) => Math.min(prev + 1, totalPages))
-          }
-          disabled={currentPage === totalPages}
+          onClick={() => setPage(page + 1)}
+          disabled={page === totalPages || !hasMore}
           className="px-3 py-1.5 text-sm font-semibold text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
-          <svg
-            width="20"
-            height="20"
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-          >
-            <path
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              strokeWidth={3}
-              d="M9 5l7 7-7 7"
-            />
-          </svg>
+          Next
         </button>
       </div>
     </div>

@@ -230,24 +230,23 @@ exports.deleteServer = async (req, res) => {
 };
 
 /**
- * Get server pings with date filter
- * @route GET /api/server
+ * Get server pings with date filter and pagination
+ * @route GET /api/servers/server-pings
  */
 exports.getServerPings = async (req, res) => {
   try {
-    const { id, days } = req.query;
+    const { id, days, page = 1, limit = 10 } = req.query;
     const daysNum = parseInt(days);
-
+    const pageNum = parseInt(page) || 1;
+    const limitNum = parseInt(limit) || 10;
     if (!id || !days || isNaN(daysNum)) {
       return res.status(400).json({ message: "Invalid parameters" });
     }
-
     // Calculate the date range
     const endDate = new Date();
     const startDate = new Date();
     startDate.setDate(startDate.getDate() - daysNum);
-
-    // Get server pings within date range
+    // Get server pings within date range, paginated
     const pings = await prisma.pingHistory.findMany({
       where: {
         serverId: id,
@@ -259,9 +258,10 @@ exports.getServerPings = async (req, res) => {
       orderBy: {
         timestamp: "desc",
       },
+      skip: (pageNum - 1) * limitNum,
+      take: limitNum,
     });
-
-    // Calculate total pages for pagination
+    // Calculate total pings for pagination
     const totalPings = await prisma.pingHistory.count({
       where: {
         serverId: id,
@@ -271,12 +271,14 @@ exports.getServerPings = async (req, res) => {
         },
       },
     });
-
     res.json({
       pings,
       totalPings,
+      page: pageNum,
+      limit: limitNum,
       startDate,
       endDate,
+      hasMore: pageNum * limitNum < totalPings,
     });
   } catch (err) {
     console.error("Get server pings error:", err.message);
