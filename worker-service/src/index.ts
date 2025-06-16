@@ -80,7 +80,8 @@ async function handlePing(job: Job<PingJob>) {
                     isActive: true,
                     consecutiveFailures: 0, // Reset failures on success
                     lastPingedAt: new Date(),
-                    nextPingAt: new Date(Date.now() + server.pingInterval * 1000)
+                    nextPingAt: new Date(Date.now() + server.pingInterval * 1000),
+                    lastImmediateAlertAt: null // Reset immediate alert flag on recovery
                 }
             }),
 

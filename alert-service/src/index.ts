@@ -27,13 +27,17 @@ function formatDowntime(startDate: Date): string {
 async function checkForNewFailures() {
     console.log("running 1m check for immediate alerts");
     try {
-        // Find servers that hit their failure threshold
+        // Find servers that hit their failure threshold and haven't been alerted yet
         const failedServers = await prisma.server.findMany({
             where: {
                 isActive: false,
                 consecutiveFailures: {
                     not: 0 // Must have at least one failure
-                }
+                },
+                failureThreshold: {
+                    not: 0
+                },
+                lastImmediateAlertAt: null, // Only servers that haven't been alerted for this failure
             },
             include: {
                 user: true
@@ -42,11 +46,17 @@ async function checkForNewFailures() {
 
         // Process each failed server that has hit its threshold
         for (const server of failedServers) {
-            // Only send alert if consecutive failures equals threshold
+            // Only send alert if consecutive failures equals threshold and not alerted yet
+            console.log("DATE: ", new Date().toISOString());
             if (server.consecutiveFailures === server.failureThreshold) {
                 try {
                     // Send immediate alert email only
                     await sendImmediateAlert(server, server.user);
+                    // Update lastImmediateAlertAt to prevent duplicate alerts
+                    await prisma.server.update({
+                        where: { id: server.id },
+                        data: { lastImmediateAlertAt: new Date() }
+                    });
                     console.log(`Sent alert email for server ${server.name} (${server.consecutiveFailures}/${server.failureThreshold} failures)`);
                 } catch (error) {
                     console.error(`Error sending alert email for server ${server.name}:`, error);
