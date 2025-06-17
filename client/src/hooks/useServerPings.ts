@@ -84,7 +84,7 @@ export const useServerPings = (serverId: string | null, days: number, page: numb
     setTotal(0);
     if (serverId) fetchPings();
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [serverId, days, page]);
+  }, [serverId, page]);
 
   return {
     data,

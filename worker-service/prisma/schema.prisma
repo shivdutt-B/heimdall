@@ -34,6 +34,7 @@ model Server {
   lastImmediateAlertAt DateTime?     @map("last_immediate_alert_at")
   user                User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   pingHistory         PingHistory[]
+  memoryHistory       MemoryHistory[] 
   failureThreshold    Int           @default(3) @map("failure_threshold") // min 1, max 10
   consecutiveFailures Int           @default(0) @map("consecutive_failures")
   alert               Alert?
@@ -48,10 +49,6 @@ model PingHistory {
   responseTime Int?     @map("response_time") // in milliseconds
   statusCode   Int?     @map("status_code")
   timestamp    DateTime @default(now())
-  heapUsage    Float?   @map("heap_usage") // heap usage in MB
-  totalHeap    Float?   @map("total_heap")
-  rssMemory    Float?   @map("rss_memory") // resident set size in MB
-  totalRss     Float?   @map("total_rss")
   server       Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
 
   @@map("ping_history")
@@ -79,4 +76,17 @@ model Alert {
   user   User   @relation(fields: [userId], references: [id], onDelete: Cascade)
 
   @@map("alerts")
+}
+
+model MemoryHistory {
+  id           String   @id @default(uuid())
+  serverId     String   @map("server_id")
+  timestamp    DateTime @default(now())
+  heapUsage    Float?   @map("heap_usage") // heap usage in MB
+  totalHeap    Float?   @map("total_heap")
+  rssMemory    Float?   @map("rss_memory") // resident set size in MB
+  totalRss     Float?   @map("total_rss")
+  server       Server   @relation(fields: [serverId], references: [id], onDelete: Cascade)
+
+  @@map("memory_history")
 }

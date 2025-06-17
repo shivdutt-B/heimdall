@@ -8,28 +8,14 @@ import {
   YAxis,
 } from "recharts";
 import { ChartAreaSkeleton } from "../../skeletons/dashboard/ChartAreaSkeleton";
+import { useMemoryHistory } from "../../hooks/useMemoryHistory";
 
 interface Props {
   className?: string;
   serverId: string | null;
   selectedDays: number;
   setSelectedDays: (days: number) => void;
-  pings: PingData[];
-  loading: boolean;
   hasServers?: boolean;
-}
-
-interface PingData {
-  id: string;
-  serverId: string;
-  status: boolean;
-  responseTime: number | null;
-  statusCode: number | null;
-  timestamp: string;
-  heapUsage: number | null;
-  totalHeap: number | null;
-  rssMemory: number | null;
-  totalRss: number | null;
 }
 
 interface ChartData {
@@ -43,21 +29,20 @@ export const ChartAreaInteractive: React.FC<Props> = ({
   serverId,
   selectedDays,
   setSelectedDays,
-  pings,
-  loading,
   hasServers = true,
 }) => {
   const [daysInput, setDaysInput] = useState(selectedDays.toString());
+  const { data: memoryData, loading, error } = useMemoryHistory(serverId, selectedDays);
 
   useEffect(() => {
     setDaysInput(selectedDays.toString());
   }, [selectedDays]);
 
-  // Create chart data
-  const chartData: ChartData[] = pings.map((ping) => ({
-    date: ping.timestamp,
-    rss: ping.rssMemory,
-    heap: ping.heapUsage,
+  // Create chart data from memoryData
+  const chartData = memoryData.map((item) => ({
+    date: item.timestamp,
+    rss: item.rssMemory,
+    heap: item.heapUsage,
   }));
   const chartWidth = Math.max(chartData.length * 50, 800);
 

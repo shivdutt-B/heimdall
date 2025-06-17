@@ -285,3 +285,38 @@ exports.getServerPings = async (req, res) => {
     res.status(500).send("Server error");
   }
 };
+
+/**
+ * Get memory history for a server
+ * @route POST /api/servers/memory-history
+ */
+exports.getMemoryHistory = async (req, res) => {
+  try {
+    const { id, days } = req.body;
+    const daysNum = parseInt(days);
+    if (!id || !days || isNaN(daysNum)) {
+      return res.status(400).json({ message: "Invalid parameters" });
+    }
+    // Calculate the date range
+    const endDate = new Date();
+    const startDate = new Date();
+    startDate.setDate(startDate.getDate() - daysNum);
+    // Get memory history within date range
+    const memoryHistory = await prisma.memoryHistory.findMany({
+      where: {
+        serverId: id,
+        timestamp: {
+          gte: startDate,
+          lte: endDate,
+        },
+      },
+      orderBy: {
+        timestamp: "desc",
+      },
+    });
+    res.json({ memoryHistory, startDate, endDate });
+  } catch (err) {
+    console.error("Get memory history error:", err.message);
+    res.status(500).send("Server error");
+  }
+};

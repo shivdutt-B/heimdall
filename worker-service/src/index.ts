@@ -92,6 +92,14 @@ async function handlePing(job: Job<PingJob>) {
                     status: true,
                     responseTime,
                     statusCode: response.status,
+                    timestamp: new Date()
+                }
+            }),
+
+            // Store memory data in MemoryHistory (new table)
+            prisma.memoryHistory.create({
+                data: {
+                    serverId,
                     timestamp: new Date(),
                     heapUsage: memory.heapUsed,
                     totalHeap: memory.heapTotal,
@@ -150,11 +158,7 @@ async function handlePing(job: Job<PingJob>) {
                     serverId,
                     status: false,
                     statusCode: error.response?.status || null,
-                    timestamp: new Date(),
-                    heapUsage: null,
-                    totalHeap: null,
-                    rssMemory: null,
-                    totalRss: null
+                    timestamp: new Date()
                 }
             });
 
