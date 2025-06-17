@@ -1,6 +1,8 @@
 import React, { useState, useEffect } from "react";
 import { format } from "date-fns";
 import { DataTableSkeleton } from "../../skeletons/dashboard/DataTableSkeleton";
+import { useRecoilValue } from "recoil";
+import { serverDetailsAtom } from "../../store/serverAtoms";
 
 interface Props {
   className?: string;
@@ -46,6 +48,12 @@ export const DataTable: React.FC<Props> = ({
   error,
   refetch,
 }) => {
+  const serverDetails = useRecoilValue(serverDetailsAtom);
+  let pingStats = { total: 0, successful: 0, failed: 0 };
+  if (serverId && serverDetails[serverId] && serverDetails[serverId].pingStats) {
+    pingStats = serverDetails[serverId].pingStats;
+  }
+
   // Filter pings based on status
   const filteredPings = pings.filter((ping) => {
     if (statusFilter === "all") return true;
@@ -101,6 +109,36 @@ export const DataTable: React.FC<Props> = ({
 
   return (
     <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
+      {/* Ping counts from serverDetails */}
+      <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 px-4 pt-4">
+        <button
+          className="px-3 py-1.5 text-sm font-medium text-white/90 rounded-md bg-white/20 font-semibold"
+          disabled
+        >
+          All
+          <span className="ml-1.5 bg-white/10 text-xs px-1.5 rounded-full">
+            {pingStats.total}
+          </span>
+        </button>
+        <button
+          className="px-3 py-1.5 text-sm font-medium text-white/90 rounded-md bg-green-500/20 font-semibold"
+          disabled
+        >
+          Success
+          <span className="bg-green-500/20 text-green-400 text-xs px-1.5 rounded-full">
+            {pingStats.successful}
+          </span>
+        </button>
+        <button
+          className="px-3 py-1.5 text-sm font-medium text-white/90 rounded-md bg-red-500/20 font-semibold"
+          disabled
+        >
+          Fail
+          <span className="bg-red-500/20 text-red-400 text-xs px-1.5 rounded-full">
+            {pingStats.failed}
+          </span>
+        </button>
+      </div>
       <div className="relative w-full overflow-auto">
         <table className="w-full caption-bottom text-sm">
           <thead>

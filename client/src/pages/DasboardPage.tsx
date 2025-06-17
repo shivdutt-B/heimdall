@@ -73,18 +73,6 @@ const Dashboard: React.FC = () => {
     setPage(1);
   }, [selectedServerId, selectedDays, statusFilter]);
 
-  // Calculate ping counts for all available pings for the current filter/days
-  const getPingCounts = () => {
-    if (!selectedServerId) return { all: 0, success: 0, fail: 0 };
-    // Use totalPings for 'all', and count in pings for success/fail
-    const all = totalPings || 0;
-    const success = pings.filter((p) => p.status === true).length;
-    const fail = pings.filter((p) => p.status === false).length;
-    return { all, success, fail };
-  };
-
-  const pingCounts = getPingCounts();
-
   // Calculate server stats from real data
   const calculateServerStats = (serverName: string): ServerStats | null => {
     // console.log("calc stats", serverName);
@@ -181,7 +169,7 @@ const Dashboard: React.FC = () => {
           {/* Data Table Section */}
           <section className="space-y-4">
             <div className="flex items-center justify-between flex-wrap gap-4">
-              <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
+              {/* <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
                 <button
                   onClick={() => setStatusFilter("all")}
                   className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors ${statusFilter === "all"
@@ -191,7 +179,7 @@ const Dashboard: React.FC = () => {
                 >
                   All
                   <span className="ml-1.5 bg-white/10 text-xs px-1.5 rounded-full">
-                    {pingCounts.all}
+                    {totalPings}
                   </span>
                 </button>
                 <button
@@ -203,7 +191,7 @@ const Dashboard: React.FC = () => {
                 >
                   Success
                   <span className="bg-green-500/20 text-green-400 text-xs px-1.5 rounded-full">
-                    {pingCounts.success}
+                    {pings.filter((p) => p.status === true).length}
                   </span>
                 </button>
                 <button
@@ -215,10 +203,10 @@ const Dashboard: React.FC = () => {
                 >
                   Fail
                   <span className="bg-red-500/20 text-red-400 text-xs px-1.5 rounded-full">
-                    {pingCounts.fail}
+                    {pings.filter((p) => p.status === false).length}
                   </span>
                 </button>
-              </div>
+              </div> */}
             </div>
             <DataTable
               serverId={selectedServerId}

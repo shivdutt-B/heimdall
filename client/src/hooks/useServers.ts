@@ -38,6 +38,8 @@ export const useServers = () => {
         }
       );
 
+      console.log("Fetched server details:", response.data);
+
       // Update cache with new data
       setServerDetails((prev) => ({
         ...prev,
