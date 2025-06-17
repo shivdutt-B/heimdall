@@ -92,5 +92,6 @@ export const useServerPings = (serverId: string | null, days: number, page: numb
     error,
     hasMore,
     total,
+    refetch: fetchPings,
   };
 };

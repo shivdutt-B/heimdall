@@ -13,6 +13,8 @@ interface Props {
   setPage: (page: number) => void;
   hasMore: boolean;
   totalPings: number;
+  error?: any;
+  refetch?: () => void;
 }
 
 interface PingData {
@@ -41,6 +43,8 @@ export const DataTable: React.FC<Props> = ({
   setPage,
   hasMore,
   totalPings,
+  error,
+  refetch,
 }) => {
   // Filter pings based on status
   const filteredPings = pings.filter((ping) => {
@@ -77,6 +81,22 @@ export const DataTable: React.FC<Props> = ({
 
   if (filteredPings.length === 0) {
     return <EmptyState message="No ping data available for the selected filter." />;
+  }
+
+  if (error) {
+    return (
+      <div className={`rounded-md border border-red-700 bg-red-950/80 p-6 text-center ${className}`}>
+        <p className="text-red-400 mb-4">{error?.message || String(error) || 'Failed to load pings.'}</p>
+        {refetch && (
+          <button
+            onClick={refetch}
+            className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold"
+          >
+            Try Again
+          </button>
+        )}
+      </div>
+    );
   }
 
   return (

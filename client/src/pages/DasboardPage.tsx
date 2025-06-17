@@ -53,6 +53,8 @@ const Dashboard: React.FC = () => {
     loading: pingsLoading,
     hasMore,
     total: totalPings,
+    error: pingsError,
+    refetch: refetchPings,
   } = useServerPings(
     selectedServerId,
     selectedDays,
@@ -71,13 +73,14 @@ const Dashboard: React.FC = () => {
     setPage(1);
   }, [selectedServerId, selectedDays, statusFilter]);
 
-  // Calculate ping counts from all fetched pings for the current filter/days
+  // Calculate ping counts for all available pings for the current filter/days
   const getPingCounts = () => {
-    if (!pings || !Array.isArray(pings)) return { success: 0, fail: 0 };
-    return {
-      success: pings.filter((p) => p.status === true).length,
-      fail: pings.filter((p) => p.status === false).length,
-    };
+    if (!selectedServerId) return { all: 0, success: 0, fail: 0 };
+    // Use totalPings for 'all', and count in pings for success/fail
+    const all = totalPings || 0;
+    const success = pings.filter((p) => p.status === true).length;
+    const fail = pings.filter((p) => p.status === false).length;
+    return { all, success, fail };
   };
 
   const pingCounts = getPingCounts();
@@ -188,7 +191,7 @@ const Dashboard: React.FC = () => {
                 >
                   All
                   <span className="ml-1.5 bg-white/10 text-xs px-1.5 rounded-full">
-                    {pingCounts.success + pingCounts.fail}
+                    {pingCounts.all}
                   </span>
                 </button>
                 <button
@@ -227,6 +230,8 @@ const Dashboard: React.FC = () => {
               setPage={setPage}
               hasMore={hasMore}
               totalPings={totalPings}
+              error={pingsError}
+              refetch={refetchPings}
             />
           </section>
         </div>
