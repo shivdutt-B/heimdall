@@ -64,7 +64,7 @@ async function addServer(
 // Function to handle deleting a server
 async function handleDeleteServer(serverId: string, token: string | null) {
   try {
-    await axios.delete(`${import.meta.env.VITE_BACKEND_UR}/api/servers/${serverId}`, {
+    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/servers/${serverId}`, {
       headers: {
         "x-auth-token": token,
       },
