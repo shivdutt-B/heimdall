@@ -75,7 +75,7 @@ export const useServerPings = (serverId: string | null, days: number, page: numb
         setLoading(false);
       }
     },
-    [serverId, days, page, cacheKey, pingHistory, setPingHistory]
+    [serverId, page, cacheKey, pingHistory, setPingHistory]
   );
 
   useEffect(() => {
