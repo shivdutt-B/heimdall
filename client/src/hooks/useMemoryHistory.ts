@@ -1,5 +1,11 @@
-import { useEffect, useState } from "react";
+import { useEffect } from "react";
 import axios from "axios";
+import { useRecoilState } from "recoil";
+import {
+  memoryHistoryAtom,
+  memoryHistoryLoadingAtom,
+  memoryHistoryErrorAtom,
+} from "../store/memoryHistory";
 
 export interface MemoryData {
   id: string;
@@ -12,19 +18,30 @@ export interface MemoryData {
 }
 
 export const useMemoryHistory = (serverId: string | null, days: number) => {
-  const [data, setData] = useState<MemoryData[]>([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState<Error | null>(null);
+  const [memoryHistory, setMemoryHistory] = useRecoilState(memoryHistoryAtom);
+  const [loadingState, setLoadingState] = useRecoilState(
+    memoryHistoryLoadingAtom
+  );
+  const [errorState, setErrorState] = useRecoilState(memoryHistoryErrorAtom);
+
+  // Unique key for each serverId+days combination
+  const key = serverId ? `${serverId}_${days}` : "";
 
   useEffect(() => {
     if (!serverId) {
-      setData([]);
+      setMemoryHistory((prev) => ({ ...prev, [key]: [] }));
+      setLoadingState((prev) => ({ ...prev, [key]: false }));
+      setErrorState((prev) => ({ ...prev, [key]: null }));
       return;
     }
-    setLoading(true);
-    setError(null);
+    // Only fetch if we don't already have data for this key
+    if (memoryHistory[key] && memoryHistory[key].length > 0) {
+      setLoadingState((prev) => ({ ...prev, [key]: false }));
+      return;
+    }
+    setLoadingState((prev) => ({ ...prev, [key]: true }));
+    setErrorState((prev) => ({ ...prev, [key]: null }));
     const token = localStorage.getItem("token");
-    console.log("Fetching memory history for server:", serverId, "days:", days);
     axios
       .post(
         `${import.meta.env.VITE_BACKEND_URL}/api/servers/memory-history`,
@@ -39,16 +56,22 @@ export const useMemoryHistory = (serverId: string | null, days: number) => {
         }
       )
       .then((res) => {
-        console.log("Memory history data:", res.data);
-        setData(res.data.memoryHistory);
+        setMemoryHistory((prev) => ({
+          ...prev,
+          [key]: res.data.memoryHistory,
+        }));
       })
       .catch((err) => {
-        setError(err);
+        setErrorState((prev) => ({ ...prev, [key]: err }));
       })
       .finally(() => {
-        setLoading(false);
+        setLoadingState((prev) => ({ ...prev, [key]: false }));
       });
-  }, [serverId, days]);
+  }, [serverId, days, key]);
 
-  return { data, loading, error };
+  return {
+    data: memoryHistory[key] || [],
+    loading: loadingState[key] || false,
+    error: errorState[key] || null,
+  };
 };

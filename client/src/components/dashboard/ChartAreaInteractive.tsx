@@ -8,6 +8,12 @@ import {
   YAxis,
 } from "recharts";
 import { ChartAreaSkeleton } from "../../skeletons/dashboard/ChartAreaSkeleton";
+import { useRecoilValue } from "recoil";
+import {
+  memoryHistoryAtom,
+  memoryHistoryLoadingAtom,
+  memoryHistoryErrorAtom,
+} from "../../store/memoryHistory";
 import { useMemoryHistory } from "../../hooks/useMemoryHistory";
 
 interface Props {
@@ -32,7 +38,13 @@ export const ChartAreaInteractive: React.FC<Props> = ({
   hasServers = true,
 }) => {
   const [daysInput, setDaysInput] = useState(selectedDays.toString());
-  const { data: memoryData, loading, error } = useMemoryHistory(serverId, selectedDays);
+  // Ensure memory data is fetched and atoms are populated
+  useMemoryHistory(serverId, selectedDays);
+  // Use Recoil for memory data, loading, and error
+  const key = serverId ? `${serverId}_${selectedDays}` : "";
+  const memoryData = useRecoilValue(memoryHistoryAtom)[key] || [];
+  const loading = useRecoilValue(memoryHistoryLoadingAtom)[key] || false;
+  const error = useRecoilValue(memoryHistoryErrorAtom)[key] || null;
 
   useEffect(() => {
     setDaysInput(selectedDays.toString());

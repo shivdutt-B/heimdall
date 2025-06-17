@@ -152,9 +152,9 @@ export const DataTable: React.FC<Props> = ({
               <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
                 Status Code
               </th>
-              <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
+              {/* <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
                 Memory Usage
-              </th>
+              </th> */}
               <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
                 Timestamp
               </th>
@@ -181,11 +181,11 @@ export const DataTable: React.FC<Props> = ({
                 <td className="p-4 align-middle text-gray-300">
                   {ping.statusCode || "N/A"}
                 </td>
-                <td className="p-4 align-middle text-gray-300">
+                {/* <td className="p-4 align-middle text-gray-300">
                   {ping.heapUsage && ping.totalHeap
                     ? `${ping.heapUsage.toFixed(2)}/${ping.totalHeap.toFixed(2)} MB`
                     : "N/A"}
-                </td>
+                </td> */}
                 <td className="p-4 align-middle text-gray-300">
                   {format(new Date(ping.timestamp), "yyyy-MM-dd HH:mm:ss")}
                 </td>
