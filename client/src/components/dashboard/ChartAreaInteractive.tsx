@@ -64,20 +64,24 @@ export const ChartAreaInteractive: React.FC<Props> = ({
 
   // Days selection component
   const DaysSelection = () => (
-    <div className="flex items-center justify-between p-6 pb-0">
-      <div className="flex items-center gap-4">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-6 pb-0 gap-3 sm:gap-0">
+      <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-blue-500/50"></div>
-          <span className="text-sm font-medium text-white/60">RSS Memory</span>
+          <span className="text-xs sm:text-sm font-medium text-white/60">
+            RSS Memory
+          </span>
         </div>
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-green-500/50"></div>
-          <span className="text-sm font-medium text-white/60">Heap Memory</span>
+          <span className="text-xs sm:text-sm font-medium text-white/60">
+            Heap Memory
+          </span>
         </div>
       </div>
-      <div className="flex items-center gap-4">
+      <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-sm font-medium text-white/60">Last</span>
+          <span className="text-xs sm:text-sm font-medium text-white/60">Last</span>
           <input
             type="number"
             min="1"
@@ -89,9 +93,9 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                 setDaysInput(value);
               }
             }}
-            className="w-16 px-2 py-1 text-sm font-medium text-white/90 bg-transparent rounded-md border border-gray-700 focus:outline-none"
+            className="w-auto min-w-0 max-w-[60px] px-2 py-1 text-xs sm:text-sm font-medium text-white/90 bg-transparent rounded-md border border-gray-700 focus:outline-none overflow-hidden text-ellipsis"
           />
-          <span className="text-sm font-medium text-white/60">Days</span>
+          <span className="text-xs sm:text-sm font-medium text-white/60">Days</span>
           <button
             onClick={() => {
               const days = parseInt(daysInput);
@@ -99,7 +103,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                 setSelectedDays(days);
               }
             }}
-            className="px-3 py-1 text-sm font-semibold text-white/90 bg-blue-500 rounded-sm transition-colors cursor-pointer"
+            className="px-3 py-1 text-xs sm:text-sm font-semibold text-white/90 bg-blue-500 rounded-sm transition-colors cursor-pointer"
           >
             Go
           </button>
