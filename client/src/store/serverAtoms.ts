@@ -15,10 +15,10 @@ interface PingHistory {
   responseTime: number | null;
   statusCode: number | null;
   timestamp: string;
-  heapUsage: number | null;
-  totalHeap: number | null;
-  rssMemory: number | null;
-  totalRss: number | null;
+  // heapUsage: number | null;
+  // totalHeap: number | null;
+  // rssMemory: number | null;
+  // totalRss: number | null;
 }
 
 interface PingStats {
