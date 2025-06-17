@@ -47,6 +47,7 @@ const NavBar: React.FC = () => {
     <nav className="sticky top-0 z-50 w-full backdrop-blur-sm text-white shadow-sm bg-transparent transition-all duration-200">
       <div className="flex h-16 w-full items-center px-2 sm:px-5 lg:px-20">
         {/* Mobile navigation */}
+        {/*
         <div className="flex w-full items-center justify-between md:hidden">
           <div className="flex flex-col gap-1.5 pl-2">
             <Link
@@ -99,9 +100,10 @@ const NavBar: React.FC = () => {
             </svg>
           </button>
         </div>
+        */}
 
         {/* Desktop navigation */}
-        <div className="hidden flex-grow items-center justify-between space-x-4 md:flex">
+        <div className="flex flex-grow items-center justify-between space-x-4 md:flex">
           <div className="flex items-center">
             <div className="flex flex-col gap-1.5">
               <Link

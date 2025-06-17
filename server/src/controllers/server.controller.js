@@ -299,7 +299,9 @@ exports.getMemoryHistory = async (req, res) => {
         timestamp: "desc",
       },
     });
-    res.json({ memoryHistory, startDate, endDate });
+    // Exclude serverId and id from each record
+    const filteredMemoryHistory = memoryHistory.map(({ serverId, id, ...rest }) => rest);
+    res.json({ memoryHistory: filteredMemoryHistory, startDate, endDate });
   } catch (err) {
     console.error("Get memory history error:", err.message);
     res.status(500).send("Server error");

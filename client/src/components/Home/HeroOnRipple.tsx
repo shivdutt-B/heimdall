@@ -25,7 +25,7 @@ function HeroOnRipple() {
                     ease: "easeInOut",
                   }}
                   className="mr-2 inline-block bg-gradient-to-r from-indigo-200 via-pink-200 to-yellow-200
- bg-clip-text text-transparent h-24"
+ bg-clip-text text-transparent h-auto"
                 >
                   {word}
                 </motion.span>
