@@ -543,15 +543,11 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
 // API code examples
 const nodeJsCode = `// Express.js endpoint
 const express = require('express');
-const cors = require('cors');
 const heimdall = require('heimdall-nodejs-sdk');
 
 const app = express();
 
-const allowedOrigins = ['https://user-frontend.com', 'https://heimdall.com'];
-app.use(cors({ origin: allowedOrigins }));
-
-// Add Heimdall ping endpoint - no need to pass CORS options again
+// Add Heimdall ping endpoint
 heimdall.ping(app);
 
 app.listen(3000, () => console.log("Server running on port 3000"));`;
@@ -894,6 +890,38 @@ const Faq: React.FC = () => (
   </section>
 );
 
+// Warning banner component
+const WarningBanner: React.FC = () => (
+  <div className="bg-yellow-100 border-3 border-yellow-500 rounded-lg p-6 mb-8 shadow-md">
+    <div className="flex items-center mb-4">
+      <span className="mr-4 text-2xl">
+        <img
+          src="https://fonts.gstatic.com/s/e/notoemoji/16.0/26a0_fe0f/72.png"
+          alt="⚠️"
+          className="w-6 h-6"
+          draggable="false"
+        />
+      </span>
+      <div>
+        <h2 className="text-yellow-700 text-xl font-bold tracking-tight">
+          Free Tier Usage Warning
+        </h2>
+      </div>
+    </div>
+
+    <p className="text-base font-semibold text-yellow-900 leading-relaxed">
+      Running this service continuously will consume your entire
+      <span className="inline-block bg-yellow-300 text-yellow-900 font-semibold px-2 py-0.5 rounded ml-1">
+        750-hour free tier
+      </span>
+      quota on free hosting platforms like Render, Railway, or Fly.io.
+    </p>
+  </div>
+
+
+
+);
+
 // Main Introduction component
 const Introduction: React.FC = () => {
   return (
@@ -919,6 +947,7 @@ const Introduction: React.FC = () => {
           </svg>
           Home
         </Link>
+        <WarningBanner />
         <Header />
         <div className="space-y-10">
           <WhatIsHeimdall />

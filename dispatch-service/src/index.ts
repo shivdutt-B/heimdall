@@ -3,7 +3,6 @@ import { Queue, Job, QueueEvents } from 'bullmq';
 import * as dotenv from 'dotenv';
 const express = require('express');
 const heimdall = require('heimdall-nodejs-sdk');
-const cors = require('cors');
 
 
 dotenv.config();
@@ -122,7 +121,6 @@ queueEvents.on('removed', ({ jobId }) => {
 
 // Express server setup for Render deployment
 const app = express();
-app.use(cors());
 heimdall.ping(app);
 
 const PORT = parseInt(process.env.PORT || '3000');
