@@ -28,7 +28,11 @@ interface ServerStats {
 const Dashboard: React.FC = () => {
   const [selectedServer, setSelectedServer] = useState<string | null>(null);
   const [selectedDays, setSelectedDays] = useRecoilState(selectedDaysAtom);
-  const [statusFilter, setStatusFilter] = useState<"all" | "success" | "fail">(
+  // const [statusFilter, setStatusFilter] = useState<"all" | "success" | "fail">(
+  //   "all"
+  // );
+  // Not declaring setStatusFilter, due to its no usage hence it is throwing an error(declared but never used) during deployment on vercel.
+  const [statusFilter] = useState<"all" | "success" | "fail">(
     "all"
   );
   const [page, setPage] = useState(1);

@@ -12,7 +12,6 @@ import { useRecoilValue } from "recoil";
 import {
   memoryHistoryAtom,
   memoryHistoryLoadingAtom,
-  memoryHistoryErrorAtom,
 } from "../../store/memoryHistory";
 import { useMemoryHistory } from "../../hooks/useMemoryHistory";
 

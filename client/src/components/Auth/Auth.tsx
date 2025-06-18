@@ -30,7 +30,7 @@ export const Auth = () => {
     password: "",
   });
 
-  const [isLoading, setIsLoading] = useState(false);
+  const [setIsLoading] = useState(false); // not using isLoading due to is not usage anywhere in the component hence it is throwing error(declared but never used) during deployment(vercel)
 
   // Auto-clear error messages after 3 seconds
   useEffect(() => {
