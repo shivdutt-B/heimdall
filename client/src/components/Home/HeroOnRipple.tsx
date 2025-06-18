@@ -33,7 +33,7 @@ function HeroOnRipple() {
           </h1>
           <p className="font-Inter text-[15px] mt-3 text-white/80 font-light">
             Heimdall keeps your backend servers awake and watches over their
-            uptime — no more cold starts or 30s delays.
+            uptime — no more cold starts or 50s delays.
           </p>
           <div className="flex justify-center mt-5">
             <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
