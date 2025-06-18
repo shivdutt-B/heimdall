@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from "react";
+import React from "react";
 import { format } from "date-fns";
 import { DataTableSkeleton } from "../../skeletons/dashboard/DataTableSkeleton";
 import { useRecoilValue } from "recoil";
@@ -112,7 +112,7 @@ export const DataTable: React.FC<Props> = ({
       {/* Ping counts from serverDetails */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 px-4 pt-4">
         <button
-          className="px-3 py-1.5 text-sm font-medium text-white/90 rounded-md bg-white/20 font-semibold"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-md bg-white/20"
           disabled
         >
           All
@@ -121,7 +121,7 @@ export const DataTable: React.FC<Props> = ({
           </span>
         </button>
         <button
-          className="px-3 py-1.5 text-sm font-medium text-white/90 rounded-md bg-green-500/20 font-semibold"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-md bg-green-500/20"
           disabled
         >
           Success
@@ -130,7 +130,7 @@ export const DataTable: React.FC<Props> = ({
           </span>
         </button>
         <button
-          className="px-3 py-1.5 text-sm font-medium text-white/90 rounded-md bg-red-500/20 font-semibold"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-md bg-red-500/20"
           disabled
         >
           Fail
@@ -152,9 +152,6 @@ export const DataTable: React.FC<Props> = ({
               <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
                 Status Code
               </th>
-              {/* <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
-                Memory Usage
-              </th> */}
               <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
                 Timestamp
               </th>
@@ -181,11 +178,6 @@ export const DataTable: React.FC<Props> = ({
                 <td className="p-4 align-middle text-gray-300">
                   {ping.statusCode || "N/A"}
                 </td>
-                {/* <td className="p-4 align-middle text-gray-300">
-                  {ping.heapUsage && ping.totalHeap
-                    ? `${ping.heapUsage.toFixed(2)}/${ping.totalHeap.toFixed(2)} MB`
-                    : "N/A"}
-                </td> */}
                 <td className="p-4 align-middle text-gray-300">
                   {format(new Date(ping.timestamp), "yyyy-MM-dd HH:mm:ss")}
                 </td>

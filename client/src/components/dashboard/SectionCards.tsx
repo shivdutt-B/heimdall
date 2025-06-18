@@ -49,13 +49,16 @@ async function addServer(
       }
     );
     return { success: true, data: response.data };
-  } catch (err: any) {
+  } catch (err: unknown) {
     let message = "Failed to add server. Please try again.";
-    if (err.response && err.response.data && err.response.data.message) {
-      message = err.response.data.message;
-    } else if (err.response && err.response.data && err.response.data.errors) {
-      // Express-validator errors
-      message = err.response.data.errors.map((e: any) => e.msg).join(", ");
+    if (axios.isAxiosError(err) && err.response && err.response.data) {
+      const errorData = err.response.data;
+      if (errorData.message) {
+        message = errorData.message;
+      } else if (errorData.errors) {
+        // Express-validator errors
+        message = errorData.errors.map((e: any) => e.msg).join(", ");
+      }
     }
     return { success: false, error: message };
   }
@@ -70,9 +73,9 @@ async function handleDeleteServer(serverId: string, token: string | null) {
       },
     });
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     let message = "Failed to delete server. Please try again.";
-    if (err.response && err.response.data && err.response.data.message) {
+    if (axios.isAxiosError(err) && err.response && err.response.data && err.response.data.message) {
       message = err.response.data.message;
     }
     return { success: false, error: message };
@@ -97,9 +100,9 @@ async function modifyServer(
       }
     );
     return { success: true };
-  } catch (err: any) {
+  } catch (err: unknown) {
     let message = "Failed to modify server. Please try again.";
-    if (err.response && err.response.data && err.response.data.message) {
+    if (axios.isAxiosError(err) && err.response && err.response.data && err.response.data.message) {
       message = err.response.data.message;
     }
     return { success: false, error: message };

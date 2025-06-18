@@ -46,63 +46,6 @@ const NavBar: React.FC = () => {
   return (
     <nav className="sticky top-0 z-50 w-full backdrop-blur-sm text-white shadow-sm bg-transparent transition-all duration-200">
       <div className="flex h-16 w-full items-center px-2 sm:px-5 lg:px-20">
-        {/* Mobile navigation */}
-        {/*
-        <div className="flex w-full items-center justify-between md:hidden">
-          <div className="flex flex-col gap-1.5 pl-2">
-            <Link
-              className="transition-opacity hover:opacity-75 text-2xl"
-              to="/"
-            >
-              <svg
-                xmlns="http://www.w3.org/2000/svg"
-                width="35px"
-                height="35px"
-                viewBox="0 0 28 26"
-                fill="#fff"
-              >
-                <path
-                  d="M9.38669 11.7586C12.6314 11.7586 15.2617 9.12628 15.2617 5.87928C15.2617 2.63224 12.6314 0 9.38669 0C6.142 0 3.51168 2.63224 3.51168 5.87928C3.51168 9.12628 6.142 11.7586 9.38669 11.7586Z"
-                  fill="#fff"
-                />
-                <path
-                  d="M19.9447 8.00949C21.5748 8.00949 22.8964 6.68699 22.8964 5.05562C22.8964 3.42427 21.5748 2.10179 19.9447 2.10179C18.3145 2.10179 16.993 3.42427 16.993 5.05562C16.993 6.68699 18.3145 8.00949 19.9447 8.00949Z"
-                  fill="#fff"
-                />
-                <path
-                  d="M2.95182 17.5744C4.58199 17.5744 5.90351 16.2519 5.90351 14.6205C5.90351 12.9892 4.58199 11.6667 2.95182 11.6667C1.32165 11.6667 0.000129382 12.9892 0.000129382 14.6205C0.000129382 16.2519 1.32165 17.5744 2.95182 17.5744Z"
-                  fill="#fff"
-                />
-                <path
-                  d="M19.2067 21.8698C22.5925 21.8698 25.3372 19.1231 25.3372 15.7348C25.3372 12.3467 22.5925 9.59995 19.2067 9.59995C15.821 9.59995 13.0763 12.3467 13.0763 15.7348C13.0763 19.1231 15.821 21.8698 19.2067 21.8698Z"
-                  fill="#fff"
-                />
-                <path
-                  d="M8.73393 24C10.7716 24 12.4235 22.3469 12.4235 20.3077C12.4235 18.2685 10.7716 16.6154 8.73393 16.6154C6.69621 16.6154 5.04431 18.2685 5.04431 20.3077C5.04431 22.3469 6.69621 24 8.73393 24Z"
-                  fill="#fff"
-                />
-              </svg>
-            </Link>
-          </div>
-          <button
-            id="nav-menu-button"
-            className="rounded-full p-2 transition-colors"
-          >
-            <svg
-              xmlns="http://www.w3.org/2000/svg"
-              width="45px"
-              height="45px"
-              viewBox="0 -960 960 960"
-              className="shrink-0 h-7 w-7"
-              fill="currentColor"
-            >
-              <path d="M150-240q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h660q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5zm0-210q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h660q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5zm0-210q-12.75 0-21.37-8.68-8.63-8.67-8.63-21.5 0-12.82 8.63-21.32 8.62-8.5 21.37-8.5h660q12.75 0 21.38 8.68 8.62 8.67 8.62 21.5 0 12.82-8.62 21.32-8.63 8.5-21.38 8.5z"></path>
-            </svg>
-          </button>
-        </div>
-        */}
-
-        {/* Desktop navigation */}
         <div className="flex flex-grow items-center justify-between space-x-4 md:flex">
           <div className="flex items-center">
             <div className="flex flex-col gap-1.5">

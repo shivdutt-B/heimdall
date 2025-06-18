@@ -25,9 +25,6 @@ export const DataTableSkeleton: React.FC<DataTableSkeletonProps> = ({
                 Status Code
               </th>
               <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
-                Memory Usage
-              </th>
-              <th className="h-12 px-4 text-left align-middle text-gray-400 font-medium">
                 Timestamp
               </th>
             </tr>

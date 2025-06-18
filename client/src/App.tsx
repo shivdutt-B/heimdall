@@ -7,7 +7,7 @@ import DocsPage from "./pages/DocsPage";
 import { Routes, Route, useLocation } from "react-router-dom";
 import Dashboard from "./pages/DasboardPage";
 import { useAuth } from "./hooks/useAuth";
-import Profile from "./pages/ProfilePage";
+// import Profile from "./pages/ProfilePage";
 
 function App() {
   useAuth();
@@ -20,7 +20,7 @@ function App() {
         <Route path="/auth/*" element={<AuthPage />} />
         <Route path="/docs" element={<DocsPage />} />
         <Route path="/dashboard/*" element={<Dashboard />} />
-        <Route path="/profile" element={<Profile />} />
+        {/* <Route path="/profile" element={<Profile />} /> */}
       </Routes>
       <Footer />
     </>

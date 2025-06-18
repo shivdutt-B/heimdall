@@ -473,7 +473,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
               setInstallCopied(true);
               setTimeout(() => setInstallCopied(false), 1800);
             }}
-            className="inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-[#040506] border border-white/20 text-white hover:bg-white/10 h-9 px-3 rounded-md text-sm h-8 px-3 border border-gray-600 hover:bg-gray-600 text-black rounded-sm bg-white/10 transition duration-200 ease-in-out"
+            className="inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-[#040506] border border-white/20 text-white hover:bg-white/10 h-8 px-3 rounded-md text-sm"
             style={{ minWidth: 65 }}
           >
             {installCopied ? (
@@ -580,108 +580,6 @@ register_ping(app)
 if __name__ == "__main__":
     app.run(port=5000, debug=True)
 `;
-
-const springCode = `// PingController.java
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.RestController;
-import java.time.LocalDateTime;
-import java.time.format.DateTimeFormatter;
-import java.lang.management.ManagementFactory;
-import java.lang.management.MemoryMXBean;
-import java.util.HashMap;
-import java.util.Map;
-
-@RestController
-public class PingController {
-
-    @GetMapping("/__ping__")
-    public Map<String, Object> ping() {
-        // Log ping
-        System.out.println("Ping received at: " + LocalDateTime.now());
-        
-        // Get memory usage
-        MemoryMXBean memoryBean = ManagementFactory.getMemoryMXBean();
-        long heapMemoryUsed = memoryBean.getHeapMemoryUsage().getUsed() / (1024 * 1024);
-        
-        Map<String, Object> response = new HashMap<>();
-        response.put("status", "ok");
-        response.put("message", "Ping successful");
-        response.put("timestamp", LocalDateTime.now().toString());
-        
-        Map<String, Object> memory = new HashMap<>();
-        memory.put("heapUsed", heapMemoryUsed);
-        response.put("memory", memory);
-        
-        return response;
-    }
-}`;
-
-const rubyCode = `# Ruby on Rails controller
-# app/controllers/ping_controller.rb
-class PingController < ApplicationController
-  def ping
-    # Log ping
-    Rails.logger.info "Ping received at: #{Time.now}"
-    
-    # Get memory usage
-    memory_usage = GetProcessMem.new.mb.round(2)
-    
-    render json: {
-      status: 'ok',
-      message: 'Ping successful',
-      timestamp: Time.now.iso8601,
-      memory: {
-        usage: memory_usage
-      }
-    }
-  end
-end
-
-# config/routes.rb
-Rails.application.routes.draw do
-  get '/__ping__', to: 'ping#ping'
-end`;
-
-const phpCode = `<?php
-// Laravel route in routes/api.php
-Route::get('/__ping__', function () {
-    // Log ping
-    Log::info('Ping received at: ' . date('Y-m-d H:i:s'));
-    
-    // Get memory usage (in MB)
-    $memoryUsage = round(memory_get_usage() / 1024 / 1024, 2);
-    
-    return response()->json([
-        'status' => 'ok',
-        'message' => 'Ping successful',
-        'timestamp' => date('c'),
-        'memory' => [
-            'usage' => $memoryUsage
-        ]
-    ]);
-});
-
-// For plain PHP
-if ($_SERVER['REQUEST_URI'] === '/__ping__') {
-    header('Content-Type: application/json');
-    
-    // Log ping
-    error_log('Ping received at: ' . date('Y-m-d H:i:s'));
-    
-    // Get memory usage
-    $memoryUsage = round(memory_get_usage() / 1024 / 1024, 2);
-    
-    echo json_encode([
-        'status' => 'ok',
-        'message' => 'Ping successful',
-        'timestamp' => date('c'),
-        'memory' => [
-            'usage' => $memoryUsage
-        ]
-    ]);
-    exit;
-}
-?>`;
 
 // API Reference section
 const ApiReference: React.FC = () => {

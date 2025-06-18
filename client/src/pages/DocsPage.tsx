@@ -1,4 +1,3 @@
-import React from "react";
 import DocsLayout from "../layouts/DocsLayout";
 import Introduction from "../components/Docs/Introduction";
 

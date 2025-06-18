@@ -1,6 +1,4 @@
-import React from "react";
 import { motion } from "framer-motion";
-import { AnimatedSubscribeButton } from "../Helper/GetStartedBtn";
 import { Link } from "react-router-dom";
 import { authState } from "../../store/auth";
 import { useRecoilValue } from "recoil";
