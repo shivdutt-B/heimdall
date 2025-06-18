@@ -1,12 +1,12 @@
 import "./App.css";
-import Footer from "./Components/Footer/Footer";
-import NavBar from "./Components/Navbar/NavBar";
-import HomePage from "./Pages/HomePage";
-import AuthPage from "./Pages/AuthPage";
-import DocsPage from "./Pages/DocsPage";
+import Footer from "./components/Footer/Footer";
+import NavBar from "./components/Navbar/NavBar";
+import HomePage from "./pages/HomePage";
+import AuthPage from "./pages/AuthPage";
+import DocsPage from "./pages/DocsPage";
 import { Routes, Route } from "react-router-dom";
-import Dashboard from "./Pages/DasboardPage";
-import { useAuth } from "./Hooks/useAuth";
+import Dashboard from "./pages/DasboardPage";
+import { useAuth } from "./hooks/useAuth";
 
 function App() {
   useAuth();

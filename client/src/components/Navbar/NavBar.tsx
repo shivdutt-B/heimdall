@@ -2,7 +2,7 @@ import { useRecoilValue, useResetRecoilState } from "recoil";
 import { Link, useNavigate } from "react-router-dom";
 import { authState } from "../../store/auth";
 import { serversAtom, serverDetailsAtom, pingHistoryAtom, selectedDaysAtom } from "../../store/serverAtoms";
-import useDeleteAccount from "../../Hooks/useDeleteAccount";
+import useDeleteAccount from "../../hooks/useDeleteAccount";
 import React from "react";
 
 const NavBar: React.FC = () => {

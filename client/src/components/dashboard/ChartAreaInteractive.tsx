@@ -14,7 +14,7 @@ import {
   memoryHistoryLoadingAtom,
   memoryHistoryErrorAtom,
 } from "../../store/memoryHistory";
-import { useMemoryHistory } from "../../Hooks/useMemoryHistory";
+import { useMemoryHistory } from "../../hooks/useMemoryHistory";
 
 interface Props {
   className?: string;

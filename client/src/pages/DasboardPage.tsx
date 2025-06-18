@@ -1,16 +1,16 @@
 import React, { useState, useEffect } from "react";
-import { DashboardLayout } from "../Layouts/DashboardLayout";
+import { DashboardLayout } from "../layouts/DashboardLayout";
 import { useRecoilState } from "recoil";
 import { selectedDaysAtom } from "../store/serverAtoms";
-import { useServerPings } from "../Hooks/useServerPings";
+import { useServerPings } from "../hooks/useServerPings";
 
 // Dashboard architecture
-import { SectionCards } from "../Components/Dashboard/SectionCards";
-import { DataTable } from "../Components/Dashboard/DataTable";
-import { ChartAreaInteractive } from "../Components/Dashboard/ChartAreaInteractive";
-import { ServerStatsCards } from "../Components/Dashboard/ServerStatsCards";
+import { SectionCards } from "../components/Dashboard/SectionCards";
+import { DataTable } from "../components/Dashboard/DataTable";
+import { ChartAreaInteractive } from "../components/Dashboard/ChartAreaInteractive";
+import { ServerStatsCards } from "../components/Dashboard/ServerStatsCards";
 
-import { useServerData } from "../Hooks/useServerData";
+import { useServerData } from "../hooks/useServerData";
 
 interface ServerStats {
   serverName: string;

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../Helper/Auth";
-import { useSignIn } from "../../Hooks/useSignIn";
-import { useSignUp } from "../../Hooks/useSignUp";
+import { useSignIn } from "../../hooks/useSignIn";
+import { useSignUp } from "../../hooks/useSignUp";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { authState } from "../../store/auth";
 import { useNavigate } from "react-router-dom";

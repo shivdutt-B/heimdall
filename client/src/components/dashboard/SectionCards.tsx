@@ -5,7 +5,7 @@ import { serversAtom } from "../../store/serverAtoms";
 import { format } from "date-fns";
 import { SectionCardsSkeleton } from "../../skeletons/dashboard/SectionCardsSkeleton";
 import axios from "axios";
-import { useServers } from "../../Hooks/useServers";
+import { useServers } from "../../hooks/useServers";
 
 interface Server {
   id: string;

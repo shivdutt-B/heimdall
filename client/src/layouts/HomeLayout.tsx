@@ -1,8 +1,8 @@
 import React from "react";
-import RippleHero from "../Components/Home/RippleHero";
-import StepsHero from "../Components/Home/StepsHero";
-import { VideoHero } from "../Components/Home/VideoHero";
-import FeatureHero from "../Components/Home/FeatureHero";
+import RippleHero from "../components/Home/RippleHero";
+import StepsHero from "../components/Home/StepsHero";
+import { VideoHero } from "../components/Home/VideoHero";
+import FeatureHero from "../components/Home/FeatureHero";
 
 
 function Home() {

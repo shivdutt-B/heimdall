@@ -1,5 +1,5 @@
 import React from "react";
-import Home from "../Layouts/HomeLayout";
+import Home from "../layouts/HomeLayout";
 
 function HomePage() {
   return <Home />;
