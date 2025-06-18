@@ -1,33 +1,32 @@
-import React from "react";
 import { Zap, LineChart, Bell } from "lucide-react";
 import { motion } from "framer-motion";
 
-const features = [
-  {
-    icon: Zap,
-    title: "Prevent Cold Starts",
-    description:
-      "Keep your servers warm and responsive by preventing them from going idle or sleeping.",
-    color: "#FFD700", // Gold color for Zap
-    size: "lg", // Large card
-  },
-  {
-    icon: LineChart,
-    title: "Uptime Monitoring",
-    description:
-      "Track your server's uptime with detailed analytics and historical performance data.",
-    color: "#4CAF50", // Green color for LineChart
-    size: "sm", // Small card
-  },
-  {
-    icon: Bell,
-    title: "Email Alerts for Failures",
-    description:
-      "Get notified immediately when your server goes down or experiences performance issues.",
-    color: "#FF5722", // Orange color for Bell
-    size: "sm", // Small card
-  },
-];
+// const features = [
+//   {
+//     icon: Zap,
+//     title: "Prevent Cold Starts",
+//     description:
+//       "Keep your servers warm and responsive by preventing them from going idle or sleeping.",
+//     color: "#FFD700", // Gold color for Zap
+//     size: "lg", // Large card
+//   },
+//   {
+//     icon: LineChart,
+//     title: "Uptime Monitoring",
+//     description:
+//       "Track your server's uptime with detailed analytics and historical performance data.",
+//     color: "#4CAF50", // Green color for LineChart
+//     size: "sm", // Small card
+//   },
+//   {
+//     icon: Bell,
+//     title: "Email Alerts for Failures",
+//     description:
+//       "Get notified immediately when your server goes down or experiences performance issues.",
+//     color: "#FF5722", // Orange color for Bell
+//     size: "sm", // Small card
+//   },
+// ];
 
 function FeatureHero() {
   return (

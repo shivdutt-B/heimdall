@@ -26,10 +26,6 @@ interface PingData {
   responseTime: number | null;
   statusCode: number | null;
   timestamp: string;
-  heapUsage: number | null;
-  totalHeap: number | null;
-  rssMemory: number | null;
-  totalRss: number | null;
 }
 
 const ITEMS_PER_PAGE = 10;

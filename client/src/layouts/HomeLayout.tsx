@@ -1,4 +1,3 @@
-import React from "react";
 import RippleHero from "../components/Home/RippleHero";
 import StepsHero from "../components/Home/StepsHero";
 import { VideoHero } from "../components/Home/VideoHero";

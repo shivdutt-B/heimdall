@@ -1,5 +1,5 @@
-import { useSetRecoilState, useRecoilState } from "recoil";
-import axios, { AxiosError } from "axios";
+import { useRecoilState } from "recoil";
+import axios from "axios";
 import { authState } from "../store/auth";
 import { useNavigate } from "react-router-dom";
 import { useEffect } from "react";

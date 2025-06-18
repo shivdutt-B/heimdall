@@ -24,11 +24,11 @@ interface Props {
   hasServers?: boolean;
 }
 
-interface ChartData {
-  date: string;
-  rss: number | null;
-  heap: number | null;
-}
+// interface ChartData {
+//   date: string;
+//   rss: number | null;
+//   heap: number | null;
+// }
 
 export const ChartAreaInteractive: React.FC<Props> = ({
   className,
@@ -44,7 +44,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
   const key = serverId ? `${serverId}_${selectedDays}` : "";
   const memoryData = useRecoilValue(memoryHistoryAtom)[key] || [];
   const loading = useRecoilValue(memoryHistoryLoadingAtom)[key] || false;
-  const error = useRecoilValue(memoryHistoryErrorAtom)[key] || null;
+  // const error = useRecoilValue(memoryHistoryErrorAtom)[key] || null;
 
   useEffect(() => {
     setDaysInput(selectedDays.toString());

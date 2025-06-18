@@ -1,4 +1,3 @@
-import { useEffect } from "react";
 import { useSetRecoilState, useRecoilState } from "recoil";
 import { serversAtom, serverDetailsAtom } from "../store/serverAtoms";
 import axios from "axios";

@@ -10,10 +10,10 @@ interface PingData {
   responseTime: number | null;
   statusCode: number | null;
   timestamp: string;
-  heapUsage: number | null;
-  totalHeap: number | null;
-  rssMemory: number | null;
-  totalRss: number | null;
+  // heapUsage: number | null;
+  // totalHeap: number | null;
+  // rssMemory: number | null;
+  // totalRss: number | null;
 }
 
 const CACHE_DURATION = 5 * 60 * 1000; // 5 minutes

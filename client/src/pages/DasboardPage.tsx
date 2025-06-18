@@ -61,6 +61,7 @@ const Dashboard: React.FC = () => {
 
   // Only auto-select first server if there are servers and none is selected
   useEffect(() => {
+    console.log(pings, "pings");
     if (servers.length > 0 && !selectedServer) {
       setSelectedServer(servers[0].name);
     }
@@ -157,8 +158,8 @@ const Dashboard: React.FC = () => {
                 serverId={selectedServerId}
                 selectedDays={selectedDays}
                 setSelectedDays={setSelectedDays}
-                pings={pings}
-                loading={pingsLoading}
+                // pings={pings}
+                // loading={pingsLoading}
                 hasServers={hasServers}
               />
             </div>
@@ -166,47 +167,8 @@ const Dashboard: React.FC = () => {
 
           {/* Data Table Section */}
           <section className="space-y-4">
-            <div className="flex items-center justify-between flex-wrap gap-4">
-              {/* <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0">
-                <button
-                  onClick={() => setStatusFilter("all")}
-                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors ${statusFilter === "all"
-                    ? "bg-white/20 font-semibold"
-                    : "bg-white/5 hover:bg-white/10"
-                    }`}
-                >
-                  All
-                  <span className="ml-1.5 bg-white/10 text-xs px-1.5 rounded-full">
-                    {totalPings}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setStatusFilter("success")}
-                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${statusFilter === "success"
-                    ? "bg-white/20 font-semibold"
-                    : "bg-white/5 hover:bg-white/10"
-                    }`}
-                >
-                  Success
-                  <span className="bg-green-500/20 text-green-400 text-xs px-1.5 rounded-full">
-                    {pings.filter((p) => p.status === true).length}
-                  </span>
-                </button>
-                <button
-                  onClick={() => setStatusFilter("fail")}
-                  className={`px-3 py-1.5 text-sm font-medium text-white/90 rounded-md transition-colors flex items-center gap-1 ${statusFilter === "fail"
-                    ? "bg-white/20 font-semibold"
-                    : "bg-white/5 hover:bg-white/10"
-                    }`}
-                >
-                  Fail
-                  <span className="bg-red-500/20 text-red-400 text-xs px-1.5 rounded-full">
-                    {pings.filter((p) => p.status === false).length}
-                  </span>
-                </button>
-              </div> */}
-            </div>
             <DataTable
+              className=""
               serverId={selectedServerId}
               statusFilter={statusFilter}
               pings={pings}
