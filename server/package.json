@@ -4,6 +4,7 @@
   "description": "Backend for Heimdall - A server monitoring and keep-alive service",
   "main": "src/index.js",
   "scripts": {
+    "build": "tsc",
     "start": "node src/index.js",
     "dev": "nodemon src/index.js",
     "test": "echo \"Error: no test specified\" && exit 1"
