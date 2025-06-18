@@ -234,6 +234,18 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     }
   }, [externalSelectedServer]);
 
+  // Ensure a server is always selected after servers are loaded
+  useEffect(() => {
+    if (
+      servers.length > 0 &&
+      !selectedCard &&
+      !externalSelectedServer
+    ) {
+      setSelectedCard(servers[0].name);
+      onServerSelect(servers[0].name);
+    }
+  }, [servers, selectedCard, externalSelectedServer, onServerSelect]);
+
   // Show skeleton during loading
   if (loading) {
     return <SectionCardsSkeleton />;
