@@ -84,7 +84,9 @@ export async function sendImmediateAlert(server: Server, user: User) {
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Last Checked</span>
                                     </div>
-                                     <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.lastPingedAt?.toLocaleString()}</p>
+                                     <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
+                                     ${format(new Date(server.lastPingedAt), "yyyy-MM-dd HH:mm:ss")}
+                              </p>
                                 </div>
                                 
                                 <!-- Consecutive Failures -->
