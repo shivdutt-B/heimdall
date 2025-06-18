@@ -5,10 +5,10 @@ import { selectedDaysAtom } from "../store/serverAtoms";
 import { useServerPings } from "../hooks/useServerPings";
 
 // Dashboard architecture
-import { SectionCards } from "../components/Dashboard/SectionCards";
-import { DataTable } from "../components/Dashboard/DataTable";
-import { ChartAreaInteractive } from "../components/Dashboard/ChartAreaInteractive";
-import { ServerStatsCards } from "../components/Dashboard/ServerStatsCards";
+import { SectionCards } from "../components/dashboard/SectionCards";
+import { DataTable } from "../components/dashboard/DataTable";
+import { ChartAreaInteractive } from "../components/dashboard/ChartAreaInteractive";
+import { ServerStatsCards } from "../components/dashboard/ServerStatsCards";
 
 import { useServerData } from "../hooks/useServerData";
 
