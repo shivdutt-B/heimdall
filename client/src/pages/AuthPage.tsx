@@ -1,5 +1,5 @@
 import React from "react";
-import AuthLayout from "../layouts/AuthLayout";
+import AuthLayout from "../Layouts/AuthLayout";
 
 function AuthPage() {
   return <AuthLayout />;

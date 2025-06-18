@@ -1,5 +1,5 @@
 import { atom } from 'recoil';
-import { MemoryData } from '../hooks/useMemoryHistory';
+import { MemoryData } from '../Hooks/useMemoryHistory';
 
 // Atom to store memory history data per serverId and days
 export const memoryHistoryAtom = atom<{ [key: string]: MemoryData[] }>({

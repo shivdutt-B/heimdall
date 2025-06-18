@@ -1,5 +1,5 @@
 import React from "react";
-import Auth from "../components/Auth/Auth";
+import Auth from "../Components/Auth/Auth";
 function AuthLayout() {
   return <Auth />;
 }
