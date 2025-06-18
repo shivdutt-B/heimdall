@@ -251,9 +251,22 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     return <SectionCardsSkeleton />;
   }
 
+  // Helper to map ServerBasic to Server (for CarouselItem)
+  function mapServerBasicToServer(server: any): Server {
+    return {
+      id: server.id,
+      name: server.name,
+      url: server.url,
+      isActive: server.isActive,
+      lastPingedAt: server.lastPingedAt,
+      pingInterval: server.pingInterval,
+      failureThreshold: server.failureThreshold ?? 3, // fallback if missing
+    };
+  }
+
   const items: CarouselItem[] = [
     { type: "add-new" },
-    ...servers.map((server) => ({ type: "card", data: server })),
+    ...servers.map((server) => ({ type: "card" as const, data: mapServerBasicToServer(server) })),
   ];
 
   // If there are no servers, show only the add new card with a message
@@ -499,22 +512,6 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
     if (seconds < 60) return `${seconds}s`;
     const minutes = Math.floor(seconds / 60);
     return `${minutes}m`;
-  };
-
-  // Update the handler for ping interval changes
-  const handlePingIntervalChange = (value: number, setter: typeof setForm | typeof setModifyForm) => {
-    const minInterval = 300; // 5 minutes in seconds
-    setter(prev => ({
-      ...prev,
-      pingInterval: value < minInterval ? minInterval : value
-    }));
-  };
-
-  // Prevent invalid input in ping interval field
-  const handlePingIntervalKeyDown = (e: React.KeyboardEvent<HTMLInputElement>) => {
-    if (e.key === "-" || e.key === "e") {
-      e.preventDefault();
-    }
   };
 
   return (
