@@ -29,7 +29,10 @@ router.get("/:id", serverController.getServerById);
 router.post(
   "/",
   [
-    // check("url", "Valid URL is required").isURL(),
+    check("url", "URL must be valid if provided")
+      .optional()
+      .matches(/^https:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/)
+      .withMessage("URL must be in the format https://xyz.abc.com"),
     check("name", "Name is required").not().isEmpty(),
     check("pingInterval", "Ping interval must be at least 300 seconds (5 minutes)")
       .optional()
@@ -52,8 +55,8 @@ router.put(
   [
     check("url", "URL must be valid if provided")
       .optional()
-      .matches(/^https:\/\/[a-zA-Z0-9-]+\.[a-zA-Z0-9-.]+$/)
-      .withMessage("URL must be in the format https://xyz-abc.com"),
+      .matches(/^https:\/\/[a-zA-Z0-9-]+(\.[a-zA-Z0-9-]+)+$/)
+      .withMessage("URL must be in the format https://xyz.abc.com"),
     check("name", "Name must not be empty if provided")
       .optional()
       .not()

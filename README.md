@@ -1,15 +1,33 @@
 <div style="font-family: Arial, sans-serif;">
 
-# 🛡️ Heimdall
-### Server Uptime & Cold Start Monitoring Platform
+<table align="center">
+  <tr>
+    <td><img src="https://raw.githubusercontent.com/shivdutt-B/heimdall/refs/heads/main/readme.assets/heimdall-logo-transparent.png" alt="Heimdall Logo" height="80"/></td>
+    <td><h1 style="margin: 0; padding-left: 10px;">Heimdall</h1></td>
+  </tr>
+</table>
+<!-- #<br> -->
+<div align="center"><h2><code>Server Uptime & Cold Start Monitoring Platform</code></h2></div>
+<br>
 
 <div align="center">
 
 [![Node.js](https://img.shields.io/badge/Built%20With-Node.js-339933?style=for-the-badge&logo=node.js&logoColor=white)](https://nodejs.org)
+[![Express.js](https://img.shields.io/badge/Framework-Express.js-000000?style=for-the-badge&logo=express&logoColor=white)](https://expressjs.com/)
+[![PostgreSQL](https://img.shields.io/badge/Database-PostgreSQL-336791?style=for-the-badge&logo=postgresql&logoColor=white)](https://www.postgresql.org/)
+[![Docker](https://img.shields.io/badge/Containerized-Docker-2496ED?style=for-the-badge&logo=docker&logoColor=white)](https://www.docker.com/)
+[![AWS EC2](https://img.shields.io/badge/Server%20Instances-AWS%20EC2-FF9900?style=for-the-badge&logo=amazon-ec2&logoColor=white)](https://aws.amazon.com/ec2/)
+[![React](https://img.shields.io/badge/Frontend-React-61DAFB?style=for-the-badge&logo=react&logoColor=black)](https://reactjs.org/)
+[![Recoil](https://img.shields.io/badge/State%20Management-Recoil-3578E5?style=for-the-badge&logo=recoil&logoColor=white)](https://recoiljs.org/)
 [![BullMQ](https://img.shields.io/badge/Queue-BullMQ-DC382D?style=for-the-badge&logo=redis&logoColor=white)](https://docs.bullmq.io/)
 [![Prisma](https://img.shields.io/badge/ORM-Prisma-2D3748?style=for-the-badge&logo=prisma&logoColor=white)](https://www.prisma.io/)
 [![Nodemailer](https://img.shields.io/badge/Email-Nodemailer-EA4335?style=for-the-badge&logo=gmail&logoColor=white)](https://nodemailer.com/)
-[![License](https://img.shields.io/github/license/yourusername/heimdall?style=for-the-badge)](LICENSE)
+[![PM2](https://img.shields.io/badge/Process%20Manager-PM2-2B037A?style=for-the-badge&logo=pm2&logoColor=white)](https://pm2.keymetrics.io/)
+[![GitHub](https://img.shields.io/badge/Code%20Hosted%20On-GitHub-181717?style=for-the-badge&logo=github&logoColor=white)](https://github.com/)
+[![Frontend Hosted on Vercel](https://img.shields.io/badge/Frontend-Vercel-000000?style=for-the-badge&logo=vercel&logoColor=white)](https://vercel.com/)
+[![Backend Hosted on Render](https://img.shields.io/badge/Backend-Render-46E3B7?style=for-the-badge&logo=render&logoColor=white)](https://render.com/)
+
+
 
 </div>
 
@@ -69,7 +87,7 @@
 ## 🏛️ Architecture Overview
 
 <div align="center">
-<img src="./readme.assets/architecture.jpg" alt="Heimdall Architecture" width="400px" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
+<img src="./readme.assets/architecture.jpg" alt="Heimdall Architecture" width="1100px" height="800px" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 </div>
 
 ### 🧱 Microservices Breakdown
@@ -78,9 +96,9 @@
 |------------|-----------------|---------------|
 | **🌐 API Service** | User management, authentication, server CRUD operations | Express.js, Prisma |
 | **⚡ Queue Service** | Job scheduling and Redis queue management | BullMQ, Redis |
-| **🔍 Ping Worker** | Server pinging, performance metrics collection | Node.js, HTTP clients |
+| **🔍 Ping Worker** | Server pinging, performance metrics collection | Node.js, Docker |
 | **📧 Alert Service** | Email notifications and alert management | Nodemailer, SMTP |
-| **⚖️ Load Balancer** | Worker distribution and scaling (Optional) | Custom Node.js |
+| **⚖️ Load Balancer** | Worker distribution and scaling | Node.js, Docker |
 | **💻 Client Dashboard** | Interactive monitoring interface | React, TailwindCSS |
 
 ---
@@ -122,10 +140,10 @@
 | Technology | Badge | Purpose |
 |------------|-------|---------|
 | **Docker** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | Containerization |
-| **Render** | ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white) | Cloud Platform |
-| **Railway** | ![Railway](https://img.shields.io/badge/Railway-0B0D0E?style=flat-square&logo=railway&logoColor=white) | Hosting Platform |
-| **AWS EC2** | ![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=flat-square&logo=amazon-aws&logoColor=white) | Cloud Compute |
-| **AWS Services** | ![AWS](https://img.shields.io/badge/AWS-FF9900?style=flat-square&logo=amazon-aws&logoColor=white) | Cloud Infrastructure |
+| **Render** | ![Render](https://img.shields.io/badge/Render-46E3B7?style=flat-square&logo=render&logoColor=white) | Hosting Main Server, Dispatch Service |
+| **AWS EC2** | ![AWS EC2](https://img.shields.io/badge/AWS_EC2-FF9900?style=flat-square&logo=amazon-aws&logoColor=white) | Hosting Alert Service, Worker and Scale Worker Service |
+| **Vercel** | ![Vercel](https://img.shields.io/badge/Vercel-000000?style=flat-square&logo=vercel&logoColor=white) | Hosting Frontend |
+
 
 ---
 
@@ -135,7 +153,7 @@
 
 Ensure you have the following installed:
 - **Node.js** (v18 or higher)
-- **pnpm** (Package manager)
+- **pnpm/npm** (Package manager)
 - **Docker** (For Redis & PostgreSQL)
 - **Git**
 
@@ -146,33 +164,62 @@ Ensure you have the following installed:
 git clone https://github.com/yourusername/heimdall.git
 cd heimdall
 
-# 2️⃣ Install dependencies across all services
-pnpm install
+# 2️⃣ Install dependencies for each microservice
+cd service && npm install && cd ../
+cd alert-service && npm install && cd ../
+cd dispatch-service && npm install && cd ../
+cd client && npm install && cd ../
+cd scale-worker-service && npm install && cd ../
 
-# 3️⃣ Start infrastructure services
-docker-compose up -d
+# 3️⃣ Configure environment variables for each service
+cp service/.env.example service/.env
+cp alert-service/.env.example alert-service/.env
+cp dispatch-service/.env.example dispatch-service/.env
+cp client/.env.example client/.env
+cp scale-worker-service/.env.example scale-worker-service/.env
+# Edit each .env file with your own configuration
 
-# 4️⃣ Configure environment variables
+# 4️⃣ Build and dockerize worker-service (used by scale-worker-service)
+cd worker-service
 cp .env.example .env
-# Edit .env with your configuration
+docker build -t heimdall-worker .
+cd ../
 
-# 5️⃣ Initialize database
-pnpm prisma migrate dev
-pnpm prisma generate
+# 5️⃣ Initialize the PostgreSQL database (only from the API service)
+cd service
+npx prisma migrate dev
+npx prisma generate
+cd ../
 
-# 6️⃣ Start all services concurrently
-pnpm dev
+# 6️⃣ Start each service individually (see below)
+
 ```
 
-### 🔧 Individual Service Commands
-
 ```bash
-# Start specific services
-pnpm --filter api-service dev      # 🌐 API Server
-pnpm --filter worker dev           # 🔍 Ping Worker
-pnpm --filter alert-service dev    # 📧 Alert Service
-pnpm --filter queue-service dev    # ⚡ Queue Service
-pnpm --filter client dev           # 💻 Dashboard
+# 🌐 Start the API Service (REST API & Auth)
+cd service
+npm run dev
+
+# 📧 Start the Alert Service (email notifications)
+cd alert-service
+npm run dev
+
+# ⚡ Start the Dispatch Service (job queue logic)
+cd dispatch-service
+npm run dev
+
+# 💻 Start the Frontend Client (React dashboard)
+cd client
+npm run dev
+
+# ⚖️ Start the Scale Worker Service (manages auto-scaling of dockerized workers)
+cd scale-worker-service
+npm run dev
+
+# 🔍 Worker Service (Ping engine)
+# ✅ Dockerized, DO NOT start manually
+# ✅ Built in Step 4 as `heimdall-worker` image
+
 ```
 
 ---
@@ -181,96 +228,55 @@ pnpm --filter client dev           # 💻 Dashboard
 
 ```
 heimdall/
-├── 🌐 api-service/           # REST API & Authentication
+├── 🌐 service/                             # REST API & Authentication
 │   ├── src/
-│   │   ├── controllers/      # Route handlers
-│   │   ├── middleware/       # Auth & validation
-│   │   └── routes/          # API endpoints
+│   │   ├── controllers/                    # Route handlers
+│   │   ├── middleware/                     # Auth & validation
+│   │   └── routes/                         # API endpoints
+│   │   └── index.js                        # Entry Point
 │   └── package.json
 │
-├── 🔍 worker/               # Ping Processing Engine
+├── 🔍 worker-service/                      # Ping Processing Engine
 │   ├── src/
-│   │   ├── jobs/            # Job processors
-│   │   └── utils/           # Helper functions
+│   │   └── index.ts                        # Entry Point
 │   └── package.json
 │
-├── 📧 alert-service/        # Notification System
+├── 📧 alert-service/                       # Notification System
 │   ├── src/
-│   │   ├── templates/       # Email templates
-│   │   └── mailer/          # SMTP configuration
+│   │   ├── utils/                          # Helpers and Templates
+│   │   │   └── mailer.ts                   # SMTP configuration & Template
+│   │   └── index.ts                        # Entry Point
 │   └── package.json
 │
-├── ⚡ queue-service/        # Job Queue Management
+├── ⚡ dispatch-service/                    # Job Queue Management
 │   ├── src/
-│   │   ├── queues/          # BullMQ setup
-│   │   └── schedulers/      # Job scheduling
+│   │   └── index.ts                        # Entry Point
 │   └── package.json
 │
-├── 💻 client/               # React Dashboard
+├── 💻 client/                              # React Dashboard
 │   ├── src/
-│   │   ├── components/      # UI components
-│   │   ├── pages/           # Route pages
-│   │   └── hooks/           # Custom hooks
+│   │   ├── assets/                         # Static Assets
+│   │   ├── components/                     # UI components
+│   │   ├── hooks/                          # Hooks for data fetching and other operation
+│   │   ├── layouts/                        # Gather components
+│   │   ├── pages/                          # Gather components and layouts
+│   │   ├── skeleton/                       # Loading Screens
+│   │   ├── stores/                         # Store Recoil Atoms
+│   │   ├── styles/                         # Setting up tailwind css
+│   │   │   └── globals.css                 # 
+│   │   ├── utils/                          # Helper functions
+│   │   │   └── cn.ts                       # Used for third part component libraries(like shadcn, magicUI) to run properly
+│   │   └── App.tsx                         # Entry Point 
 │   └── package.json
 │
-└── ⚖️ scale-worker-service/  # Load Balancer (Optional)
+└── ⚖️ scale-worker-service/                # Worker Scaling
     └── src/
-        └── balancer/        # Worker distribution
+    │   └── index.ts                        # Entry Point
+    └── package.json
+
 ```
-
----
-
-## 🎨 Dashboard Preview
-
-### 📊 Real-time Monitoring Interface
-
-*Coming Soon: Dashboard screenshots showcasing uptime metrics, response times, and alert configurations*
-
-**Key Dashboard Features:**
-- 📈 Interactive latency graphs
-- 🟢 Real-time server status indicators
-- ⚙️ Customizable ping intervals
-- 📋 Historical performance data
-- 🔔 Alert configuration panel
-
----
-
-## 🔧 Configuration
-
-### Environment Variables
-
-Create a `.env` file in the root directory:
-
-```bash
-# Database Configuration
-DATABASE_URL="postgresql://username:password@localhost:5432/heimdall"
-
-# Redis Configuration
-REDIS_URL="redis://localhost:6379"
-
-# Email Configuration (SMTP)
-SMTP_HOST="smtp.gmail.com"
-SMTP_PORT=587
-SMTP_USER="your-email@gmail.com"
-SMTP_PASS="your-app-password"
-
-# JWT Configuration
-JWT_SECRET="your-super-secret-jwt-key"
-JWT_EXPIRES_IN="7d"
-
-# Application Settings
-NODE_ENV="development"
-PORT=3000
-```
-
----
 
 ## 🤝 Contributing
-
-We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.md) for details.
-
-### 📝 Development Workflow
-
 1. **Fork** the repository
 2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
 3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
@@ -279,34 +285,14 @@ We welcome contributions! Please see our [Contributing Guidelines](CONTRIBUTING.
 
 ---
 
-## 📄 License
+<h2>📄 License</h2>
 
-This project is licensed under the **MIT License** - see the [LICENSE](LICENSE) file for details.
-
----
-
-## 🆘 Support & Community
-
-<div align="center">
-
-**Need Help?** | **Stay Connected**
---- | ---
-🐛 [Report Issues](https://github.com/yourusername/heimdall/issues) | 💬 [Discussions](https://github.com/yourusername/heimdall/discussions)
-📧 [Email Support](mailto:support@heimdall.dev) | 🐦 [Twitter Updates](https://twitter.com/heimdall_dev)
-📖 [Documentation](https://docs.heimdall.dev) | ⭐ [Star on GitHub](https://github.com/yourusername/heimdall)
-
-</div>
+<p>
+  This project is licensed under the <a href="./LICENSE"><strong>MIT License</strong></a>.
+</p>
 
 ---
 
 <div align="center">
-
-### 🌟 Show Your Support
-
-If Heimdall helps keep your servers running smoothly, please consider giving it a ⭐!
-
-**Made with ❤️ by the Heimdall Team**
-
-*Keeping your servers awake so you can sleep peacefully* 😴
-
+<code> Made this BITCH with ❤️ </code>
 </div>

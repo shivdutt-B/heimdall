@@ -1,5 +1,18 @@
 import nodemailer from 'nodemailer';
 import { Server, User } from '@prisma/client';
+import { format } from "date-fns";
+import { toZonedTime } from "date-fns-tz"; // <-- fix import
+
+/**
+ * Formats a Date object to a string in Indian Standard Time (IST).
+ * @param {Date} date - The date to format.
+ * @returns {string} - The formatted date string in IST.
+ */
+function formatIST(date: Date): string {
+    const istTime = toZonedTime(date, "Asia/Kolkata");
+    return format(istTime, "yyyy-MM-dd HH:mm:ss");
+}
+
 
 const transporter = nodemailer.createTransport({
     service: 'gmail',
@@ -85,7 +98,8 @@ export async function sendImmediateAlert(server: Server, user: User) {
                                         <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Last Checked</span>
                                     </div>
                                      <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">
-                                     ${format(new Date(server.lastPingedAt), "yyyy-MM-dd HH:mm:ss")}
+                                         ${server.lastPingedAt ? formatIST(new Date(server.lastPingedAt)) : "Unknown"}
+
                               </p>
                                 </div>
                                 
@@ -201,7 +215,6 @@ export async function sendRecurringAlert(server: Server, user: User, downtime: s
                                 <span style="margin-right: 14px; font-size: 22px;">⚠️</span>
                                 <div>
                                     <h2 style="color: #eab308; margin: 0; font-size: 26px; font-weight: 800; letter-spacing: -0.025em;">Extended Downtime Alert</h2>
-                                    <p style="color: #9ca3af; margin: 4px 0 0 0; font-size: 15px; font-weight: 500;">Alert ID: ${alertId}</p>
                                 </div>
                             </div>
                             
@@ -231,7 +244,8 @@ export async function sendRecurringAlert(server: Server, user: User, downtime: s
                                     <div style="display: flex; justify-content: space-between; align-items: center;">
                                         <span style="color: #d1d5db; font-size: 14px; font-weight: 600; text-transform: uppercase; letter-spacing: 0.1em;">Last Checked</span>
                                     </div>
-                                     <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.lastPingedAt?.toLocaleString()}</p>
+                                     <p style="color: #f3f4f6; margin: 10px 0 0 0; font-size: 16px; font-family: 'Monaco', 'Menlo', monospace; word-break: break-all; background: rgba(255, 255, 255, 0.05); padding: 8px 12px; border-radius: 6px; border: 1px solid rgba(255, 255, 255, 0.1);">${server.lastPingedAt ? formatIST(new Date(server.lastPingedAt)) : "Unknown"}
+</p>
                                 </div>
                                 
                                 <!-- Total Downtime -->

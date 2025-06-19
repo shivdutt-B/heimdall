@@ -90,7 +90,7 @@ async function modifyServer(
 ) {
   try {
     await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/${serverId}`,
+      `${import.meta.env.VITE_BACKEND_URL}/api/servers/${serverId}`,
       data,
       {
         headers: {

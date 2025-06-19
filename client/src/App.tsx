@@ -15,10 +15,6 @@ function App() {
     <>
       <NavBar />
       <Routes>
-        {/*
-        Not adding "exact" in the routes because React Router v6 does not require it.
-        The routes are now always matched in order, so the first match will be used.
-        */}
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/docs" element={<DocsPage />} />
