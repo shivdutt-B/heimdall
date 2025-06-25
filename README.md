@@ -294,5 +294,10 @@ heimdall/
 ---
 
 <div align="center">
-<code> Made this BITCH with ❤️ </code>
+<pre>
+⬛⬜
+⬜⬛
+</pre>
 </div>
+
+
