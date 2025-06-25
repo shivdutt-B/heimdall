@@ -1,7 +1,7 @@
 import nodemailer from 'nodemailer';
 import { Server, User } from '@prisma/client';
 import { format } from "date-fns";
-import { toZonedTime } from "date-fns-tz"; // <-- fix import
+import { toZonedTime } from "date-fns-tz";
 
 /**
  * Formats a Date object to a string in Indian Standard Time (IST).

@@ -288,7 +288,7 @@ heimdall/
 <h2>📄 License</h2>
 
 <p>
-  This project is licensed under the <a href="./LICENSE"><strong>MIT License</strong></a>.
+  This project is licensed under the <a href="./LICENCE"><strong>MIT License</strong></a>.
 </p>
 
 ---
