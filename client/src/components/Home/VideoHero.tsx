@@ -1,20 +1,20 @@
 import { HeroVideoDialog } from "../Helper/VideoHero";
-
+import YoutubeVideoThumbnail from "../../assets/thumbnails/heimdall-thumbnail.jpg";
 export function VideoHero() {
   return (
     <div className="relative max-w-7xl mx-auto mt-20 px-4" id="demo-video">
       <HeroVideoDialog
         className="block dark:hidden"
         animationStyle="top-in-bottom-out"
-        videoSrc="https://youtu.be/-B-Hw2NKQGc"
-        thumbnailSrc="https://startup-template-sage.vercel.app/hero-light.png"
+        videoSrc="https://www.youtube.com/embed/-B-Hw2NKQGc"
+        thumbnailSrc={YoutubeVideoThumbnail}
         thumbnailAlt="Hero Video"
       />
       <HeroVideoDialog
         className="hidden dark:block"
         animationStyle="top-in-bottom-out"
-        videoSrc="https://youtu.be/-B-Hw2NKQGc"
-        thumbnailSrc="https://startup-template-sage.vercel.app/hero-dark.png"
+        videoSrc="https://www.youtube.com/embed/-B-Hw2NKQGc"
+        thumbnailSrc={YoutubeVideoThumbnail}
         thumbnailAlt="Hero Video"
       />
     </div>

@@ -3,7 +3,7 @@ import { motion } from "framer-motion";
 
 function FeatureHero() {
   return (
-    <section className="container px-4 pt-24 pb-0 bg-[#040506] text-white/80">
+    <section className="container px-4 pt-24 pb-0 bg-[#040506] text-white/80 m-auto">
       <div className="flex flex-col items-center text-center space-y-4 mb-12">
         <div className="space-y-2">
           <motion.h2
