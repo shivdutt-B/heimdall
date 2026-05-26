@@ -30,7 +30,7 @@ export const Auth = () => {
     password: "",
   });
 
-  const [,setIsLoading] = useState(false); // not using isLoading due to is not usage anywhere in the component hence it is throwing error(declared but never used) during deployment(vercel)
+  const [, setIsLoading] = useState(false); // not using isLoading due to is not usage anywhere in the component hence it is throwing error(declared but never used) during deployment(vercel)
 
   // Auto-clear error messages after 3 seconds
   useEffect(() => {
@@ -68,7 +68,7 @@ export const Auth = () => {
     try {
       await axios.post(
         `${import.meta.env.VITE_BACKEND_URL}/api/users/send-code`,
-        { email: signInForm.email }
+        { email: signInForm.email },
       );
       setCodeSent(true);
     } catch (err) {
@@ -95,7 +95,7 @@ export const Auth = () => {
         {
           email: signInForm.email,
           code: verificationCode,
-        }
+        },
       );
 
       if (response.data.token) {
@@ -238,7 +238,7 @@ export const Auth = () => {
                     disabled={
                       auth.loading ||
                       (isCodeSignIn && codeSent && !verificationCode) || // Only check for verification code when code is sent
-                      (!signInForm.email) || // Always require email
+                      !signInForm.email || // Always require email
                       (!isCodeSignIn && !signInForm.password) // Require password only for regular sign in
                     }
                     className="w-full bg-white text-black font-medium py-2 rounded-sm hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
@@ -246,24 +246,32 @@ export const Auth = () => {
                     {auth.loading
                       ? "Processing..."
                       : isCodeSignIn
-                        ? codeSent
-                          ? "Verify Code"
-                          : "Send Code"
-                        : "Sign In"}
+                      ? codeSent
+                        ? "Verify Code"
+                        : "Send Code"
+                      : "Sign In"}
                   </button>
+
                   <button
-                    type="button" onClick={() => {
-                      setIsCodeSignIn(!isCodeSignIn);
-                      setCodeSent(false);
-                      setVerificationCode("");
-                      setSignInForm(prev => ({ ...prev, password: "" })); // Clear password when switching modes
-                    }}
-                    className="w-full mt-2 bg-transparent border border-white/30 text-white/80 font-medium py-2 rounded-sm hover:bg-white/10 transition-colors"
+                    type="button"
+                    // onClick={() => {
+                    //   setIsCodeSignIn(!isCodeSignIn);
+                    //   setCodeSent(false);
+                    //   setVerificationCode("");
+                    //   setSignInForm((prev) => ({ ...prev, password: "" })); // Clear password when switching modes
+                    // }}
+
+                    className="cursor-not-allowed w-full mt-2 bg-transparent border border-white/30 text-white/80 font-medium py-2 rounded-sm hover:bg-white/10 transition-colors"
                   >
                     {isCodeSignIn
                       ? "Sign in with password"
                       : "Sign in with code"}
                   </button>
+                </div>
+                <div className="mt-4 p-3 bg-yellow-900/40 border border-yellow-600/50 text-yellow-200 rounded-sm text-sm">
+                  <span className="font-semibold">Sign in with code</span> is
+                  temporarily disabled. Please use{" "}
+                  <span className="font-semibold">password sign in</span>.
                 </div>
               </div>
             </form>

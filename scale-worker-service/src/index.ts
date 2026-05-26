@@ -116,26 +116,10 @@ const stopWorker = async (worker: WorkerContainer) => {
     console.log(`[${new Date().toISOString()}] Stopped worker: ${worker.name}`);
 };
 
-const acquireLock = async (key: string, ttl: number): Promise<boolean> => {
-    const client = new Redis(REDIS_CONFIG);
-    const res = await client.set(key, 'locked', 'PX', ttl, 'NX');
-    client.quit();
-    return res === 'OK';
-};
-
-const releaseLock = async (key: string) => {
-    const client = new Redis(REDIS_CONFIG);
-    await client.del(key);
-    client.quit();
-};
 
 const scaleWorkers = async () => {
-    const lockKey = 'scale-workers-lock';
-    const lockTTL = parseInt(SCALE_COOLDOWN);
-    if (!(await acquireLock(lockKey, lockTTL))) return;
 
     const now = Date.now();
-    if (now - lastScaleTime < lockTTL) return;
 
     const pending = await getQueueMetrics();
     const workers = await listRunningWorkers();
