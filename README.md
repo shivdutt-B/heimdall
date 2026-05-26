@@ -33,21 +33,21 @@
 
 ---
 
-## 🌟 Overview
+## Overview
 
 **Heimdall** is a comprehensive ping and uptime monitoring platform designed to eliminate cold starts on free hosting platforms like **Render**, **Railway**, and **Fly.io**. By intelligently pinging your backend servers at customizable intervals, Heimdall ensures optimal performance while providing detailed analytics and instant alerts.
 
-> **🎯 Mission**: Keep your servers warm, your users happy, and your deployments reliable.
+> **Mission**: Keep your servers warm, your users happy, and your deployments reliable.
 
 ---
 
-## ✨ Key Features
+## Key Features
 
 <table>
 <tr>
 <td width="50%">
 
-### 🚀 **Performance Optimization**
+### **Performance Optimization**
 - **Cold Start Prevention** — Reduce delays by 30-50 seconds
 - **Intelligent Pinging** — Customizable intervals per server
 - **Smart Resource Management** — Heap & RSS memory tracking
@@ -55,7 +55,7 @@
 </td>
 <td width="50%">
 
-### 📊 **Advanced Monitoring**
+### **Advanced Monitoring**
 - **Real-time Metrics** — Response time, uptime %, status codes
 - **Interactive Dashboard** — Visual latency trends and history
 - **Performance Analytics** — Comprehensive server health insights
@@ -65,7 +65,7 @@
 <tr>
 <td width="50%">
 
-### 🔔 **Intelligent Alerting**
+### **Intelligent Alerting**
 - **Email Notifications** — Instant failure alerts
 - **Smart Spam Prevention** — Configurable thresholds
 - **24/7 Monitoring** — Continuous health checks
@@ -73,7 +73,7 @@
 </td>
 <td width="50%">
 
-### 🏗️ **Scalable Architecture**
+### **Scalable Architecture**
 - **6-Microservice Design** — Clean separation of concerns
 - **Queue-Based Processing** — BullMQ + Redis integration
 - **Horizontal Scaling** — Load balancer ready
@@ -84,59 +84,59 @@
 
 ---
 
-## 🏛️ Architecture Overview
+## Architecture Overview
 
 <div align="center">
 <img src="./readme.assets/architecture.jpg" alt="Heimdall Architecture" width="1100px" height="800px" style="border-radius: 10px; box-shadow: 0 4px 8px rgba(0,0,0,0.1);">
 </div>
 
-### 🧱 Microservices Breakdown
+### Microservices Breakdown
 
-| 🎯 Service | 📝 Description | 🔧 Technology |
+|  Service | Description | Technology |
 |------------|-----------------|---------------|
-| **🌐 API Service** | User management, authentication, server CRUD operations | Express.js, Prisma |
-| **⚡ Queue Service** | Job scheduling and Redis queue management | BullMQ, Redis |
-| **🔍 Ping Worker** | Server pinging, performance metrics collection | Node.js, Docker |
-| **📧 Alert Service** | Email notifications and alert management | Nodemailer, SMTP |
-| **⚖️ Load Balancer** | Worker distribution and scaling | Node.js, Docker |
-| **💻 Client Dashboard** | Interactive monitoring interface | React, TailwindCSS |
+| **API Service** | User management, authentication, server CRUD operations | Express.js, Prisma |
+| **Queue Service** | Job scheduling and Redis queue management | BullMQ, Redis |
+| **Ping Worker** | Server pinging, performance metrics collection | Node.js, Docker |
+| **Alert Service** | Email notifications and alert management | Nodemailer, SMTP |
+| **Load Balancer** | Worker distribution and scaling | Node.js, Docker |
+| **Client Dashboard** | Interactive monitoring interface | React, TailwindCSS |
 
 ---
 
-## 🛠️ Technology Stack
+## Technology Stack
 
-### 🖥️ **Backend Infrastructure**
+### **Backend Infrastructure**
 | Technology | Badge | Purpose |
 |------------|-------|---------|
 | **Node.js** | ![Node.js](https://img.shields.io/badge/Node.js-339933?style=flat-square&logo=node.js&logoColor=white) | Runtime Environment |
 | **Express.js** | ![Express.js](https://img.shields.io/badge/Express.js-000000?style=flat-square&logo=express&logoColor=white) | Web Framework |
 | **Prisma** | ![Prisma](https://img.shields.io/badge/Prisma-2D3748?style=flat-square&logo=prisma&logoColor=white) | ORM & Database Client |
 
-### 🗄️ **Database & Storage**
+### **Database & Storage**
 | Technology | Badge | Purpose |
 |------------|-------|---------|
 | **PostgreSQL** | ![PostgreSQL](https://img.shields.io/badge/PostgreSQL-336791?style=flat-square&logo=postgresql&logoColor=white) | Primary Database |
 | **Redis** | ![Redis](https://img.shields.io/badge/Redis-DC382D?style=flat-square&logo=redis&logoColor=white) | Caching & Queue Storage |
 
-### 📬 **Queue System**
+### **Queue System**
 | Technology | Badge | Purpose |
 |------------|-------|---------|
 | **BullMQ** | ![BullMQ](https://img.shields.io/badge/BullMQ-FF6B6B?style=flat-square&logo=redis&logoColor=white) | Job Queue Management |
 | **Redis Queue** | ![Redis](https://img.shields.io/badge/Redis_Queue-DC382D?style=flat-square&logo=redis&logoColor=white) | Queue Backend |
 
-### 🎨 **Frontend**
+### **Frontend**
 | Technology | Badge | Purpose |
 |------------|-------|---------|
 | **React** | ![React](https://img.shields.io/badge/React-61DAFB?style=flat-square&logo=react&logoColor=black) | UI Library |
 | **TailwindCSS** | ![TailwindCSS](https://img.shields.io/badge/Tailwind_CSS-38B2AC?style=flat-square&logo=tailwind-css&logoColor=white) | Styling Framework |
 
-### 📧 **Communication**
+### **Communication**
 | Technology | Badge | Purpose |
 |------------|-------|---------|
 | **Nodemailer** | ![Nodemailer](https://img.shields.io/badge/Nodemailer-EA4335?style=flat-square&logo=gmail&logoColor=white) | Email Service |
 | **SMTP** | ![SMTP](https://img.shields.io/badge/SMTP-FF6B35?style=flat-square&logo=mail.ru&logoColor=white) | Email Protocol |
 
-### 🚀 **DevOps & Deployment**
+### **DevOps & Deployment**
 | Technology | Badge | Purpose |
 |------------|-------|---------|
 | **Docker** | ![Docker](https://img.shields.io/badge/Docker-2496ED?style=flat-square&logo=docker&logoColor=white) | Containerization |
@@ -147,9 +147,9 @@
 
 ---
 
-## 🚀 Quick Start Guide
+## Quick Start Guide
 
-### 📋 Prerequisites
+### Prerequisites
 
 Ensure you have the following installed:
 - **Node.js** (v18 or higher)
@@ -157,21 +157,21 @@ Ensure you have the following installed:
 - **Docker** (For Redis & PostgreSQL)
 - **Git**
 
-### ⚡ Installation Steps
+### Installation Steps
 
 ```bash
-# 1️⃣ Clone the repository
+# 1 Clone the repository
 git clone https://github.com/yourusername/heimdall.git
 cd heimdall
 
-# 2️⃣ Install dependencies for each microservice
+# 2 Install dependencies for each microservice
 cd service && npm install && cd ../
 cd alert-service && npm install && cd ../
 cd dispatch-service && npm install && cd ../
 cd client && npm install && cd ../
 cd scale-worker-service && npm install && cd ../
 
-# 3️⃣ Configure environment variables for each service
+# 3 Configure environment variables for each service
 cp service/.env.example service/.env
 cp alert-service/.env.example alert-service/.env
 cp dispatch-service/.env.example dispatch-service/.env
@@ -179,44 +179,44 @@ cp client/.env.example client/.env
 cp scale-worker-service/.env.example scale-worker-service/.env
 # Edit each .env file with your own configuration
 
-# 4️⃣ Build and dockerize worker-service (used by scale-worker-service)
+# 4 Build and dockerize worker-service (used by scale-worker-service)
 cd worker-service
 cp .env.example .env
 docker build -t heimdall-worker .
 cd ../
 
-# 5️⃣ Initialize the PostgreSQL database (only from the API service)
+# 5 Initialize the PostgreSQL database (only from the API service)
 cd service
 npx prisma migrate dev
 npx prisma generate
 cd ../
 
-# 6️⃣ Start each service individually (see below)
+# 6 Start each service individually (see below)
 
 ```
 
 ```bash
-# 🌐 Start the API Service (REST API & Auth)
+# Start the API Service (REST API & Auth)
 cd service
 npm run dev
 
-# 📧 Start the Alert Service (email notifications)
+# Start the Alert Service (email notifications)
 cd alert-service
 npm run dev
 
-# ⚡ Start the Dispatch Service (job queue logic)
+# Start the Dispatch Service (job queue logic)
 cd dispatch-service
 npm run dev
 
-# 💻 Start the Frontend Client (React dashboard)
+# Start the Frontend Client (React dashboard)
 cd client
 npm run dev
 
-# ⚖️ Start the Scale Worker Service (manages auto-scaling of dockerized workers)
+# Start the Scale Worker Service (manages auto-scaling of dockerized workers)
 cd scale-worker-service
 npm run dev
 
-# 🔍 Worker Service (Ping engine)
+# Worker Service (Ping engine)
 # ✅ Dockerized, DO NOT start manually
 # ✅ Built in Step 4 as `heimdall-worker` image
 
@@ -224,11 +224,11 @@ npm run dev
 
 ---
 
-## 📁 Project Structure
+## Project Structure
 
 ```
 heimdall/
-├── 🌐 service/                             # REST API & Authentication
+├── service/                             # REST API & Authentication
 │   ├── src/
 │   │   ├── controllers/                    # Route handlers
 │   │   ├── middleware/                     # Auth & validation
@@ -236,24 +236,24 @@ heimdall/
 │   │   └── index.js                        # Entry Point
 │   └── package.json
 │
-├── 🔍 worker-service/                      # Ping Processing Engine
+├── worker-service/                      # Ping Processing Engine
 │   ├── src/
 │   │   └── index.ts                        # Entry Point
 │   └── package.json
 │
-├── 📧 alert-service/                       # Notification System
+├── alert-service/                       # Notification System
 │   ├── src/
 │   │   ├── utils/                          # Helpers and Templates
 │   │   │   └── mailer.ts                   # SMTP configuration & Template
 │   │   └── index.ts                        # Entry Point
 │   └── package.json
 │
-├── ⚡ dispatch-service/                    # Job Queue Management
+├── dispatch-service/                    # Job Queue Management
 │   ├── src/
 │   │   └── index.ts                        # Entry Point
 │   └── package.json
 │
-├── 💻 client/                              # React Dashboard
+├── client/                              # React Dashboard
 │   ├── src/
 │   │   ├── assets/                         # Static Assets
 │   │   ├── components/                     # UI components
@@ -269,14 +269,14 @@ heimdall/
 │   │   └── App.tsx                         # Entry Point 
 │   └── package.json
 │
-└── ⚖️ scale-worker-service/                # Worker Scaling
+└── scale-worker-service/                # Worker Scaling
     └── src/
     │   └── index.ts                        # Entry Point
     └── package.json
 
 ```
 
-## 🤝 Contributing
+## Contributing
 1. **Fork** the repository
 2. **Create** a feature branch (`git checkout -b feature/amazing-feature`)
 3. **Commit** your changes (`git commit -m 'Add amazing feature'`)
@@ -285,7 +285,7 @@ heimdall/
 
 ---
 
-<h2>📄 License</h2>
+<h2>License</h2>
 
 <p>
   This project is licensed under the <a href="./LICENCE"><strong>MIT License</strong></a>.
