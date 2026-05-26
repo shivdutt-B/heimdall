@@ -2,7 +2,7 @@ import * as dotenv from 'dotenv';
 import { prisma } from './utils/db';
 import { checkForNewFailures, checkForRecurringAlerts } from './utils/alerts';
 
-dotenv.config()
+dotenv.config();
 
 /**
  * Constants from environment variables 
