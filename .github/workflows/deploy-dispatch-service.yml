@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ec2-deploy
+  group: deploy-dispatch-service
   cancel-in-progress: false
-  
+
 jobs:
   deploy:
     name: Deploy dispatch-service to EC2

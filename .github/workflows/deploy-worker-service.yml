@@ -9,9 +9,9 @@ on:
   workflow_dispatch:
 
 concurrency:
-  group: ec2-deploy
+  group: deploy-worker-service
   cancel-in-progress: false
-  
+
 jobs:
   deploy:
     name: Build & redeploy worker-service Docker image on EC2
