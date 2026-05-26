@@ -1,22 +1,4 @@
-name: Deploy — dispatch-service
-
-on:
-  push:
-    branches:
-      - main
-    paths:
-      - 'dispatch-service/**'
-
-jobs:
-  deploy:
-    name: Deploy dispatch-service to EC2
-    runs-on: ubuntu-latest
-
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v4
-
-      - name: Deploy via SSH
+- name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
@@ -24,6 +6,12 @@ jobs:
           key: ${{ secrets.EC2_SSH_KEY }}
           script: |
             set -e
+
+            echo "→ Checking repo..."
+            if [ ! -d ~/heimdall ]; then
+              echo "→ Repo not found, cloning fresh..."
+              git clone https://github.com/<your-username>/heimdall.git ~/heimdall
+            fi
 
             echo "→ Pulling latest code..."
             cd ~/heimdall

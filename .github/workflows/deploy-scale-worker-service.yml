@@ -25,6 +25,12 @@ jobs:
           script: |
             set -e
 
+            echo "→ Checking repo..."
+            if [ ! -d ~/heimdall ]; then
+              echo "→ Repo not found, cloning fresh..."
+              git clone https://github.com/<your-username>/heimdall.git ~/heimdall
+            fi
+
             echo "→ Pulling latest code..."
             cd ~/heimdall
             git pull origin main
