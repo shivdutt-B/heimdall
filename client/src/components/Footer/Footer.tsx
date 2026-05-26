@@ -33,7 +33,7 @@ export default function Footer() {
           </a>
         </DockIcon>
         <DockIcon className="bg-black/10 dark:bg-white/10">
-          <a href="https://shivdutt.netlify.app/" target="_blank">
+          <a href="https://shivdutt.dev" target="_blank">
             <Icons.website className="size-full hover:scale-125 transition-transform duration-200" />
           </a>
         </DockIcon>
