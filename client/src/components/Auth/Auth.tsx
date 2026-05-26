@@ -2,17 +2,16 @@ import React, { useState, useEffect } from "react";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "../Helper/Auth";
 import { useSignIn } from "../../hooks/useSignIn";
 import { useSignUp } from "../../hooks/useSignUp";
+import { useSignInWithCode } from "../../hooks/useSignInWithCode";
 import { useRecoilValue, useSetRecoilState } from "recoil";
 import { authState } from "../../store/auth";
-import { useNavigate } from "react-router-dom";
-import axios from "axios";
 
 export const Auth = () => {
   const { signIn } = useSignIn();
   const { signUp } = useSignUp();
+  const { sendCode, verifyCode } = useSignInWithCode();
   const auth = useRecoilValue(authState);
   const setAuth = useSetRecoilState(authState);
-  const navigate = useNavigate();
 
   const [isCodeSignIn, setIsCodeSignIn] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
@@ -29,8 +28,6 @@ export const Auth = () => {
     email: "",
     password: "",
   });
-
-  const [, setIsLoading] = useState(false); // not using isLoading due to is not usage anywhere in the component hence it is throwing error(declared but never used) during deployment(vercel)
 
   // Auto-clear error messages after 3 seconds
   useEffect(() => {
@@ -61,70 +58,23 @@ export const Auth = () => {
 
   const handleSendVerificationCode = async (event: React.FormEvent) => {
     event.preventDefault();
-    setIsLoading(true);
     setError("");
-    setAuth((prev) => ({ ...prev, loading: true, error: null }));
 
-    try {
-      await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/send-code`,
-        { email: signInForm.email },
-      );
+    const result = await sendCode(signInForm.email);
+    if (result.success) {
       setCodeSent(true);
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.data?.message) {
-        setError(err.response.data.message);
-      } else {
-        setError("An error occurred while sending the code. Please try again.");
-      }
-    } finally {
-      setIsLoading(false);
-      setAuth((prev) => ({ ...prev, loading: false }));
+    } else {
+      setError(result.error || "An error occurred while sending the code. Please try again.");
     }
   };
 
   const handleVerificationCodeSubmit = async (event: React.FormEvent) => {
     event.preventDefault();
-    setIsLoading(true);
     setError("");
-    setAuth((prev) => ({ ...prev, loading: true, error: null }));
 
-    try {
-      const response = await axios.post(
-        `${import.meta.env.VITE_BACKEND_URL}/api/users/verify-code`,
-        {
-          email: signInForm.email,
-          code: verificationCode,
-        },
-      );
-
-      if (response.data.token) {
-        localStorage.setItem("token", response.data.token);
-        localStorage.setItem("user", JSON.stringify(response.data.user));
-        setAuth((prev) => ({
-          ...prev,
-          user: response.data.user,
-          token: response.data.token,
-          loading: false,
-          error: null,
-        }));
-        navigate("/dashboard");
-      }
-    } catch (err) {
-      if (axios.isAxiosError(err) && err.response?.data?.message) {
-        setError(err.response.data.message);
-        setAuth((prev) => ({
-          ...prev,
-          loading: false,
-          // error: err.response.data.message,
-        }));
-      } else {
-        const errorMsg = "An error occurred. Please try again.";
-        setError(errorMsg);
-        setAuth((prev) => ({ ...prev, loading: false, error: errorMsg }));
-      }
-    } finally {
-      setIsLoading(false);
+    const result = await verifyCode(signInForm.email, verificationCode);
+    if (!result.success) {
+      setError(result.error || "An error occurred. Please try again.");
     }
   };
 
