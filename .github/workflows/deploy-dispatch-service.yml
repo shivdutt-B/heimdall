@@ -1,0 +1,46 @@
+name: Deploy — dispatch-service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dispatch-service/**'
+
+jobs:
+  deploy:
+    name: Deploy dispatch-service to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+
+            echo "→ Pulling latest code..."
+            cd ~/heimdall
+            git pull origin main
+
+            echo "→ Injecting environment variables from Doppler..."
+            cd dispatch-service
+            DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_DISPATCH }} doppler secrets download \
+              --no-file --format env > .env
+
+            echo "→ Installing dependencies..."
+            npm install --production=false
+
+            echo "→ Building TypeScript..."
+            npm run build
+
+            echo "→ Restarting via PM2..."
+            pm2 restart dispatch-service || pm2 start npm --name "dispatch-service" -- run start
+
+            echo "✓ dispatch-service deployed successfully"

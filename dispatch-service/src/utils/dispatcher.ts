@@ -27,18 +27,7 @@ export async function findServersToDispatch() {
                 jobId: server.id // avoid duplicate job for same server
             });
 
-            // Print job details in a structured format
-            console.log('\n📋 Job Added to Queue:', JSON.stringify({
-                jobId: job.id,
-                name: job.name,
-                data: job.data,
-                timestamp: new Date().toISOString(),
-                options: job.opts
-            }, null, 2));
-
         }
-
-        console.log(`Dispatched ${servers.length} ping jobs at ${new Date().toISOString()}`);
     } catch (error) {
         console.error('Error in dispatcher:', error);
     }
