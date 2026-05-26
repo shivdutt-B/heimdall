@@ -13,7 +13,10 @@ function formatIST(date: Date): string {
     return format(istTime, "yyyy-MM-dd HH:mm:ss");
 }
 
-
+/**
+ * Nodemailer transporter for sending emails.
+ * Requires GMAIL_USER and GMAIL_APP_PASSWORD environment variables.
+ */
 const transporter = nodemailer.createTransport({
     service: 'gmail',
     auth: {
@@ -22,11 +25,16 @@ const transporter = nodemailer.createTransport({
     }
 });
 
+/**
+ * Sends an immediate alert email to the specified user for the given server.
+ * @param {Server} server - The server that failed to respond.
+ * @param {User} user - The user to send the alert to.
+ */
 export async function sendImmediateAlert(server: Server, user: User) {
     const mailOptions = {
         from: process.env.FROM_EMAIL,
         to: user.email,
-        subject: `🚨 Alert: ${server.name} is down!`,
+        subject: `Alert: ${server.name} is down!`,
         html: `
             <!DOCTYPE html>
         <html lang="en">
@@ -162,16 +170,18 @@ export async function sendImmediateAlert(server: Server, user: User) {
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log(`✉️ Immediate alert sent to ${user.email} for server ${server.name}`);
     } catch (error) {
-        console.error('Error sending immediate alert:', error);
         throw error;
     }
 }
 
+/**
+ * Sends a recurring alert email to the specified user for the given server.
+ * @param {Server} server - The server that failed to respond.
+ * @param {User} user - The user to send the alert to.
+ * @param {string} downtime - The downtime of the server.
+ */
 export async function sendRecurringAlert(server: Server, user: User, downtime: string) {
-    const alertId = `HMD-${new Date().getFullYear()}-${String(new Date().getMonth() + 1).padStart(2, '0')}${String(new Date().getDate()).padStart(2, '0')}-${String(Math.floor(Math.random() * 1000)).padStart(3, '0')}`;
-
     const mailOptions = {
         from: process.env.FROM_EMAIL,
         to: user.email,
@@ -307,9 +317,7 @@ export async function sendRecurringAlert(server: Server, user: User, downtime: s
 
     try {
         await transporter.sendMail(mailOptions);
-        console.log('Recurring alert email sent successfully');
     } catch (error) {
-        console.error('Error sending recurring alert email:', error);
         throw error;
     }
 }
