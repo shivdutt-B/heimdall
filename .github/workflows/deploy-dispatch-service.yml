@@ -29,7 +29,7 @@ jobs:
             echo "→ Checking repo..."
             if [ ! -d ~/heimdall ]; then
               echo "→ Repo not found, cloning fresh..."
-              git clone https://github.com/<your-username>/heimdall.git ~/heimdall
+              git clone https://github.com/shivdutt-B/heimdall.git ~/heimdall
             fi
 
             echo "→ Pulling latest code..."
