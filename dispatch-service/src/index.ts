@@ -43,7 +43,6 @@ async function cleanup() {
         // Close express server
         expressServer.close();
     } catch (error) {
-        console.error('Error during cleanup:', error);
         process.exit(1);
     }
 }

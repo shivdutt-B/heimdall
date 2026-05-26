@@ -31,8 +31,6 @@ export const scaleWorkers = async () => {
         parseInt(MAX_WORKERS)
     );
 
-    console.log(`[${new Date().toISOString()}] Scaling check: pending jobs = ${pending}, running containers = ${runningCount}, desired containers = ${desired}`);
-
     let started = 0;
     let stopped = 0;
 

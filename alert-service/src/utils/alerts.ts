@@ -55,7 +55,6 @@ export async function checkForNewFailures() {
                         where: { id: server.id },
                         data: { lastImmediateAlertAt: new Date() }
                     });
-                    console.log(`Sent alert email for server ${server.name} (${server.consecutiveFailures}/${server.failureThreshold} failures)`);
                 } catch (error) {
                     console.error(`Error sending alert email for server ${server.name}:`, error);
                 }

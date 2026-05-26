@@ -65,7 +65,6 @@ export const startWorker = async () => {
             }
         });
         await container.start();
-        console.log(`[${new Date().toISOString()}] Started new worker: ${name}`);
     }
 };
 

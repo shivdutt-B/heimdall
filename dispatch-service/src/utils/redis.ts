@@ -7,7 +7,6 @@ export const redisConfig = {
     maxRetriesPerRequest: 3,
     retryStrategy: (times: number) => {
         const delay = Math.min(times * 1000, 5000);
-        console.log(`[${new Date().toISOString()}] Retrying Redis connection in ${delay}ms... (attempt ${times})`);
         return delay;
     }
 };
