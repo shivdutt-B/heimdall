@@ -1,0 +1,101 @@
+name: Deploy — all services
+
+on:
+  workflow_dispatch:
+
+concurrency:
+  group: ec2-deploy
+  cancel-in-progress: false
+
+jobs:
+  deploy-alert:
+    name: Deploy alert-service
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            if [ ! -d ~/heimdall ]; then
+              git clone https://github.com/shivdutt-B/heimdall.git ~/heimdall
+            fi
+            cd ~/heimdall && git pull origin main
+            cd alert-service
+            DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_ALERT }} doppler secrets download --no-file --format env > .env
+            npm install --production=false
+            npm run build
+            pm2 restart alert-service || pm2 start npm --name "alert-service" -- run start
+
+  deploy-dispatch:
+    name: Deploy dispatch-service
+    runs-on: ubuntu-latest
+    needs: deploy-alert          # ← waits for alert to finish
+    steps:
+      - uses: actions/checkout@v4
+      - uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            if [ ! -d ~/heimdall ]; then
+              git clone https://github.com/shivdutt-B/heimdall.git ~/heimdall
+            fi
+            cd ~/heimdall && git pull origin main
+            cd dispatch-service
+            DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_DISPATCH }} doppler secrets download --no-file --format env > .env
+            npm install --production=false
+            npm run build
+            pm2 restart dispatch-service || pm2 start npm --name "dispatch-service" -- run start
+
+  deploy-scale-worker:
+    name: Deploy scale-worker-service
+    runs-on: ubuntu-latest
+    needs: deploy-dispatch        # ← waits for dispatch to finish
+    steps:
+      - uses: actions/checkout@v4
+      - uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            if [ ! -d ~/heimdall ]; then
+              git clone https://github.com/shivdutt-B/heimdall.git ~/heimdall
+            fi
+            cd ~/heimdall && git pull origin main
+            cd scale-worker-service
+            DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }} doppler secrets download --no-file --format env > .env
+            npm install --production=false
+            npm run build
+            pm2 restart scale-worker-service || pm2 start npm --name "scale-worker-service" -- run start
+
+  deploy-worker:
+    name: Deploy worker-service
+    runs-on: ubuntu-latest
+    needs: deploy-scale-worker    # ← waits for scale-worker to finish
+    steps:
+      - uses: actions/checkout@v4
+      - uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ secrets.EC2_HOST }}
+          username: ${{ secrets.EC2_USER }}
+          key: ${{ secrets.EC2_SSH_KEY }}
+          script: |
+            set -e
+            if [ ! -d ~/heimdall ]; then
+              git clone https://github.com/shivdutt-B/heimdall.git ~/heimdall
+            fi
+            cd ~/heimdall && git pull origin main
+            cd worker-service
+            DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_WORKER }} doppler secrets download --no-file --format env > .env
+            docker build -t worker-service:latest .
+            docker ps -q --filter "ancestor=worker-service:latest" | xargs -r docker stop
+            docker ps -aq --filter "ancestor=worker-service:latest" | xargs -r docker rm
+            pm2 restart scale-worker-service

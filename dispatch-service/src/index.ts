@@ -6,7 +6,7 @@ import { findServersToDispatch } from './utils/dispatcher';
 const express = require('express');
 const heimdall = require('heimdall-nodejs-sdk'); 
 
-dotenv.config()
+dotenv.config();
 
 // Get dispatch interval from env or default to 60 seconds
 const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '60000'); 
