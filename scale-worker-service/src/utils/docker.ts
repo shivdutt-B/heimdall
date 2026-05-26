@@ -1,14 +1,8 @@
-import { exec } from 'child_process';
-import { promisify } from 'util';
+import Docker from 'dockerode';
 import { v4 as uuidv4 } from 'uuid';
-import * as dotenv from 'dotenv';
 
-// Load environment variables
-dotenv.config();
-dotenv.config({ path: '.env.worker-service' });
-
-const execAsync = promisify(exec);
-
+// Connect to the local Docker socket
+const docker = new Docker({ socketPath: '/var/run/docker.sock' });
 const WORKER_IMAGE = process.env.WORKER_IMAGE || 'heimdall-worker:latest';
 
 export interface WorkerContainer {
@@ -21,31 +15,63 @@ export interface WorkerContainer {
 export const isWorkerRunning = (state?: string): boolean =>
     !!state && (state.toLowerCase().startsWith('up') || state.toLowerCase().includes('running'));
 
+// 1. List workers without parsing stdout strings
 export const listRunningWorkers = async (): Promise<WorkerContainer[]> => {
-    const { stdout } = await execAsync('docker ps -a --filter name=worker- --format "{{.ID}}\t{{.Names}}\t{{.CreatedAt}}\t{{.Status}}"');
-    return stdout.trim().split('\n').filter(Boolean).map(line => {
-        const [id, name, created, state] = line.split('\t');
-        return { id, name, created: new Date(created), state };
-    });
+    const containers = await docker.listContainers({ all: true });
+    
+    return containers
+        .filter(c => c.Names.some(name => name.includes('/worker-')))
+        .map(c => {
+            const name = c.Names[0].replace(/^\//, ''); // Strip leading slash
+            return {
+                id: c.Id,
+                name,
+                created: new Date(c.Created * 1000), // API returns Unix epoch seconds
+                state: c.Status // e.g. "Up 2 hours"
+            };
+        });
 };
 
+// 2. Clean up exited containers cleanly
 export const cleanupStoppedWorkers = async (name: string) => {
-    const { stdout } = await execAsync(`docker ps -a -q --filter name=${name} --filter status=exited`);
-    if (stdout.trim()) await execAsync(`docker rm -f ${stdout.trim()}`);
+    const containers = await docker.listContainers({
+        all: true,
+        filters: JSON.stringify({ name: [name], status: ['exited'] })
+    });
+    
+    for (const containerInfo of containers) {
+        const container = docker.getContainer(containerInfo.Id);
+        await container.remove({ force: true });
+    }
 };
 
+// 3. Start worker containers programmatically
 export const startWorker = async () => {
     const name = `worker-${uuidv4()}`;
     await cleanupStoppedWorkers(name);
-    const workers = await listRunningWorkers();
-    const isRunning = workers.some(w => w.name === name && isWorkerRunning(w.state));
+    
+    const containers = await docker.listContainers({ all: true });
+    const isRunning = containers.some(c => 
+        c.Names.some(n => n.replace(/^\//, '') === name) && 
+        isWorkerRunning(c.Status)
+    );
+
     if (!isRunning) {
-        await execAsync(`docker run -d --name ${name} --restart unless-stopped ${WORKER_IMAGE}`);
+        const container = await docker.createContainer({
+            Image: WORKER_IMAGE,
+            name: name,
+            HostConfig: {
+                RestartPolicy: { Name: 'unless-stopped' }
+            }
+        });
+        await container.start();
         console.log(`[${new Date().toISOString()}] Started new worker: ${name}`);
     }
 };
 
+// 4. Force remove containers directly
 export const stopWorker = async (worker: WorkerContainer) => {
-    await execAsync(`docker rm -f ${worker.id}`);
+    const container = docker.getContainer(worker.id);
+    await container.remove({ force: true });
     console.log(`[${new Date().toISOString()}] Stopped worker: ${worker.name}`);
 };
