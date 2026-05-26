@@ -8,6 +8,10 @@ on:
       - 'alert-service/**'
   workflow_dispatch:
 
+concurrency:
+  group: ec2-deploy
+  cancel-in-progress: false
+
 jobs:
   deploy:
     name: Deploy alert-service to EC2

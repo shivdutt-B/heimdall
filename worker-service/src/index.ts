@@ -2,14 +2,14 @@ import * as dotenv from 'dotenv';
 import { prisma } from './utils/db';
 import { worker } from './utils/worker';
 
-dotenv.config();
+dotenv.config(); 
 
 // Enhanced process termination handling
 async function gracefulShutdown(signal: string) {
     try {
         await worker.close();
         await prisma.$disconnect();
-        process.exit(0);
+        process.exit(0); 
     } catch (error) {
         process.exit(1);
     }

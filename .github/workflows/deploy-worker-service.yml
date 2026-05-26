@@ -8,6 +8,10 @@ on:
       - 'worker-service/**'
   workflow_dispatch:
 
+concurrency:
+  group: ec2-deploy
+  cancel-in-progress: false
+  
 jobs:
   deploy:
     name: Build & redeploy worker-service Docker image on EC2

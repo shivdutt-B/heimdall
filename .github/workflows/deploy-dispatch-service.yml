@@ -8,6 +8,10 @@ on:
       - 'dispatch-service/**'
   workflow_dispatch:
 
+concurrency:
+  group: ec2-deploy
+  cancel-in-progress: false
+  
 jobs:
   deploy:
     name: Deploy dispatch-service to EC2

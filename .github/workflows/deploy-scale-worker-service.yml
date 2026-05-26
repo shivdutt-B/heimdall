@@ -8,6 +8,10 @@ on:
       - 'scale-worker-service/**'
   workflow_dispatch:
 
+concurrency:
+  group: ec2-deploy
+  cancel-in-progress: false
+  
 jobs:
   deploy:
     name: Deploy scale-worker-service to EC2

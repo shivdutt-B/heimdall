@@ -4,7 +4,7 @@ import { pingQueue, queueEvents } from './utils/queue';
 import { findServersToDispatch } from './utils/dispatcher';
 
 const express = require('express');
-const heimdall = require('heimdall-nodejs-sdk');
+const heimdall = require('heimdall-nodejs-sdk'); 
 
 dotenv.config();
 
