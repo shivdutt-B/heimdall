@@ -11,7 +11,7 @@ async function gracefulShutdown(signal: string) {
         await prisma.$disconnect();
         process.exit(0); 
     } catch (error) {
-        process.exit(1);
+        process.exit(1); 
     }
 }
 

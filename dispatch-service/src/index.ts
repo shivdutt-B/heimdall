@@ -9,7 +9,7 @@ const heimdall = require('heimdall-nodejs-sdk');
 dotenv.config();
 
 // Get dispatch interval from env or default to 60 seconds
-const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '60000');
+const DISPATCH_INTERVAL = parseInt(process.env.DISPATCH_INTERVAL || '60000'); 
 
 // Run the dispatcher every DISPATCH_INTERVAL milliseconds
 const dispatchInterval = setInterval(findServersToDispatch, DISPATCH_INTERVAL);

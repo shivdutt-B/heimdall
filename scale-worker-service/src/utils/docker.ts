@@ -1,5 +1,5 @@
 import Docker from 'dockerode';
-import { v4 as uuidv4 } from 'uuid';
+import { randomUUID } from 'crypto';
 
 // Connect to the local Docker socket
 const docker = new Docker({ socketPath: '/var/run/docker.sock' });
@@ -47,7 +47,7 @@ export const cleanupStoppedWorkers = async (name: string) => {
 
 // 3. Start worker containers programmatically
 export const startWorker = async () => {
-    const name = `worker-${uuidv4()}`;
+    const name = `worker-${randomUUID()}`;
     await cleanupStoppedWorkers(name);
     
     const containers = await docker.listContainers({ all: true });

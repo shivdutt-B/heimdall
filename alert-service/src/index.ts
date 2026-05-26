@@ -5,7 +5,7 @@ import { checkForNewFailures, checkForRecurringAlerts } from './utils/alerts';
 dotenv.config(); 
 
 /**
- * Constants from environment variables
+ * Constants from environment variables 
  */ 
 const IMMEDIATE_CHECK_INTERVAL = parseInt(process.env.IMMEDIATE_CHECK_INTERVAL || '60000');  // 1 minute
 const RECURRING_CHECK_INTERVAL = parseInt(process.env.RECURRING_CHECK_INTERVAL || '3600000');  // 1 hour
