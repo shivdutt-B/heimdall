@@ -13,7 +13,7 @@ export const Auth = () => {
   const auth = useRecoilValue(authState);
   const setAuth = useSetRecoilState(authState);
 
-  const [isCodeSignIn, setIsCodeSignIn] = useState(false);
+  const [isCodeSignIn, ] = useState(false);
   const [verificationCode, setVerificationCode] = useState("");
   const [codeSent, setCodeSent] = useState(false);
   const [error, setError] = useState("");
