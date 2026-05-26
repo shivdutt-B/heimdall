@@ -4,7 +4,6 @@ import { useRecoilValue } from "recoil";
 import { serversAtom } from "../../store/serverAtoms";
 import { format } from "date-fns";
 import { SectionCardsSkeleton } from "../../skeletons/dashboard/SectionCardsSkeleton";
-import axios from "axios";
 import { useServers } from "../../hooks/useServers";
 
 interface Server {
@@ -24,133 +23,6 @@ interface SectionCardsProps {
   selectedServer?: string | null;
   loading?: boolean;
   hasServers?: boolean;
-}
-
-// Function to handle adding a new server
-type AddServerParams = { name: string; url: string; pingInterval: number; failureThreshold: number };
-async function addServer(
-  { name, url, pingInterval, failureThreshold }: AddServerParams,
-  token: string | null
-) {
-  try {
-    const response = await axios.post(
-      `${import.meta.env.VITE_BACKEND_URL}/api/servers`,
-      {
-        name,
-        url,
-        pingInterval,
-        failureThreshold,
-      },
-      {
-        headers: {
-          "x-auth-token": token,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return { success: true, data: response.data };
-  } catch (err: unknown) {
-    let message = "Failed to add server. Please try again.";
-    if (axios.isAxiosError(err) && err.response && err.response.data) {
-      const errorData = err.response.data;
-      if (errorData.message) {
-        message = errorData.message;
-      } else if (errorData.errors) {
-        // Express-validator errors
-        message = errorData.errors.map((e: any) => e.msg).join(", ");
-      }
-    }
-    return { success: false, error: message };
-  }
-}
-
-// Function to handle deleting a server
-async function handleDeleteServer(serverId: string, token: string | null) {
-  try {
-    await axios.delete(`${import.meta.env.VITE_BACKEND_URL}/api/servers/${serverId}`, {
-      headers: {
-        "x-auth-token": token,
-      },
-    });
-    return { success: true };
-  } catch (err: unknown) {
-    let message = "Failed to delete server. Please try again.";
-    if (axios.isAxiosError(err) && err.response && err.response.data && err.response.data.message) {
-      message = err.response.data.message;
-    }
-    return { success: false, error: message };
-  }
-}
-
-// Function to handle modifying a server
-async function modifyServer(
-  serverId: string,
-  data: { name: string; url: string; pingInterval: number; failureThreshold: number },
-  token: string | null
-) {
-  try {
-    await axios.put(
-      `${import.meta.env.VITE_BACKEND_URL}/api/servers/${serverId}`,
-      data,
-      {
-        headers: {
-          "x-auth-token": token,
-          "Content-Type": "application/json",
-        },
-      }
-    );
-    return { success: true };
-  } catch (err: unknown) {
-    let message = "Failed to modify server. Please try again.";
-    if (axios.isAxiosError(err) && err.response && err.response.data && err.response.data.message) {
-      message = err.response.data.message;
-    }
-    return { success: false, error: message };
-  }
-}
-
-// Function to handle modifying a server and all related state
-async function handleModifyServer({
-  e,
-  serverToModify,
-  modifyForm,
-  setIsModifying,
-  setModifyError,
-  setShowModifyDialog,
-  setServerToModify,
-  refetchServers
-}: {
-  e: React.FormEvent,
-  serverToModify: Server,
-  modifyForm: { name: string; url: string; pingInterval: number; failureThreshold: number },
-  setIsModifying: (v: boolean) => void,
-  setModifyError: (v: string) => void,
-  setShowModifyDialog: (v: boolean) => void,
-  setServerToModify: (v: Server | null) => void,
-  refetchServers: () => void
-}) {
-  e.preventDefault();
-  setIsModifying(true);
-  setModifyError("");
-  const token = localStorage.getItem("token");
-  const result = await modifyServer(
-    serverToModify.id,
-    {
-      name: modifyForm.name,
-      url: modifyForm.url,
-      pingInterval: modifyForm.pingInterval,
-      failureThreshold: modifyForm.failureThreshold,
-    },
-    token
-  );
-  if (result.success) {
-    setShowModifyDialog(false);
-    setServerToModify(null);
-    refetchServers();
-  } else {
-    setModifyError(result.error || "Failed to modify server. Please try again.");
-  }
-  setIsModifying(false);
 }
 
 export const SectionCards: React.FC<SectionCardsProps> = ({
@@ -175,7 +47,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [serverToDelete, setServerToDelete] = useState<Server | null>(null);
-  const { refetchServers } = useServers();
+  const { refetchServers, addServer, deleteServer, modifyServer } = useServers();
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [showModifyDialog, setShowModifyDialog] = useState(false);
@@ -188,6 +60,30 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   });
   const [isModifying, setIsModifying] = useState(false);
   const [modifyError, setModifyError] = useState("");
+
+  const handleModifyServerSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!serverToModify) return;
+
+    setIsModifying(true);
+    setModifyError("");
+
+    const result = await modifyServer(serverToModify.id, {
+      name: modifyForm.name,
+      url: modifyForm.url,
+      pingInterval: modifyForm.pingInterval,
+      failureThreshold: modifyForm.failureThreshold,
+    });
+
+    if (result.success) {
+      setShowModifyDialog(false);
+      setServerToModify(null);
+      refetchServers();
+    } else {
+      setModifyError(result.error || "Failed to modify server. Please try again.");
+    }
+    setIsModifying(false);
+  };
 
   // Automatically clear error after 5 seconds
   useEffect(() => {
@@ -305,8 +201,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   e.preventDefault();
                   setFormError("");
                   setIsSubmitting(true);
-                  const token = localStorage.getItem("token");
-                  const result = await addServer(form, token);
+                  const result = await addServer(form);
                   if (result.success) {
                     setIsDialogOpen(false);
                     setForm({
@@ -742,8 +637,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                 e.preventDefault();
                 setFormError("");
                 setIsSubmitting(true);
-                const token = localStorage.getItem("token");
-                const result = await addServer(form, token);
+                const result = await addServer(form);
                 if (result.success) {
                   setIsDialogOpen(false);
                   setForm({
@@ -953,11 +847,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   if (!serverToDelete) return;
                   setIsDeleting(true);
                   setDeleteError("");
-                  const token = localStorage.getItem("token");
-                  const result = await handleDeleteServer(
-                    serverToDelete.id,
-                    token
-                  );
+                  const result = await deleteServer(serverToDelete.id);
                   if (result.success) {
                     setShowDeleteConfirm(false);
                     setServerToDelete(null);
@@ -1026,16 +916,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
               Modify Server
             </h2>
             <form
-              onSubmit={(e) => handleModifyServer({
-                e,
-                serverToModify,
-                modifyForm,
-                setIsModifying,
-                setModifyError,
-                setShowModifyDialog,
-                setServerToModify,
-                refetchServers
-              })}
+              onSubmit={handleModifyServerSubmit}
               className="flex flex-col gap-4"
             >
               <div className="text-left">
