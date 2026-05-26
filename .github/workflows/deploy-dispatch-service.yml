@@ -1,4 +1,23 @@
-- name: Deploy via SSH
+name: Deploy — dispatch-service
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - 'dispatch-service/**'
+  workflow_dispatch:
+
+jobs:
+  deploy:
+    name: Deploy dispatch-service to EC2
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout code
+        uses: actions/checkout@v4
+
+      - name: Deploy via SSH
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
