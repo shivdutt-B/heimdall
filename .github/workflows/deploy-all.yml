@@ -130,7 +130,7 @@ jobs:
             echo "INJECTING SECRETS..."
             DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_WORKER }} doppler secrets download --no-file --format env > .env
             echo "BUILDING DOCKER IMAGE..."
-            docker build -t heimdall-worker:latest .
+            docker build --no-cache -t heimdall-worker:latest .
             echo "REMOVING OLD STOPPED WORKER CONTAINERS..."
             docker ps -q --filter "ancestor=heimdall-worker:latest" | xargs -r docker stop
             docker ps -aq --filter "ancestor=heimdall-worker:latest" | xargs -r docker rm
