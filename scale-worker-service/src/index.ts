@@ -4,7 +4,7 @@ import { scaleWorkers } from './utils/scaler';
 import { listRunningWorkers, isWorkerRunning, stopWorker } from './utils/docker';
 
 // Load environment variables
-dotenv.config();
+dotenv.config()
 dotenv.config({ path: '.env.worker-service' }); 
 
 const SCALE_CHECK_INTERVAL = process.env.SCALE_CHECK_INTERVAL || '30000';
