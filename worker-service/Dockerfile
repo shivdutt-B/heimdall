@@ -14,9 +14,6 @@ RUN npm install
 # Copy everything else (including src/, tsconfig.json, etc.)
 COPY . .
 
-# Re-run install to ensure Prisma binaries match Alpine architecture
-RUN npm install
-
 # Generate Prisma Client
 RUN npx prisma generate
 
