@@ -2,30 +2,52 @@ import { TextHoverEffect } from "../Common/TextHoverEffect";
 
 const Footer = () => {
   return (
-    <footer className="relative w-full bg-black overflow-hidden pt-0 pb-8 md:pb-12 flex flex-col justify-end -mt-1 min-h-[240px]">
+    <footer className="relative w-full bg-bg-dark pt-12 pb-8 flex flex-col justify-end -mt-1 min-h-[240px]">
       {/* Top blue glow */}
-      <div className="absolute -top-4 left-0 right-0 h-[500px] pointer-events-none z-0">
-        <div className="w-full h-full bg-gradient-to-b from-blue-600/50 via-blue-500/20 to-transparent blur-xl mix-blend-screen opacity-100" />
+      <div className="absolute -top-[150px] left-1/2 -translate-x-1/2 w-full max-w-[1200px] h-[300px] pointer-events-none z-0">
+        <div className="w-full h-full bg-[radial-gradient(circle_at_center,_var(--tw-gradient-stops))] from-blue-500/35 via-blue-600/5 to-transparent blur-3xl mix-blend-screen opacity-90" />
       </div>
 
       {/* Large text */}
-      {/* <MouseTrackingText /> */}
       <TextHoverEffect text="Heimdall" />
 
       {/* Footer content */}
-      <div className="relative z-10 w-full max-w-7xl mx-auto px-4 md:px-6 py-8">
-        {/* Main Footer Grid */}
-        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-0 px-0 sm:gap-4 md:gap-8 mb-12">
-          {/* ByteHint Info */}
-          <div className="flex flex-col space-y-3 md:space-y-4 px-4 sm:px-0">
-            <div className="flex items-center gap-3 mb-2">
-            </div>
-            <p className="text-white/60 text-sm leading-relaxed">
-              Building innovative solutions for the digital future. Transform
-              your ideas into reality with our cutting-edge technology.
-            </p>
-          </div>
+      <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-8 flex flex-col items-center text-center space-y-6">
+        <p className="text-white/40 text-[16px] leading-relaxed max-w-md">
+          Heimdall is a comprehensive ping and uptime monitoring platform designed to
+          eliminate cold starts on free hosting platforms like Render, Railway, and Fly.io.
+        </p>
+        <div className="flex items-center justify-center gap-6 text-sm">
+          <a
+            href="https://github.com/shivdutt-B"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/40 hover:text-emerald-500 transition-colors"
+          >
+            GitHub ↗
+          </a>
+          <span className="text-white/10">•</span>
+          <a
+            href="https://www.linkedin.com/in/shivdutt-bhadakwad-07a462280/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/40 hover:text-emerald-500 transition-colors"
+          >
+            LinkedIn ↗
+          </a>
+          <span className="text-white/10">•</span>
+          <a
+            href="https://shivdutt.dev/"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-white/40 hover:text-emerald-500 transition-colors"
+          >
+            Portfolio ↗
+          </a>
         </div>
+        <p className="text-white/20 text-xs pt-4">
+          &copy; {new Date().getFullYear()} Heimdall. All rights reserved.
+        </p>
       </div>
     </footer>
   );

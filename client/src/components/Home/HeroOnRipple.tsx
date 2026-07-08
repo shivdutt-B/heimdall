@@ -67,17 +67,17 @@ function HeroOnRipple() {
           ) : (
             <Link
               to={auth.user ? "/dashboard" : "/auth"}
-              className="bg-white hover:bg-white/80 transition-all duration-300 text-black px-6 py-2.5 rounded-sm shadow-md text-sm flex items-center gap-2 font-semibold"
+              className="bg-emerald-500 hover:bg-emerald-600 transition-all duration-300 text-black px-8 py-4 rounded-[2px] shadow-md text-md flex items-center gap-2 font-semibold"
             >
               <span>{auth.user ? "Dashboard" : "Get Started"}</span>
               <motion.svg
                 xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
+                width="20"
+                height="20"
                 viewBox="0 0 24 24"
                 fill="none"
                 stroke="currentColor"
-                strokeWidth="2"
+                strokeWidth="3"
                 strokeLinecap="round"
                 strokeLinejoin="round"
                 whileHover={{ x: 3 }}
@@ -88,54 +88,6 @@ function HeroOnRipple() {
               </motion.svg>
             </Link>
           )}
-
-          <a href="#demo-video" className="scroll-smooth">
-            <motion.button
-              className="bg-transparent border border-white/30 hover:border-white/60 text-white px-6 py-2.5 rounded-sm shadow-md flex items-center gap-2 text-sm font-semibold font-Inter cursor-pointer"
-              whileHover={{ scale: 1.03 }}
-              whileTap={{ scale: 0.97 }}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              transition={{ delay: 0.5 }}
-            >
-              Demo
-              <motion.svg
-                viewBox="0 0 16 16"
-                fill="none"
-                xmlns="http://www.w3.org/2000/svg"
-                width="16"
-                height="16"
-                stroke="currentColor"
-                strokeWidth="0.5"
-                whileHover={{ x: 3 }}
-                transition={{ duration: 0.1 }}
-              >
-                <g id="SVGRepo_bgCarrier" strokeWidth="0"></g>
-                <g
-                  id="SVGRepo_tracerCarrier"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                ></g>
-                <g id="SVGRepo_iconCarrier">
-                  <path
-                    d="M14 4H0V2H16V14H9.98707C9.99565 13.8344 10 13.6677 10 13.5C10 12.9896 9.95975 12.4886 9.88225 12H14V4Z"
-                    fill="currentColor"
-                    strokeWidth="0.2"
-                  ></path>
-                  <path
-                    d="M0 10C2.20914 10 4 11.7909 4 14H2C2 12.8954 1.10457 12 0 12V10Z"
-                    fill="currentColor"
-                    strokeWidth="0.2"
-                  ></path>
-                  <path
-                    d="M8 14C8 9.58172 4.41828 6 0 6V8C3.31371 8 6 10.6863 6 14H8Z"
-                    fill="currentColor"
-                    strokeWidth="0.2"
-                  ></path>
-                </g>
-              </motion.svg>
-            </motion.button>
-          </a>
         </div>
       </div>
     </div>

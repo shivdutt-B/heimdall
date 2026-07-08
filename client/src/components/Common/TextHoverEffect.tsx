@@ -1,6 +1,5 @@
 import React, { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-
 export const TextHoverEffect = ({
   text,
   duration,
@@ -10,12 +9,10 @@ export const TextHoverEffect = ({
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
   const [hovered, setHovered] = useState(false);
   const [maskPosition, setMaskPosition] = useState({ cx: "50%", cy: "50%" });
-
   // Responsive font size, margin, and container height
   const [fontSize, setFontSize] = useState(440);
   const [marginTop, setMarginTop] = useState(80);
   const [containerHeight, setContainerHeight] = useState(260);
-
   useEffect(() => {
     const handleResize = () => {
       const width = window.innerWidth;
@@ -41,12 +38,10 @@ export const TextHoverEffect = ({
         setContainerHeight(300);
       }
     };
-
     handleResize();
     window.addEventListener('resize', handleResize);
     return () => window.removeEventListener('resize', handleResize);
   }, []);
-
   useEffect(() => {
     if (svgRef.current && cursor.x !== null && cursor.y !== null) {
       const svgRect = svgRef.current.getBoundingClientRect();
@@ -89,11 +84,16 @@ export const TextHoverEffect = ({
         >
           {hovered && (
             <>
-              <stop offset="0%" stopColor="#eab308" />
+              {/* <stop offset="0%" stopColor="#eab308" />
               <stop offset="25%" stopColor="#ef4444" />
               <stop offset="50%" stopColor="#3b82f6" />
               <stop offset="75%" stopColor="#06b6d4" />
-              <stop offset="100%" stopColor="#8b5cf6" />
+              <stop offset="100%" stopColor="#8b5cf6" /> */}
+              <stop offset="0%" stopColor="#20a87bff" />
+              <stop offset="25%" stopColor="#20a87bff" />
+              <stop offset="50%" stopColor="#20a87bff" />
+              <stop offset="75%" stopColor="#20a87bff" />
+              <stop offset="100%" stopColor="#20a87bff" />
             </>
           )}
         </linearGradient>
@@ -134,8 +134,8 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         fontSize={fontSize}
         fontWeight="900"
-        strokeWidth="4"
-        className="fill-transparent stroke-neutral-300 font-[helvetica] dark:stroke-neutral-700"
+        strokeWidth="8"
+        className="fill-transparent stroke-neutral-300 font-[helvetica] dark:stroke-neutral-400"
         style={{ opacity: 0.8 }}
       >
         {text}
@@ -146,8 +146,8 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         fontSize={fontSize}
         fontWeight="900"
-        strokeWidth={hovered ? "6" : "4"}
-        className="fill-transparent stroke-neutral-200 font-[helvetica] dark:stroke-neutral-800"
+        strokeWidth={hovered ? "12" : "8"}
+        className="fill-transparent stroke-neutral-200 font-[helvetica] dark:stroke-neutral-400"
         style={{ opacity: hovered ? 0.9 : 0.6 }}
       >
         {text}
@@ -158,8 +158,8 @@ export const TextHoverEffect = ({
         textAnchor="middle"
         fontSize={fontSize}
         fontWeight="900"
-        strokeWidth={hovered ? "6" : "4"}
-        className="fill-transparent stroke-neutral-200 font-[helvetica] dark:stroke-neutral-800"
+        strokeWidth={hovered ? "12" : "8"}
+        className="fill-transparent stroke-neutral-200 font-[helvetica] dark:stroke-neutral-400"
         initial={{ strokeDashoffset: 1000, strokeDasharray: 1000 }}
         animate={{
           strokeDashoffset: 0,
@@ -179,7 +179,7 @@ export const TextHoverEffect = ({
         fontSize={fontSize}
         fontWeight="900"
         stroke="url(#textGradient)"
-        strokeWidth={hovered ? "6" : "4"}
+        strokeWidth={hovered ? "12" : "8"}
         mask="url(#textMask)"
         className="fill-transparent font-[helvetica]"
       >

@@ -22,10 +22,10 @@ const FeatureHero: React.FC = () => {
         </div>
 
         {/* 2x2 Feature Grid with sharp borders and bigger boxes */}
-        <div className="grid grid-cols-1 md:grid-cols-2 border-t border-l border-white/[0.06] max-w-6xl mx-auto">
+        <div className="grid grid-cols-1 md:grid-cols-2 border-t border-l border-white/[0.06] max-w-6xl mx-auto rounded-[5px]">
           
           {/* Card 1: Performance Optimization */}
-          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300 group rounded-top-left-[5px]">
             {/* Background Image */}
             <img
               src={image1}
@@ -37,7 +37,7 @@ const FeatureHero: React.FC = () => {
 
             {/* Bottom Content */}
             <div className="relative z-10 space-y-3">
-              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+              <h3 className="ttext-xl md:text-2xl font-bold text-white group-hover:text-emerald-500 tracking-tight leading-tight duration-400 duration-400">
                 Performance optimization
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed font-normal">
@@ -47,7 +47,7 @@ const FeatureHero: React.FC = () => {
           </div>
 
           {/* Card 2: Advanced Monitoring */}
-          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300 group rounded-top-right-[5px]">
             {/* Background Image */}
             <img
               src={image2}
@@ -59,7 +59,7 @@ const FeatureHero: React.FC = () => {
 
             {/* Bottom Content */}
             <div className="relative z-10 space-y-3">
-              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+              <h3 className="ttext-xl md:text-2xl font-bold text-white group-hover:text-emerald-500 tracking-tight leading-tight duration-400">
                 Advanced monitoring
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed font-normal">
@@ -69,7 +69,7 @@ const FeatureHero: React.FC = () => {
           </div>
 
           {/* Card 3: Intelligent Alerting */}
-          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300 group rounded-bottom-left-[5px]">
             {/* Background Image */}
             <img
               src={image3}
@@ -81,7 +81,7 @@ const FeatureHero: React.FC = () => {
 
             {/* Bottom Content */}
             <div className="relative z-10 space-y-3">
-              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+              <h3 className="ttext-xl md:text-2xl font-bold text-white group-hover:text-emerald-500 tracking-tight leading-tight duration-400">
                 Intelligent alerting
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed font-normal">
@@ -91,7 +91,7 @@ const FeatureHero: React.FC = () => {
           </div>
 
           {/* Card 4: Scalable Architecture */}
-          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300 group rounded-bottom-right-[5px]">
             {/* Background Image */}
             <img
               src={image4}
@@ -103,7 +103,7 @@ const FeatureHero: React.FC = () => {
 
             {/* Bottom Content */}
             <div className="relative z-10 space-y-3">
-              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+              <h3 className="ttext-xl md:text-2xl font-bold text-white group-hover:text-emerald-500 tracking-tight leading-tight duration-400">
                 Scalable architecture
               </h3>
               <p className="text-gray-300 text-sm leading-relaxed font-normal">

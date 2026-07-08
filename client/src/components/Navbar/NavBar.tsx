@@ -91,7 +91,7 @@ const NavBar: React.FC = () => {
               <div className="flex gap-2">
                 <Link
                   to="/docs"
-                  className="justify-center whitespace-nowrap text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none h-8 rounded-sm px-2 py-3 flex items-center gap-1 transition-colors hover:bg-transparent hover:text-muted-foreground border border-[grey] bg-bg-card text-white"
+                  className="justify-center whitespace-nowrap text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none h-8 rounded-[3px] px-2 py-3 flex items-center gap-1 transition-colors hover:bg-bg-card hover:text-white border border-[grey] bg-bg-card text-white"
                 >
                   Docs
                   <svg
@@ -136,7 +136,7 @@ const NavBar: React.FC = () => {
                   </div>
                 ) : (
                   <button
-                    className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none bg-white text-primary-foreground hover:bg-white/90 h-8 rounded-sm px-2 py-3 border border-gray-300 relative"
+                    className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none bg-white text-primary-foreground hover:bg-white/90 h-8 rounded-[3px] px-2 py-3 border border-gray-300 relative"
                     id="signup-link"
                     type="button"
                     onClick={(e) => {
@@ -167,7 +167,7 @@ const NavBar: React.FC = () => {
                     {showUserDialog && auth.user && (
                       <div
                         id="user-dialog"
-                        className="w-64 bg-black border border-gray-700 rounded shadow-lg z-50 p-4 text-left flex flex-col items-stretch gap-2"
+                        className="w-64 bg-bg-dark border border-red rounded shadow-lg z-50 p-4 text-left flex flex-col items-stretch gap-2"
                         style={{ top: "50px", position: "absolute", right: 0 }}
                       >
                         <div className="mb-2">

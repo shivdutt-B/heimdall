@@ -14,7 +14,7 @@ const StepItem: React.FC<StepProps> = ({ number, title, description }) => {
         <span className="font-sans text-5xl md:text-6xl font-black text-white/10 transition-colors duration-300 select-none shrink-0 leading-none">
           {number}
         </span>
-        <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight">
+        <h3 className="text-2xl md:text-3xl font-extrabold text-white tracking-tight leading-tight group-hover:text-emerald-400">
           {title}
         </h3>
       </div>
@@ -59,7 +59,7 @@ const StepsHero: React.FC = () => {
   ];
 
   return (
-    <section className="w-full py-24 bg-[#080b11] text-white relative border-t border-white/[0.02]">
+    <section className="w-full py-24 bg-[#080b11] text-white relative">
       {/* Background radial glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[400px] h-[400px] bg-indigo-500/5 rounded-full blur-[100px] pointer-events-none" />
 
