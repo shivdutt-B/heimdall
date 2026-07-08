@@ -10,9 +10,9 @@ function Home() {
     <>
       <RippleHero />
       <LogoTicker />
+      <FeatureHero />
       <StepsHero />
       <VideoHero />
-      <FeatureHero />
     </>
   );
 }

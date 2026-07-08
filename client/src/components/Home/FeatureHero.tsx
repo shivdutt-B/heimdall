@@ -1,108 +1,121 @@
-import { Zap, LineChart, Bell } from "lucide-react";
-import { motion } from "framer-motion";
+import React from "react";
+import image1 from "../../assets/home/image1.png";
+import image2 from "../../assets/home/image2.png";
+import image3 from "../../assets/home/image3.png";
+import image4 from "../../assets/home/image4.png";
 
-function FeatureHero() {
+const FeatureHero: React.FC = () => {
   return (
-    <section className="container px-4 pt-24 pb-0 bg-bg-dark text-white/80 m-auto">
-      <div className="flex flex-col items-center text-center space-y-4 mb-12">
-        <div className="space-y-2">
-          <motion.h2
-            className="text-3xl font-semibold tracking-tighter sm:text-4xl md:text-5xl font-Inter"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            Features
-          </motion.h2>
-          <motion.p
-            className="text-muted-foreground md:text-[16px] max-w-[42rem] mx-auto font-Inter"
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-          >
-            Everything you need to keep your servers running smoothly.
-          </motion.p>
+    <section className="w-full py-24 bg-[#080b11] text-white overflow-hidden relative">
+      {/* Background radial glow */}
+      <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
+
+      <div className="max-w-7xl mx-auto px-6 relative z-10">
+        {/* Section Heading */}
+        <div className="text-center max-w-2xl mx-auto mb-20 space-y-4">
+          <h2 className="text-3xl md:text-5xl font-extrabold tracking-tight text-white">
+            Everything you need
+          </h2>
+          <p className="font-Inter text-[16px] mt-6 text-white/70 font-light leading-relaxed text-center">
+            Heimdall provides smart server warmers, detailed logs, and failure warnings to keep deployments running smoothly.
+          </p>
         </div>
-      </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-4 sm:gap-4 px-4 max-w-6xl mx-auto">
-        <motion.div
-          key={0}
-          className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-gray-500 md:col-span-2 md:row-span-2 flex flex-col justify-center rounded-sm"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-          whileHover={{ scale: 1.02, y: -3 }}
-        >
-          <div className="flex gap-4 mb-4 items-center">
-            <motion.div
-              className="bg-primary/20 p-3 rounded-full"
-              whileHover={{ rotate: 10, scale: 1.1 }}
-            >
-              <Zap className="h-6 w-6" style={{ color: "#FFD700" }} />
-            </motion.div>
-            <h3 className="text-xl font-semibold bg-gradient-to-r from-indigo-200 via-pink-200 to-yellow-200 bg-clip-text text-transparent font-Inter">
-              Prevent Cold Starts
-            </h3>
-          </div>
-          <p className="text-white/70 font-Inter">
-            Keep your servers warm and responsive by preventing them from going
-            idle or sleeping.
-          </p>
-        </motion.div>
+        {/* 2x2 Feature Grid with sharp borders and bigger boxes */}
+        <div className="grid grid-cols-1 md:grid-cols-2 border-t border-l border-white/[0.06] max-w-6xl mx-auto">
+          
+          {/* Card 1: Performance Optimization */}
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+            {/* Background Image */}
+            <img
+              src={image1}
+              alt="Performance Optimization"
+              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-[1.03] transition-all duration-500 pointer-events-none"
+            />
+            {/* Black Gradient Fade Overlay (starting strong from bottom and disappearing going up) */}
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none z-0" />
 
-        <motion.div
-          key={1}
-          className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-gray-500 md:col-span-2 rounded-sm"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.4 }}
-          whileHover={{ scale: 1.02, y: -3 }}
-        >
-          <div className="flex items-center gap-4 mb-4">
-            <motion.div
-              className="bg-primary/20 p-3 rounded-full"
-              whileHover={{ rotate: 10, scale: 1.1 }}
-            >
-              <LineChart className="h-6 w-6" style={{ color: "#4CAF50" }} />
-            </motion.div>
-            <h3 className="text-xl font-semibold bg-gradient-to-r from-indigo-200 via-pink-200 to-yellow-200 bg-clip-text text-transparent font-Inter">
-              Uptime Monitoring
-            </h3>
+            {/* Bottom Content */}
+            <div className="relative z-10 space-y-3">
+              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+                Performance optimization
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed font-normal">
+                Reduce cold start delays by 30-50 seconds with customizable, intelligent ping intervals tailored per server instance.
+              </p>
+            </div>
           </div>
-          <p className="text-white/70 font-Inter">
-            Track your server's uptime with detailed analytics and historical
-            performance data.
-          </p>
-        </motion.div>
 
-        <motion.div
-          key={2}
-          className="bg-gradient-to-br from-gray-900 to-gray-800 p-6 border border-gray-700 shadow-lg hover:shadow-xl transition-all duration-300 hover:border-gray-500 md:col-span-2 rounded-sm"
-          initial={{ opacity: 0, y: 30 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.5 }}
-          whileHover={{ scale: 1.02, y: -3 }}
-        >
-          <div className="flex items-center gap-4 mb-4">
-            <motion.div
-              className="bg-primary/20 p-3 rounded-full"
-              whileHover={{ rotate: 10, scale: 1.1 }}
-            >
-              <Bell className="h-6 w-6" style={{ color: "#FF5722" }} />
-            </motion.div>
-            <h3 className="text-xl font-semibold bg-gradient-to-r from-indigo-200 via-pink-200 to-yellow-200 bg-clip-text text-transparent font-Inter">
-              Email Alerts for Failures
-            </h3>
+          {/* Card 2: Advanced Monitoring */}
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+            {/* Background Image */}
+            <img
+              src={image2}
+              alt="Advanced Monitoring"
+              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-[1.03] transition-all duration-500 pointer-events-none"
+            />
+            {/* Black Gradient Fade Overlay */}
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none z-0" />
+
+            {/* Bottom Content */}
+            <div className="relative z-10 space-y-3">
+              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+                Advanced monitoring
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed font-normal">
+                Track real-time response curves, heap memory details, RSS allocations, and general uptime statistics on a live dashboard.
+              </p>
+            </div>
           </div>
-          <p className="text-white/70 font-Inter">
-            Get notified immediately when your server goes down or experiences
-            performance issues.
-          </p>
-        </motion.div>
+
+          {/* Card 3: Intelligent Alerting */}
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+            {/* Background Image */}
+            <img
+              src={image3}
+              alt="Intelligent Alerting"
+              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-[1.03] transition-all duration-500 pointer-events-none"
+            />
+            {/* Black Gradient Fade Overlay */}
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none z-0" />
+
+            {/* Bottom Content */}
+            <div className="relative z-10 space-y-3">
+              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+                Intelligent alerting
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed font-normal">
+                Receive instant email failure notifications built with configurable spam prevention thresholds to preserve your inbox.
+              </p>
+            </div>
+          </div>
+
+          {/* Card 4: Scalable Architecture */}
+          <div className="relative border-r border-b border-white/[0.06] h-[380px] p-8 md:p-12 flex flex-col justify-end overflow-hidden group transition-all duration-300">
+            {/* Background Image */}
+            <img
+              src={image4}
+              alt="Scalable Architecture"
+              className="absolute inset-0 w-full h-full object-cover opacity-40 group-hover:opacity-55 group-hover:scale-[1.03] transition-all duration-500 pointer-events-none"
+            />
+            {/* Black Gradient Fade Overlay */}
+            <div className="absolute inset-x-0 bottom-0 h-1/2 bg-gradient-to-t from-black/85 via-black/40 to-transparent pointer-events-none z-0" />
+
+            {/* Bottom Content */}
+            <div className="relative z-10 space-y-3">
+              <h3 className="text-xl md:text-2xl font-bold text-white tracking-tight leading-tight">
+                Scalable architecture
+              </h3>
+              <p className="text-gray-300 text-sm leading-relaxed font-normal">
+                Engineered with a high-performance 6-microservice architecture using BullMQ and Redis queues to monitor hundreds of servers.
+              </p>
+            </div>
+          </div>
+
+        </div>
       </div>
     </section>
   );
-}
+};
 
 export default FeatureHero;
