@@ -49,3 +49,42 @@ body {
   mask-image: radial-gradient(ellipse at 50% 0%, black 35%, transparent 75%);
   -webkit-mask-image: radial-gradient(ellipse at 50% 0%, black 35%, transparent 75%);
 }
+
+@keyframes float {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(-8px);
+  }
+}
+
+@keyframes float-delayed {
+  0%, 100% {
+    transform: translateY(0px);
+  }
+  50% {
+    transform: translateY(8px);
+  }
+}
+
+.animate-float {
+  animation: float 5s ease-in-out infinite;
+}
+
+.animate-float-delayed {
+  animation: float-delayed 6s ease-in-out infinite;
+}
+
+@keyframes scroll-right {
+  0% {
+    transform: translateX(-50%);
+  }
+  100% {
+    transform: translateX(0%);
+  }
+}
+
+.animate-scroll-right {
+  animation: scroll-right 28s linear infinite;
+}
