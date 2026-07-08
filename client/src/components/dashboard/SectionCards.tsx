@@ -194,8 +194,8 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
 
         {/* Make sure the dialog is rendered even in empty state */}
         {isDialogOpen && (
-          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-bg-[#27272a] p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px] backdrop-blur-sm">
-            <div className="bg-[#181A20] rounded-lg p-0 w-full max-w-md shadow-lg">
+          <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px] backdrop-blur-sm">
+            <div className="bg-bg-panel rounded-lg p-0 w-full max-w-md shadow-lg">
               <form
                 onSubmit={async (e) => {
                   e.preventDefault();
@@ -219,7 +219,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     setIsSubmitting(false);
                   }
                 }}
-                className="bg-black p-6 border border-gray-700 shadow-lg rounded-lg min-h-[400px]"
+                className="bg-bg-panel p-6 border border-gray-700 shadow-lg rounded-lg min-h-[400px]"
               >
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -316,7 +316,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
 
                     <select
                       id="failure-threshold"
-                      className="w-full p-2 border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm bg-black"
+                      className="w-full p-2 border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm bg-bg-card"
                       value={form.failureThreshold}
                       onChange={(e) =>
                         setForm((f) => ({
@@ -630,8 +630,8 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
       </div>
       {/* Add New Server Dialog */}
       {isDialogOpen && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 bg-bg-[#27272a] p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px] backdrop-blur-sm">
-          <div className="bg-[#181A20] rounded-lg p-0 w-full max-w-md shadow-lg">
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px] backdrop-blur-sm">
+          <div className="bg-bg-panel rounded-lg p-0 w-full max-w-md shadow-lg">
             <form
               onSubmit={async (e) => {
                 e.preventDefault();
@@ -655,7 +655,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   setIsSubmitting(false);
                 }
               }}
-              className="bg-black p-6 border border-gray-700 shadow-lg rounded-lg min-h-[400px]"
+              className="bg-bg-panel p-6 border border-gray-700 shadow-lg rounded-lg min-h-[400px]"
             >
               <div className="mb-4">
                 <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
@@ -751,7 +751,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   </label>
                   <select
                     id="failure-threshold"
-                    className="w-full p-2 border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm bg-black"
+                    className="w-full p-2 border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500 text-white text-sm bg-bg-card"
                     value={form.failureThreshold}
                     onChange={(e) =>
                       setForm((f) => ({
@@ -822,7 +822,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
           style={{ minHeight: "100vh", minWidth: "100vw" }}
         >
-          <div className="bg-black rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
+          <div className="bg-bg-panel rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
             <h2 className="text-md font-semibold text-white mb-2">
               Confirm Delete
             </h2>
@@ -911,7 +911,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
           style={{ minHeight: "100vh", minWidth: "100vw" }}
         >
-          <div className="bg-black rounded-lg p-6 w-full max-w-[400px] shadow-lg border border-gray-700 text-center">
+          <div className="bg-bg-panel rounded-lg p-6 w-full max-w-[400px] shadow-lg border border-gray-700 text-center">
             <h2 className="text-md font-semibold text-white mb-2">
               Modify Server
             </h2>

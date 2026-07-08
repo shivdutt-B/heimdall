@@ -43,7 +43,7 @@ const StepsHero: React.FC = () => {
   ];
 
   return (
-    <div className="w-full bg-[#040506] py-16">
+    <div className="w-full bg-bg-dark py-16">
       <div className="max-w-7xl mx-auto px-4">
         <div className="relative">
           {/* Horizontal connector line */}

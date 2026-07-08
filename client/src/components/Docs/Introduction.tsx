@@ -463,8 +463,8 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
   return (
     <>
       {install && (
-        <div className="flex items-center justify-between mb-4 bg-[#0d1117] py-2 pl-1 pr-[15px]">
-          <span className={`font-mono bg-[#151b23] text-sm rounded px-3 py-2 shadow-sm`}>{install.cmd}</span>
+        <div className="flex items-center justify-between mb-4 bg-bg-code py-2 pl-1 pr-[15px]">
+          <span className={`font-mono bg-bg-code-highlight text-sm rounded px-3 py-2 shadow-sm`}>{install.cmd}</span>
           <Button
             variant="outline"
             size="sm"
@@ -473,7 +473,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
               setInstallCopied(true);
               setTimeout(() => setInstallCopied(false), 1800);
             }}
-            className="inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-[#040506] border border-white/20 text-white hover:bg-white/10 h-8 px-3 rounded-md text-sm"
+            className="inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-bg-dark border border-white/20 text-white hover:bg-white/10 h-8 px-3 rounded-md text-sm"
             style={{ minWidth: 65 }}
           >
             {installCopied ? (
@@ -491,7 +491,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
         </div>
       )}
       <div className="relative">
-        <div className={`rounded-md bg-[#0d1117] p-4 border ${borderColor.replace(
+        <div className={`rounded-md bg-bg-code p-4 border ${borderColor.replace(
           "600",
           "800"
         )} border-opacity-40`}
@@ -525,7 +525,7 @@ const CodeBlock: React.FC<CodeBlockProps> = ({
             </Button>
           </div>
           <pre
-            className={`p-4 font-mono text-sm overflow-x-auto rounded-md bg-[#161b22]  ${borderColor.replace(
+            className={`p-4 font-mono text-sm overflow-x-auto rounded-md bg-bg-code-tabs  ${borderColor.replace(
               "600",
               "500"
             )}`}
@@ -638,7 +638,7 @@ const ApiReference: React.FC = () => {
       </p>
 
       <Tabs defaultValue="nodejs" className="w-full my-6">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 bg-[#161b22] p-1 rounded-md">
+        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 bg-bg-code-tabs p-1 rounded-md">
           <TabsTrigger
             value="nodejs"
             className={`text-white ${getTabStyles(

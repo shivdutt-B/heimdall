@@ -91,7 +91,7 @@ const NavBar: React.FC = () => {
               <div className="flex gap-2">
                 <Link
                   to="/docs"
-                  className="justify-center whitespace-nowrap text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none h-8 rounded-sm px-2 py-3 flex items-center gap-1 transition-colors hover:bg-transparent hover:text-muted-foreground border border-[grey] bg-[#27272a] text-white"
+                  className="justify-center whitespace-nowrap text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none h-8 rounded-sm px-2 py-3 flex items-center gap-1 transition-colors hover:bg-transparent hover:text-muted-foreground border border-[grey] bg-bg-card text-white"
                 >
                   Docs
                   <svg

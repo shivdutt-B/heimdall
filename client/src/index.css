@@ -1,12 +1,33 @@
 @import "tailwindcss";
 
+:root {
+  /* Controllable color system (Single Place) */
+  --bg-dark: #080b11;              /* Primary dark background */             
+  --bg-panel: #0f131d;             /* Dashboard panel background */
+  --bg-card: #181d2a;              /* Card / Modal / Input background */
+  --bg-button: #262f45;            /* Secondary button background */
+  
+  --bg-code: #0d111c;              /* Code block background */
+  --bg-code-highlight: #141a29;    /* Highlighted code background */
+  --bg-code-tabs: #181f30;         /* Code block tabs background */
+}
+
 body {
-  background-color: #040506;
+  background-color: var(--bg-dark);
 }
 
 @theme inline {
   --animate-ripple: ripple var(--duration, 2s) ease calc(var(--i, 0) * 0.2s)
     infinite;
+
+  /* Theme mapping to Tailwind utilities */
+  --color-bg-dark: var(--bg-dark);
+  --color-bg-panel: var(--bg-panel);
+  --color-bg-card: var(--bg-card);
+  --color-bg-button: var(--bg-button);
+  --color-bg-code: var(--bg-code);
+  --color-bg-code-highlight: var(--bg-code-highlight);
+  --color-bg-code-tabs: var(--bg-code-tabs);
   
   @keyframes ripple {
     0%,

@@ -79,10 +79,10 @@ export const Auth = () => {
   };
 
   return (
-    <div className="flex justify-center items-center min-h-screen bg-[#040506] text-white/80">
+    <div className="flex justify-center items-center min-h-screen bg-bg-dark text-white/80">
       <div className="w-full max-w-[400px] px-4">
         <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="h-10 bg-[#27272a] grid w-full grid-cols-2 p-0 rounded-md gap-3">
+          <TabsList className="h-10 bg-bg-card grid w-full grid-cols-2 p-0 rounded-md gap-3">
             <TabsTrigger
               value="signin"
               className="data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-medium rounded-sm transition-all duration-200"

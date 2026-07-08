@@ -105,7 +105,7 @@ const Dashboard: React.FC = () => {
 
   return (
     <DashboardLayout>
-      <div className="min-h-screen bg-[#040506]">
+      <div className="min-h-screen bg-bg-dark">
         <div className="max-w-[1920px] mx-auto p-4 sm:p-6 lg:p-8 space-y-6 lg:space-y-8">
           {/* Active Servers Section */}
           <section className="space-y-4">
