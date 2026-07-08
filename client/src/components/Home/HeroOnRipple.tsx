@@ -7,7 +7,8 @@ function HeroOnRipple() {
   const auth = useRecoilValue(authState);
   return (
     <div className="text-white text-center font-inter flex flex-col items-center justify-center max-w-4xl mx-auto px-4 mt-6">
-      <h1 className="relative z-10 mx-auto max-w-4xl text-center lg:text-7xl text-4xl sm:text-6xl md:text-7xl font-bold tracking-tighter leading-none text-white py-1">
+      <h1 className="relative z-10 mx-auto max-w-4xl text-center lg:text-8xl text-6xl sm:text-7xl md:text-8xl font-bold tracking-tighter leading-none py-2">
+        {/* bg-clip-text text-transparent */}
         Never Let Your Server Sleep Again
       </h1>
       <p className="font-Inter text-[16px] mt-6 text-white/70 max-w-lg font-light leading-relaxed text-center">
