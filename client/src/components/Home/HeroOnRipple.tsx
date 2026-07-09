@@ -42,7 +42,7 @@ function HeroOnRipple() {
       <div className="flex justify-center mt-8">
         <div className="flex flex-col sm:flex-row gap-4 items-center justify-center">
           {auth.loading ? (
-            <div className="bg-white px-6 py-2.5 rounded-sm shadow-md text-sm flex items-center gap-2 font-semibold text-black">
+            <div className="bg-emerald-500 px-6 py-2.5 rounded-[2px] shadow-md text-sm flex items-center gap-2 font-semibold text-black">
               <svg
                 className="animate-spin h-5 w-5 text-black"
                 xmlns="http://www.w3.org/2000/svg"

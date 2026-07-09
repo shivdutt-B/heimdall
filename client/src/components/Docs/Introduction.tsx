@@ -1,7 +1,6 @@
 import React, { useState } from "react";
 import { Button } from "../Common/button";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "./tabs";
-import { Check, ChevronDown, Copy, CheckCircle2 } from "lucide-react";
+import { Check, ChevronDown, Copy, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 
 // Header section component
@@ -24,7 +23,7 @@ interface FeatureCardProps {
 }
 
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, description }) => (
-  <div className="flex-1 rounded-lg border border-white/10 bg-white/5 p-6">
+  <div className="flex-1 rounded-[3px] border border-white/10 bg-transparent p-6">
     <div className="flex items-center gap-2 mb-2">
       <Check className="h-5 w-5 text-emerald-400" />
       <h3 className="font-medium text-white">{title}</h3>
@@ -71,10 +70,10 @@ interface StepProps {
 }
 
 const Step: React.FC<StepProps> = ({ number, title, description }) => (
-  <div className="flex items-start gap-3">
-    <div className="bg-indigo-600/20 p-1 rounded-full mt-1">
-      <span className="text-indigo-400 font-bold text-sm">{number}</span>
-    </div>
+  <div className="flex items-center gap-4">
+    <span className="font-sans text-3xl font-bold text-neutral-500 select-none shrink-0 leading-none">
+      {number}
+    </span>
     <div>
       <p className="font-medium text-white">{title}</p>
       <p className="text-white/60">{description}</p>
@@ -118,7 +117,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
     return code.split(/\b/).map((part, i) => {
       if (
         /^(const|let|var|function|return|import|export|from|if|else|for|while|class|async|await)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -128,7 +127,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
         );
       } else if (
         /^(console|require|app|res|req|process|Math|Date|JSON|Object|Array)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -170,7 +169,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
     return code.split(/\b/).map((part, i) => {
       if (
         /^(def|import|from|as|return|if|elif|else|for|while|class|try|except|with|print|self)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -180,7 +179,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
         );
       } else if (
         /^(datetime|json|response|request|psutil|round|process|JsonResponse|f)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -220,7 +219,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
     return code.split(/\b/).map((part, i) => {
       if (
         /^(public|private|protected|class|interface|void|static|final|return|if|else|for|while|try|catch|import|package|extends|implements)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -230,7 +229,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
         );
       } else if (
         /^(System|String|Map|HashMap|LocalDateTime|MemoryMXBean|ManagementFactory)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -272,7 +271,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
     return code.split(/\b/).map((part, i) => {
       if (
         /^(def|class|module|require|include|extend|attr_accessor|return|if|else|end|do)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -318,7 +317,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
     return code.split(/\b/).map((part, i) => {
       if (
         /^(function|return|if|else|foreach|while|class|public|private|protected|namespace|use|require|include)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -328,7 +327,7 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
         );
       } else if (
         /^(Route|Log|response|request|date|memory_get_usage|round|header|exit|echo|json_encode)$/.test(
-          part
+          part,
         )
       ) {
         return (
@@ -382,164 +381,6 @@ const colorizeKeywords = (code: string, language: string): React.ReactNode => {
   return code;
 };
 
-// Enhanced Code block component for API examples with copy button
-interface CodeBlockProps {
-  method: string;
-  endpoint: string;
-  code: string;
-  language: string;
-}
-
-const CodeBlock: React.FC<CodeBlockProps> = ({
-  method,
-  endpoint,
-  code,
-  language,
-}) => {
-  const [copied, setCopied] = useState(false);
-  const [installCopied, setInstallCopied] = useState(false);
-
-  const handleCopy = () => {
-    navigator.clipboard.writeText(code);
-    setCopied(true);
-    setTimeout(() => setCopied(false), 2000);
-  };
-
-  // Get theme color based on language
-  const getThemeColor = (lang: string) => {
-    switch (lang) {
-      case "nodejs":
-        return "bg-green-600";
-      case "django":
-        return "bg-emerald-600";
-      case "fastapi":
-        return "bg-cyan-600";
-      case "flask":
-        return "bg-orange-600";
-      case "spring":
-        return "bg-blue-600";
-      case "ruby":
-        return "bg-red-600";
-      case "php":
-        return "bg-purple-600";
-      default:
-        return "bg-indigo-600";
-    }
-  };
-
-  const methodBgColor = getThemeColor(language);
-  const borderColor = methodBgColor.replace("bg-", "border-");
-
-  // Installation command for each framework
-  const getInstallCommand = (lang: string) => {
-    switch (lang) {
-      case "nodejs":
-        return {
-          cmd: "npm install heimdall-nodejs-sdk",
-          color: "text-green-300 bg-green-950/40 border border-green-700"
-        };
-      case "django":
-        return {
-          cmd: "pip install heimdall-python-sdk",
-          color: "text-emerald-300 bg-emerald-950/40 border border-emerald-700"
-        };
-      case "fastapi":
-        return {
-          cmd: "pip install heimdall-python-sdk",
-          color: "text-cyan-300 bg-cyan-950/40 border border-cyan-700"
-        };
-      case "flask":
-        return {
-          cmd: "pip install heimdall-python-sdk",
-          color: "text-orange-300 bg-orange-950/40 border border-orange-700"
-        };
-      default:
-        return null;
-    }
-  };
-
-  const install = getInstallCommand(language);
-
-  return (
-    <>
-      {install && (
-        <div className="flex items-center justify-between mb-4 bg-bg-code py-2 pl-1 pr-[15px]">
-          <span className={`font-mono bg-bg-code-highlight text-sm rounded px-3 py-2 shadow-sm`}>{install.cmd}</span>
-          <Button
-            variant="outline"
-            size="sm"
-            onClick={() => {
-              navigator.clipboard.writeText(install.cmd);
-              setInstallCopied(true);
-              setTimeout(() => setInstallCopied(false), 1800);
-            }}
-            className="inline-flex items-center justify-center font-medium transition-colors focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-indigo-400 focus-visible:ring-offset-2 disabled:opacity-50 disabled:pointer-events-none ring-offset-bg-dark border border-white/20 text-white hover:bg-white/10 h-8 px-3 rounded-md text-sm"
-            style={{ minWidth: 65 }}
-          >
-            {installCopied ? (
-              <>
-                <CheckCircle2 className="h-4 w-4 mr-1 text-green-400" />
-                <span className="text-xs">Copied!</span>
-              </>
-            ) : (
-              <>
-                <Copy className="h-3.5 w-3.5 mr-1" />
-                <span className="text-xs">Copy</span>
-              </>
-            )}
-          </Button>
-        </div>
-      )}
-      <div className="relative">
-        <div className={`rounded-md bg-bg-code p-4 border ${borderColor.replace(
-          "600",
-          "800"
-        )} border-opacity-40`}
-        >
-          <div className="flex items-center justify-between mb-3">
-            <div className="flex h-6 items-center gap-1 text-sm">
-              <div
-                className={`rounded px-2 py-1 font-mono text-xs font-medium text-white ${methodBgColor}`}
-              >
-                {method}
-              </div>
-              <span className="text-white/60 ml-2">{endpoint}</span>
-            </div>
-            <Button
-              variant="outline"
-              size="sm"
-              onClick={handleCopy}
-              className="h-8 px-3 border border-gray-600 hover:bg-gray-600 text-black rounded-sm bg-white/10 transition duration-200 ease-in-out"
-            >
-              {copied ? (
-                <>
-                  <CheckCircle2 className="h-3.5 w-3.5 mr-1 text-green-400" />
-                  <span className="text-xs">Copied</span>
-                </>
-              ) : (
-                <>
-                  <Copy className="h-3.5 w-3.5 mr-1" />
-                  <span className="text-xs">Copy</span>
-                </>
-              )}
-            </Button>
-          </div>
-          <pre
-            className={`p-4 font-mono text-sm overflow-x-auto rounded-md bg-bg-code-tabs  ${borderColor.replace(
-              "600",
-              "500"
-            )}`}
-          >
-            <code className="leading-relaxed">
-              {colorizeKeywords(code, language)}
-            </code>
-          </pre>
-        </div>
-      </div>
-    </>
-  );
-};
-
 // API code examples
 const nodeJsCode = `// Express.js endpoint
 const express = require('express');
@@ -581,50 +422,95 @@ if __name__ == "__main__":
     app.run(port=5000, debug=True)
 `;
 
-// API Reference section
 const ApiReference: React.FC = () => {
-  // Language-specific theme colors and styling
-  const getTabStyles = (language: string) => {
-    switch (language) {
-      case "nodejs":
-        return "data-[state=active]:bg-green-600";
-      case "django":
-        return "data-[state=active]:bg-emerald-600";
-      case "fastapi":
-        return "data-[state=active]:bg-cyan-600";
-      case "flask":
-        return "data-[state=active]:bg-orange-600";
-      case "spring":
-        return "data-[state=active]:bg-blue-600";
-      case "ruby":
-        return "data-[state=active]:bg-red-600";
-      case "php":
-        return "data-[state=active]:bg-purple-600";
-      default:
-        return "data-[state=active]:bg-indigo-600";
+  const [activeTech, setActiveTech] = useState("nodejs");
+  const [copied, setCopied] = useState(false);
+  const [installCopied, setInstallCopied] = useState(false);
+
+  const handleCopyCode = () => {
+    const code = getCodeSnippet(activeTech);
+    navigator.clipboard.writeText(code);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const handleCopyInstall = () => {
+    const installCmd = getInstallCommand(activeTech);
+    if (installCmd) {
+      navigator.clipboard.writeText(installCmd);
+      setInstallCopied(true);
+      setTimeout(() => setInstallCopied(false), 1800);
     }
   };
 
-  const getTabContentBackground = (language: string) => {
-    switch (language) {
+  const getInstallCommand = (tech: string) => {
+    switch (tech) {
       case "nodejs":
-        return "bg-gradient-to-br from-green-950/30 to-transparent";
+        return "npm install heimdall-nodejs-sdk";
       case "django":
-        return "bg-gradient-to-br from-emerald-950/30 to-transparent";
       case "fastapi":
-        return "bg-gradient-to-br from-cyan-950/30 to-transparent";
       case "flask":
-        return "bg-gradient-to-br from-orange-950/30 to-transparent";
-      case "spring":
-        return "bg-gradient-to-br from-blue-950/30 to-transparent";
-      case "ruby":
-        return "bg-gradient-to-br from-red-950/30 to-transparent";
-      case "php":
-        return "bg-gradient-to-br from-purple-950/30 to-transparent";
+        return "pip install heimdall-python-sdk";
+      default:
+        return null;
+    }
+  };
+
+  const getCodeSnippet = (tech: string) => {
+    switch (tech) {
+      case "nodejs":
+        return nodeJsCode;
+      case "django":
+        return djangoCode;
+      case "fastapi":
+        return fastapiCode;
+      case "flask":
+        return flaskCode;
       default:
         return "";
     }
   };
+
+  const getLanguage = (tech: string) => {
+    switch (tech) {
+      case "nodejs":
+        return "nodejs";
+      case "django":
+      case "fastapi":
+      case "flask":
+        return "django";
+      default:
+        return "";
+    }
+  };
+
+  const getFilename = (tech: string) => {
+    switch (tech) {
+      case "nodejs":
+        return "index.js";
+      case "django":
+        return "urls.py";
+      case "fastapi":
+        return "main.py";
+      case "flask":
+        return "app.py";
+      default:
+        return "code";
+    }
+  };
+
+  const techs = [
+    { id: "nodejs", label: "Node.js" },
+    { id: "django", label: "Django" },
+    { id: "fastapi", label: "FastAPI" },
+    { id: "flask", label: "Flask" },
+    { id: "springboot", label: "Spring Boot" },
+  ];
+
+  const installCmd = getInstallCommand(activeTech);
+  const code = getCodeSnippet(activeTech);
+  const language = getLanguage(activeTech);
+  const filename = getFilename(activeTech);
 
   return (
     <section className="space-y-4">
@@ -637,107 +523,109 @@ const ApiReference: React.FC = () => {
         ping endpoint in various frameworks that Heimdall can monitor.
       </p>
 
-      <Tabs defaultValue="nodejs" className="w-full my-6">
-        <TabsList className="grid w-full grid-cols-3 sm:grid-cols-5 bg-bg-code-tabs p-1 rounded-md">
-          <TabsTrigger
-            value="nodejs"
-            className={`text-white ${getTabStyles(
-              "nodejs"
-            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
-          >
-            Node.js
-          </TabsTrigger>
-          <TabsTrigger
-            value="django"
-            className={`text-white ${getTabStyles(
-              "django"
-            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
-          >
-            Django
-          </TabsTrigger>
-          <TabsTrigger
-            value="fastapi"
-            className={`text-white ${getTabStyles(
-              "fastapi"
-            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
-          >
-            FastAPI
-          </TabsTrigger>
-          <TabsTrigger
-            value="flask"
-            className={`text-white ${getTabStyles(
-              "flask"
-            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
-          >
-            Flask
-          </TabsTrigger>
-          <TabsTrigger
-            value="spring"
-            className={`text-white ${getTabStyles(
-              "spring"
-            )} data-[state=active]:text-white transition-colors duration-200 rounded-xs truncate`}
-          >
-            Spring Boot
-          </TabsTrigger>
-        </TabsList>
+      {/* Standalone Technology Selector Tabs */}
+      <div className="flex gap-4 flex-wrap border-b border-white/10 mb-6">
+        {techs.map((t) => {
+          const isActive = activeTech === t.id;
+          return (
+            <button
+              key={t.id}
+              onClick={() => setActiveTech(t.id)}
+              className={`py-3 text-[13px] font-medium transition duration-200 border-b-2 cursor-pointer ${
+                isActive
+                  ? "text-emerald-500 border-emerald-500"
+                  : "text-white/40 border-transparent hover:text-white/70"
+              }`}
+            >
+              {t.label}
+            </button>
+          );
+        })}
+      </div>
 
-        <TabsContent
-          value="nodejs"
-          className={`mt-4 rounded-md p-1 ${getTabContentBackground("nodejs")}`}
-        >
-          <CodeBlock
-            method="GET"
-            endpoint="/__ping__"
-            code={nodeJsCode}
-            language="nodejs"
-          />
-        </TabsContent>
+      <div className="space-y-4 mt-6">
+        {installCmd && (
+          <div className="rounded-[4px] border border-white/10 bg-transparent overflow-hidden shadow-md">
+            {/* Header */}
+            <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-black/15 select-none">
+              <span className="text-[12px] font-mono text-white/40 font-semibold">
+                Command
+              </span>
+              <button
+                onClick={handleCopyInstall}
+                className="p-1.5 rounded-[4px] border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 text-white/60 hover:text-white transition cursor-pointer"
+              >
+                {installCopied ? (
+                  <Check className="h-3.5 w-3.5 text-emerald-400" />
+                ) : (
+                  <Copy className="h-3.5 w-3.5" />
+                )}
+              </button>
+            </div>
 
-        <TabsContent
-          value="django"
-          className={`mt-4 rounded-md p-1 ${getTabContentBackground("django")}`}
-        >
-          <CodeBlock
-            method="GET"
-            endpoint="/__ping__"
-            code={djangoCode}
-            language="django"
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="fastapi"
-          className={`mt-4 rounded-md p-1 ${getTabContentBackground("fastapi")}`}
-        >
-          <CodeBlock
-            method="GET"
-            endpoint="/__ping__"
-            code={fastapiCode}
-            language="fastapi"
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="flask"
-          className={`mt-4 rounded-md p-1 ${getTabContentBackground("flask")}`}
-        >
-          <CodeBlock
-            method="GET"
-            endpoint="/__ping__"
-            code={flaskCode}
-            language="flask"
-          />
-        </TabsContent>
-
-        <TabsContent
-          value="spring"
-          className={`mt-4 rounded-md p-1 ${getTabContentBackground("spring")}`}
-        >
-          <div className="p-6 text-white/80 text-base">
-            We are working on the Spring Boot SDK. It will be released soon.
+            {/* Code Body */}
+            <div className="p-4 bg-transparent text-left">
+              <pre className="font-mono text-[13px] overflow-x-auto">
+                <code className="leading-relaxed text-white font-bold">
+                  {installCmd}
+                </code>
+              </pre>
+            </div>
           </div>
-        </TabsContent>
-      </Tabs>
+        )}
+
+        <div className="rounded-[4px] border border-white/10 bg-transparent overflow-hidden shadow-md">
+          {/* Header */}
+          <div className="flex items-center justify-between px-4 py-2 border-b border-white/10 bg-transparent select-none">
+            <span className="text-[12px] font-mono text-white/40 font-semibold">
+              Code
+            </span>
+            <div className="flex items-center gap-2">
+              {/*  */}
+              {activeTech !== "springboot" && (
+                <button
+                  onClick={handleCopyCode}
+                  className="p-1.5 rounded-[4px] border border-white/10 bg-white/5 hover:bg-white/10 hover:border-white/20 text-white/60 hover:text-white transition cursor-pointer"
+                >
+                  {copied ? (
+                    <Check className="h-3.5 w-3.5 text-emerald-400" />
+                  ) : (
+                    <Copy className="h-3.5 w-3.5" />
+                  )}
+                </button>
+              )}
+            </div>
+          </div>
+
+          {/* Code Body or Placeholder */}
+          <div className="bg-transparent text-left">
+            {activeTech === "springboot" ? (
+              <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
+                <div className="flex items-center justify-center size-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
+                  <span className="text-[10px] font-black uppercase font-mono tracking-wider">
+                    SDK
+                  </span>
+                </div>
+                <h3 className="text-white font-semibold text-base">
+                  Spring Boot SDK
+                </h3>
+                <p className="text-white/40 text-sm max-w-xs leading-relaxed">
+                  We are currently developing the Spring Boot SDK. It will be
+                  released and documented here soon.
+                </p>
+              </div>
+            ) : (
+              <div className="p-4">
+                <pre className="font-mono text-xs overflow-x-auto">
+                  <code className="leading-relaxed block">
+                    {colorizeKeywords(code, language)}
+                  </code>
+                </pre>
+              </div>
+            )}
+          </div>
+        </div>
+      </div>
     </section>
   );
 };
@@ -749,9 +637,9 @@ interface FaqItemProps {
 }
 
 const FaqItem: React.FC<FaqItemProps> = ({ question, answer }) => (
-  <div className="rounded-lg border border-white/10 bg-white/5 p-4">
+  <div className="rounded-[4px] border border-white/10 bg-transparent p-4">
     <div className="flex items-center gap-2">
-      <ChevronDown className="h-5 w-5 text-indigo-400" />
+      <ChevronDown className="h-5 w-5 text-emerald-400" />
       <h3 className="font-medium text-white">{question}</h3>
     </div>
     <div className="mt-2 pl-7">
@@ -790,7 +678,7 @@ const Faq: React.FC = () => (
 
 // Warning banner component
 const WarningBanner: React.FC = () => (
-  <div className="bg-yellow-100 border-3 border-yellow-500 rounded-lg p-6 mb-8 shadow-md">
+  <div className="bg-yellow-200 border-[3px] border-yellow-500 rounded-[5px] p-6 mb-8 shadow-md">
     <div className="flex items-center mb-4">
       <span className="mr-4 text-2xl">
         <img
@@ -801,23 +689,20 @@ const WarningBanner: React.FC = () => (
         />
       </span>
       <div>
-        <h2 className="text-yellow-700 text-xl font-bold tracking-tight">
+        <h2 className="text-black text-xl font-bold tracking-tight">
           Free Tier Usage Warning
         </h2>
       </div>
     </div>
 
-    <p className="text-base font-semibold text-yellow-900 leading-relaxed">
-      Running this service continuously will consume your entire
-      <span className="inline-block bg-yellow-300 text-yellow-900 font-semibold px-2 py-0.5 rounded ml-1">
+    <p className="text-base font-semibold text-black leading-relaxed">
+      Running this service continuously will consume your entire{" "}
+      <span className="inline-block bg-yellow-500 text-black font-semibold px-[4px] rounded-[2px]">
         750-hour free tier
-      </span>
+      </span>{" "}
       quota on free hosting platforms like Render, Railway, or Fly.io.
     </p>
   </div>
-
-
-
 );
 
 // Main Introduction component
