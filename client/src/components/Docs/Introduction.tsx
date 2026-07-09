@@ -601,11 +601,6 @@ const ApiReference: React.FC = () => {
           <div className="bg-transparent text-left">
             {activeTech === "springboot" ? (
               <div className="flex flex-col items-center justify-center p-8 text-center space-y-3">
-                <div className="flex items-center justify-center size-10 rounded-full bg-emerald-500/10 border border-emerald-500/20 text-emerald-400">
-                  <span className="text-[10px] font-black uppercase font-mono tracking-wider">
-                    SDK
-                  </span>
-                </div>
                 <h3 className="text-white font-semibold text-base">
                   Spring Boot SDK
                 </h3>

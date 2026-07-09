@@ -104,33 +104,33 @@ export const DataTable: React.FC<Props> = ({
   }
 
   return (
-    <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
+    <div className={`rounded-[4px] border border-gray-800 bg-transparent ${className}`}>
       {/* Ping counts from serverDetails */}
       <div className="flex items-center gap-2 overflow-x-auto pb-2 sm:pb-0 px-4 pt-4">
         <button
-          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-md bg-white/20"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-[2px] bg-white/20"
           disabled
         >
-          All
-          <span className="ml-1.5 bg-white/10 text-xs px-1.5 rounded-full">
+          All:
+          <span className="text-xs px-1.5">
             {pingStats.total}
           </span>
         </button>
         <button
-          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-md bg-green-500/20"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-[2px] bg-green-500/20"
           disabled
         >
-          Success
-          <span className="bg-green-500/20 text-green-400 text-xs px-1.5 rounded-full">
+          Success:
+          <span className="text-xs px-1">
             {pingStats.successful}
           </span>
         </button>
         <button
-          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-md bg-red-500/20"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 rounded-[2px] bg-red-500/20"
           disabled
         >
-          Fail
-          <span className="bg-red-500/20 text-red-400 text-xs px-1.5 rounded-full">
+          Fail:
+          <span className="text-red-400 text-xs px-1 rounded-full">
             {pingStats.failed}
           </span>
         </button>
@@ -158,7 +158,7 @@ export const DataTable: React.FC<Props> = ({
               <tr key={ping.id} className="border-b border-gray-800">
                 <td className="p-4 align-middle">
                   <span
-                    className={`inline-flex items-center rounded-full px-2.5 py-0.5 text-xs font-medium
+                    className={`inline-flex items-center rounded-[2px] px-2.5 py-0.5 text-xs font-medium
                       ${ping.status
                         ? "bg-green-500/10 text-green-500"
                         : "bg-red-500/10 text-red-500"
@@ -187,7 +187,7 @@ export const DataTable: React.FC<Props> = ({
         <button
           onClick={() => setPage(page - 1)}
           disabled={page === 1}
-          className="px-3 py-1.5 text-sm font-semibold text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 bg-white/5 rounded-[2px] hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           Prev
         </button>
@@ -197,7 +197,7 @@ export const DataTable: React.FC<Props> = ({
         <button
           onClick={() => setPage(page + 1)}
           disabled={page === totalPages || !hasMore}
-          className="px-3 py-1.5 text-sm font-semibold text-white/90 bg-white/5 rounded-md hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
+          className="px-3 py-1.5 text-sm font-semibold text-white/90 bg-white/5 rounded-[2px] hover:bg-white/10 transition-colors disabled:opacity-50 disabled:cursor-not-allowed cursor-pointer"
         >
           Next
         </button>

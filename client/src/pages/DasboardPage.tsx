@@ -32,9 +32,7 @@ const Dashboard: React.FC = () => {
   //   "all"
   // );
   // Not declaring setStatusFilter, due to its no usage hence it is throwing an error(declared but never used) during deployment on vercel.
-  const [statusFilter] = useState<"all" | "success" | "fail">(
-    "all"
-  );
+  const [statusFilter] = useState<"all" | "success" | "fail">("all");
   const [page, setPage] = useState(1);
 
   const {
@@ -57,11 +55,7 @@ const Dashboard: React.FC = () => {
     total: totalPings,
     error: pingsError,
     refetch: refetchPings,
-  } = useServerPings(
-    selectedServerId,
-    selectedDays,
-    page
-  );
+  } = useServerPings(selectedServerId, selectedDays, page);
 
   // Only auto-select first server if there are servers and none is selected
   useEffect(() => {
@@ -156,7 +150,7 @@ const Dashboard: React.FC = () => {
                 Analytics Overview
               </h2>
             </div>
-            <div className="bg-black/20 rounded-lg border border-white/10 ">
+            <div className="bg-black/20 rounded-[3px] border border-white/10 ">
               <ChartAreaInteractive
                 className="w-full"
                 serverId={selectedServerId}

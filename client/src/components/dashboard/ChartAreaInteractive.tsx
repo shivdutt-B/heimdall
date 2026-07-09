@@ -63,11 +63,11 @@ export const ChartAreaInteractive: React.FC<Props> = ({
 
   // Days selection component
   const DaysSelection = () => (
-    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-6 pb-0 gap-3 sm:gap-0">
+    <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between p-3 sm:p-4 pb-0 gap-3 sm:gap-0">
       <div className="flex flex-col sm:flex-row gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
           <div className="w-3 h-3 rounded-full bg-blue-500/50"></div>
-          <span className="text-xs sm:text-sm font-medium text-white/60">
+          <span className="text-xs sm:text-sm font-xm text-white/60">
             RSS Memory
           </span>
         </div>
@@ -80,7 +80,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
       </div>
       <div className="flex flex-col sm:flex-row items-start sm:items-center gap-2 sm:gap-4">
         <div className="flex items-center gap-2">
-          <span className="text-xs sm:text-sm font-medium text-white/60">Last</span>
+          <span className="text-xs sm:text-sm font-normal text-white/60">Last</span>
           <input
             type="number"
             min="1"
@@ -92,9 +92,9 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                 setDaysInput(value);
               }
             }}
-            className="w-auto min-w-0 max-w-[60px] px-2 py-1 text-xs sm:text-sm font-medium text-white/90 bg-transparent rounded-md border border-gray-700 focus:outline-none overflow-hidden text-ellipsis"
+            className="w-auto min-w-0 max-w-[60px] px-2 py-1 text-xs sm:text-sm font-medium text-white/90 bg-transparent rounded-[2px] border border-gray-700 focus:outline-none overflow-hidden text-ellipsis"
           />
-          <span className="text-xs sm:text-sm font-medium text-white/60">Days</span>
+          <span className="text-xs sm:text-sm font-normal text-white/60">Days</span>
           <button
             onClick={() => {
               const days = parseInt(daysInput);
@@ -102,7 +102,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                 setSelectedDays(days);
               }
             }}
-            className="px-3 py-1 text-xs sm:text-sm font-semibold text-white/90 bg-blue-500 rounded-sm transition-colors cursor-pointer"
+            className="px-3 py-1 text-xs sm:text-sm font-normal text-white/90 bg-blue-500 rounded-[2px] transition-colors cursor-pointer"
           >
             Go
           </button>
@@ -135,12 +135,12 @@ export const ChartAreaInteractive: React.FC<Props> = ({
   }
 
   return (
-    <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
+    <div className={`rounded-md bg-transparent ${className}`}>
       <DaysSelection />
       {/* Scrollable Chart Container */}
       <div
         id="chart-container"
-        className="overflow-x-auto scrollbar scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20 scrollbar-track-gray-900/20 transition-all duration-300 scroll-smooth px-4"
+        className="overflow-x-auto scrollbar scrollbar-thin scrollbar-thumb-white/10 hover:scrollbar-thumb-white/20 scrollbar-track-gray-900/20 transition-all duration-300 scroll-smooth px-1"
       >
         <div
           className="h-[300px] min-w-[800px] py-4"
@@ -178,7 +178,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                 axisLine={false}
                 tickFormatter={(value) => `${value} MB`}
                 label={{
-                  value: "Memory (MB)",
+                  value: "",
                   angle: -90,
                   position: "insideLeft",
                 }}
@@ -189,6 +189,9 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                   border: "none",
                   borderRadius: "8px",
                   color: "#F3F4F6",
+                  fontSize: "14px",
+                  padding: "8px",
+                  fontFamily: "Inter, sans-serif",
                 }}
                 formatter={(value) => [`${value} MB`]}
                 labelFormatter={(label) => new Date(label).toLocaleString()}
@@ -197,7 +200,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                 type="monotone"
                 dataKey="rss"
                 stroke="#3B82F6"
-                strokeWidth={2}
+                strokeWidth={1}
                 fillOpacity={1}
                 fill="url(#colorRSS)"
                 name="RSS Memory"
@@ -206,7 +209,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
                 type="monotone"
                 dataKey="heap"
                 stroke="#10B981"
-                strokeWidth={2}
+                strokeWidth={1}
                 fillOpacity={1}
                 fill="url(#colorHeap)"
                 name="Heap Memory"

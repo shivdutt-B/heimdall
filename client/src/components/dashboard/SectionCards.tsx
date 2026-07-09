@@ -29,7 +29,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   onServerSelect,
   selectedServer: externalSelectedServer,
   loading = false,
-  hasServers = true
+  hasServers = true,
 }) => {
   const [currentPage, setCurrentPage] = useState(0);
   const [cardsPerPage, setCardsPerPage] = useState(3);
@@ -47,7 +47,8 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
   const [isSubmitting, setIsSubmitting] = useState(false);
   const [showDeleteConfirm, setShowDeleteConfirm] = useState(false);
   const [serverToDelete, setServerToDelete] = useState<Server | null>(null);
-  const { refetchServers, addServer, deleteServer, modifyServer } = useServers();
+  const { refetchServers, addServer, deleteServer, modifyServer } =
+    useServers();
   const [isDeleting, setIsDeleting] = useState(false);
   const [deleteError, setDeleteError] = useState("");
   const [showModifyDialog, setShowModifyDialog] = useState(false);
@@ -80,7 +81,9 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
       setServerToModify(null);
       refetchServers();
     } else {
-      setModifyError(result.error || "Failed to modify server. Please try again.");
+      setModifyError(
+        result.error || "Failed to modify server. Please try again.",
+      );
     }
     setIsModifying(false);
   };
@@ -135,11 +138,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
 
   // Ensure a server is always selected after servers are loaded
   useEffect(() => {
-    if (
-      servers.length > 0 &&
-      !selectedCard &&
-      !externalSelectedServer
-    ) {
+    if (servers.length > 0 && !selectedCard && !externalSelectedServer) {
       setSelectedCard(servers[0].name);
       onServerSelect(servers[0].name);
     }
@@ -165,7 +164,10 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
 
   const items: CarouselItem[] = [
     { type: "add-new" },
-    ...servers.map((server) => ({ type: "card" as const, data: mapServerBasicToServer(server) })),
+    ...servers.map((server) => ({
+      type: "card" as const,
+      data: mapServerBasicToServer(server),
+    })),
   ];
 
   // If there are no servers, show only the add new card with a message
@@ -183,12 +185,26 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
           <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-purple-500/5 to-blue-500/5 rounded-lg opacity-50 group-hover:opacity-75 transition-opacity" />
           <div className="relative flex flex-col items-center gap-2">
             <div className="p-2 rounded-full bg-white/5 group-hover:bg-white/10 transition-colors">
-              <svg className="w-6 h-6 text-gray-400 group-hover:text-gray-300" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M12 6v6m0 0v6m0-6h6m-6 0H6" />
+              <svg
+                className="w-6 h-6 text-gray-400 group-hover:text-gray-300"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth={2}
+                  d="M12 6v6m0 0v6m0-6h6m-6 0H6"
+                />
               </svg>
             </div>
-            <span className="text-sm font-medium text-gray-400 group-hover:text-gray-300">Add your first server</span>
-            <p className="text-xs text-center text-gray-500 group-hover:text-gray-400">Get started by adding a server to monitor</p>
+            <span className="text-sm font-medium text-gray-400 group-hover:text-gray-300">
+              Add your first server
+            </span>
+            <p className="text-xs text-center text-gray-500 group-hover:text-gray-400">
+              Get started by adding a server to monitor
+            </p>
           </div>
         </div>
 
@@ -214,7 +230,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     setIsSubmitting(false);
                   } else {
                     setFormError(
-                      result.error || "Failed to add server. Please try again."
+                      result.error || "Failed to add server. Please try again.",
                     );
                     setIsSubmitting(false);
                   }
@@ -274,7 +290,9 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                       htmlFor="ping-interval"
                     >
                       Ping Interval (seconds)
-                      <span className="text-xs ml-1 text-gray-400">(Minimum: 5 minutes / 300 seconds)</span>
+                      <span className="text-xs ml-1 text-gray-400">
+                        (Minimum: 5 minutes / 300 seconds)
+                      </span>
                     </label>
                     <input
                       id="ping-interval"
@@ -309,7 +327,8 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           !
                         </span>
                         <div className="absolute z-10 hidden group-hover:block w-56 p-2 bg-gray-800 text-white text-xs rounded shadow-lg top-full left-1/2 -translate-x-1/2 mt-1">
-                          Alerts you after this many consecutive server failures.
+                          Alerts you after this many consecutive server
+                          failures.
                         </div>
                       </div>
                     </label>
@@ -381,7 +400,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
             </div>
           </div>
         )}
-      </div >
+      </div>
     );
   }
 
@@ -420,10 +439,11 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
           <button
             key={index}
             onClick={() => setCurrentPage(index)}
-            className={`w-2 h-2 rounded-full transition-all duration-300 ${currentPage === index
-              ? "bg-white w-4"
-              : "bg-gray-600 hover:bg-gray-500"
-              }`}
+            className={`w-2 h-2 rounded-full transition-all duration-300 ${
+              currentPage === index
+                ? "bg-white w-4"
+                : "bg-gray-600 hover:bg-gray-500"
+            }`}
             aria-label={`Go to page ${index + 1}`}
           />
         ))}
@@ -434,10 +454,11 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
         <button
           onClick={prevPage}
           disabled={currentPage === 0}
-          className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 -ml-4 sm:-ml-6 text-white rounded-xl transition-all duration-200 ${currentPage === 0
-            ? "opacity-0 cursor-not-allowed"
-            : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
-            }`}
+          className={`absolute left-0 top-1/2 -translate-y-1/2 z-10 p-3 -ml-4 sm:-ml-6 text-white rounded-xl transition-all duration-200 ${
+            currentPage === 0
+              ? "opacity-0 cursor-not-allowed"
+              : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
+          }`}
         >
           <svg
             width="20"
@@ -470,12 +491,12 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                 item.type === "add-new" ? (
                   <div
                     key="add-new"
-                    className="rounded-lg border-dashed border-2 border-white/20 p-4 sm:p-6 hover:bg-white/5 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center h-full group"
+                    className="rounded-[4px] border-dashed border-2 border-white/20 p-4 sm:p-6 hover:bg-white/2 hover:border-emerald-500/80 transition-all duration-200 cursor-pointer flex flex-col items-center justify-center h-full group"
                     onClick={() => setIsDialogOpen(true)}
                   >
                     <div className="flex flex-col items-center">
                       <svg
-                        className="w-8 h-8 text-white/40 mb-3 group-hover:text-white/60 transition-colors"
+                        className="w-8 h-8 text-white/40 mb-3 group-hover:text-emerald-500/80 transition-colors"
                         fill="none"
                         viewBox="0 0 24 24"
                         stroke="currentColor"
@@ -487,7 +508,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           d="M12 6v6m0 0v6m0-6h6m-6 0H6"
                         />
                       </svg>
-                      <p className="text-white/40 group-hover:text-white/60 font-semibold">
+                      <p className="text-white/40 group-hover:text-emerald-500/80 font-semibold">
                         Add New Server
                       </p>
                     </div>
@@ -496,29 +517,33 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   <div
                     key={`${item.data.id}-${index}`}
                     onClick={() => handleCardSelect(item.data.name)}
-                    className={`rounded-lg border-white/10 border bg-black/20 p-4 sm:p-6 hover:bg-white/5 transition-all duration-200 group relative cursor-pointer ${selectedCard === item.data.name
-                      ? "ring-2 ring-blue-500/50 border-blue-500/50 bg-white/5"
-                      : ""
-                      }`}
+                    className={`rounded-[3px] p-4 sm:p-6 transition-all duration-200 group relative cursor-pointer ${
+                      selectedCard === item.data.name
+                        ? item.data.isActive
+                          ? "border-1 border-green-400 bg-green-500/10"
+                          : "border-1 border-red-400 bg-red-500/10"
+                        : "border-white/10 border"
+                    }`}
                   >
                     <div className="flex justify-between items-start">
                       <p className="text-sm font-semibold text-white capitalize hover:text-gray-300 transition-colors">
                         {item.data.name}
                       </p>
                       <span
-                        className={`px-2 py-1 rounded-full text-xs font-medium ${item.data.isActive
-                          ? "bg-green-500/10 text-green-500"
-                          : "bg-red-500/10 text-red-500"
-                          }`}
+                        className={`px-2 py-1 rounded-[2px] text-xs font-medium ${
+                          item.data.isActive
+                            ? "bg-green-500/10 text-green-500"
+                            : "bg-red-500/10 text-red-500"
+                        }`}
                       >
                         {item.data.isActive ? "online" : "offline"}
                       </span>
                     </div>
                     <div className="mt-3">
-                      <p className="text-[15px] font-medium text-white/80 hover:text-blue-400 transition-colors break-all">
+                      <p className="text-[15px] font-sm text-white/80 hover:text-blue-400 transition-colors break-all">
                         {item.data.url}
                       </p>
-                      <p className="mt-2 text-[13px] font-medium text-gray-400 flex items-center gap-1">
+                      <p className="mt-2 text-[13px] font-sm text-gray-400 flex items-center gap-1">
                         <svg
                           className="w-4 h-4 mt-[1px] flex-shrink-0"
                           fill="none"
@@ -536,13 +561,13 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           Last ping:{" "}
                           {item.data.lastPingedAt
                             ? format(
-                              new Date(item.data.lastPingedAt),
-                              "yyyy-MM-dd HH:mm:ss"
-                            )
+                                new Date(item.data.lastPingedAt),
+                                "yyyy-MM-dd HH:mm:ss",
+                              )
                             : "Never"}
                         </span>
                       </p>
-                      <p className="mt-1 text-[13px] font-medium text-gray-400 flex items-center gap-1">
+                      <p className="mt-1 text-[13px] font-sm text-gray-400 flex items-center gap-1">
                         <svg
                           className="w-4 h-4 mt-[1px] flex-shrink-0"
                           fill="none"
@@ -561,18 +586,40 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                           {formatPingInterval(item.data.pingInterval)}
                         </span>
                       </p>
-                      <p className="mt-1 text-[13px] font-medium text-gray-400 flex items-center gap-1">
-                        <svg width="18px" height="18px" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg"><g id="SVGRepo_bgCarrier" stroke-width="0"></g><g id="SVGRepo_tracerCarrier" stroke-linecap="round" stroke-linejoin="round"></g><g id="SVGRepo_iconCarrier"> <path d="M8.37032 11.0726L5.41421 14.0287C4.63317 14.8097 4.63316 16.076 5.41421 16.8571L6.95611 18.399C7.73715 19.18 9.00348 19.18 9.78453 18.399L12.7406 15.4429M11.0726 8.37032L14.0287 5.41421C14.8097 4.63317 16.076 4.63316 16.8571 5.41421L18.399 6.95611C19.18 7.73715 19.18 9.00348 18.399 9.78453L15.4429 12.7406M6.64883 6.64883L4.88296 4.88296M19.0992 19.0992L17.3333 17.3333M9.35119 5.87299V4M14.6488 20V18.127M5.87299 9.35119H4M20 14.6488H18.127" stroke="#99a1af" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"></path> </g></svg>
+                      <p className="mt-1 text-[13px] font-sm text-gray-400 flex items-center gap-1">
+                        <svg
+                          width="18px"
+                          height="18px"
+                          viewBox="0 0 24 24"
+                          fill="none"
+                          xmlns="http://www.w3.org/2000/svg"
+                        >
+                          <g id="SVGRepo_bgCarrier" stroke-width="0"></g>
+                          <g
+                            id="SVGRepo_tracerCarrier"
+                            stroke-linecap="round"
+                            stroke-linejoin="round"
+                          ></g>
+                          <g id="SVGRepo_iconCarrier">
+                            {" "}
+                            <path
+                              d="M8.37032 11.0726L5.41421 14.0287C4.63317 14.8097 4.63316 16.076 5.41421 16.8571L6.95611 18.399C7.73715 19.18 9.00348 19.18 9.78453 18.399L12.7406 15.4429M11.0726 8.37032L14.0287 5.41421C14.8097 4.63317 16.076 4.63316 16.8571 5.41421L18.399 6.95611C19.18 7.73715 19.18 9.00348 18.399 9.78453L15.4429 12.7406M6.64883 6.64883L4.88296 4.88296M19.0992 19.0992L17.3333 17.3333M9.35119 5.87299V4M14.6488 20V18.127M5.87299 9.35119H4M20 14.6488H18.127"
+                              stroke="#99a1af"
+                              stroke-width="2"
+                              stroke-linecap="round"
+                              stroke-linejoin="round"
+                            ></path>{" "}
+                          </g>
+                        </svg>
 
                         <span className="truncate">
-                          Failure Threshold:{" "}
-                          {item.data.failureThreshold}
+                          Failure Threshold: {item.data.failureThreshold}
                         </span>
                       </p>
                     </div>
                     <div className="absolute inset-0 flex items-center justify-center gap-2 bg-black/70 opacity-0 group-hover:opacity-100 transition-opacity rounded-lg">
                       <button
-                        className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-md hover:bg-blue-700 transition-colors"
+                        className="px-4 py-2 text-sm font-semibold text-white bg-blue-600 rounded-[2px] cursor-pointer hover:bg-blue-700 transition-colors"
                         onClick={() => {
                           setServerToModify(item.data);
                           setModifyForm({
@@ -587,7 +634,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                         Modify
                       </button>
                       <button
-                        className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-md hover:bg-red-700 transition-colors"
+                        className="px-4 py-2 text-sm font-semibold text-white bg-red-600 rounded-[2px] cursor-pointer hover:bg-red-700 transition-colors"
                         onClick={() => {
                           setServerToDelete(item.data);
                           setShowDeleteConfirm(true);
@@ -597,7 +644,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                       </button>
                     </div>
                   </div>
-                )
+                ),
               )}
             </motion.div>
           </AnimatePresence>
@@ -606,10 +653,11 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
         <button
           onClick={nextPage}
           disabled={currentPage === pageCount - 1}
-          className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 -mr-4 sm:-mr-6 text-white rounded-xl transition-all duration-200 ${currentPage === pageCount - 1
-            ? "opacity-0 cursor-not-allowed"
-            : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
-            }`}
+          className={`absolute right-0 top-1/2 -translate-y-1/2 z-10 p-3 -mr-4 sm:-mr-6 text-white rounded-xl transition-all duration-200 ${
+            currentPage === pageCount - 1
+              ? "opacity-0 cursor-not-allowed"
+              : "bg-black/30 hover:bg-black/50 backdrop-blur-sm hover:scale-110"
+          }`}
         >
           <svg
             width="20"
@@ -650,7 +698,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   setIsSubmitting(false);
                 } else {
                   setFormError(
-                    result.error || "Failed to add server. Please try again."
+                    result.error || "Failed to add server. Please try again.",
                   );
                   setIsSubmitting(false);
                 }
@@ -710,7 +758,9 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     htmlFor="ping-interval"
                   >
                     Ping Interval (seconds)
-                    <span className="text-xs ml-1 text-gray-400">(Minimum: 5 minutes / 300 seconds)</span>
+                    <span className="text-xs ml-1 text-gray-400">
+                      (Minimum: 5 minutes / 300 seconds)
+                    </span>
                   </label>
                   <input
                     id="ping-interval"
@@ -819,10 +869,10 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
       {/* Delete Confirmation Dialog */}
       {showDeleteConfirm && serverToDelete && (
         <div
-          className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
+          className="fixed inset-0 z-50 flex items-center justify-center backdrop-blur-[10px]"
           style={{ minHeight: "100vh", minWidth: "100vw" }}
         >
-          <div className="bg-bg-panel rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
+          <div className="bg-bg-dark border border-gray-900 rounded-[4px] p-6 w-full max-w-xs shadow-lg  text-center">
             <h2 className="text-md font-semibold text-white mb-2">
               Confirm Delete
             </h2>
@@ -854,7 +904,9 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                     refetchServers();
                     // Set a new selected server after deletion
                     setTimeout(() => {
-                      const remainingServers = servers.filter(s => s.id !== serverToDelete.id);
+                      const remainingServers = servers.filter(
+                        (s) => s.id !== serverToDelete.id,
+                      );
                       if (remainingServers.length > 0) {
                         setSelectedCard(remainingServers[0].name);
                         onServerSelect(remainingServers[0].name);
@@ -866,7 +918,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   } else {
                     setDeleteError(
                       result.error ||
-                      "Failed to delete server. Please try again."
+                        "Failed to delete server. Please try again.",
                     );
                   }
                   setIsDeleting(false);
@@ -909,9 +961,13 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
       {showModifyDialog && serverToModify && (
         <div
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
-          style={{ minHeight: "100vh", minWidth: "100vw" }}
+          style={{
+            minHeight: "100vh",
+            minWidth: "100vw",
+            backdropFilter: "blur(10px)",
+          }}
         >
-          <div className="bg-bg-panel rounded-lg p-6 w-full max-w-[400px] shadow-lg border border-gray-700 text-center">
+          <div className="bg-bg-dark rounded-[4px] p-6 w-full max-w-[400px] shadow-lg border border-gray-900 text-center">
             <h2 className="text-md font-semibold text-white mb-2">
               Modify Server
             </h2>
@@ -925,7 +981,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                 </label>
                 <input
                   type="text"
-                  className="w-full px-3 py-2 rounded bg-transparent text-white text-sm border border-gray-700 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-[2px] bg-transparent text-white text-sm border border-gray-800 focus:outline-none"
                   value={modifyForm.name}
                   onChange={(e) =>
                     setModifyForm((f) => ({ ...f, name: e.target.value }))
@@ -937,7 +993,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                 <label className="block text-white/80 mb-1 text-sm">URL</label>
                 <input
                   type="url"
-                  className="w-full px-3 py-2 rounded bg-transparent text-white text-sm border border-gray-700 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-[2px] bg-transparent text-white text-sm border border-gray-800 focus:outline-none"
                   value={modifyForm.url}
                   onChange={(e) =>
                     setModifyForm((f) => ({ ...f, url: e.target.value }))
@@ -945,14 +1001,18 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                   required
                 />
               </div>
-              <div className="text-left">                <label className="block text-white/80 mb-1 text-sm">
-                Ping Interval (seconds)
-                <span className="text-xs ml-1 text-gray-400">(Minimum: 5 minutes / 300 seconds)</span>
-              </label>
+              <div className="text-left">
+                {" "}
+                <label className="block text-white/80 mb-1 text-sm">
+                  Ping Interval (seconds)
+                  <span className="text-xs ml-1 text-gray-400">
+                    (Minimum: 5 minutes / 300 seconds)
+                  </span>
+                </label>
                 <input
                   type="number"
                   min={300}
-                  className="w-full px-3 py-2 rounded bg-transparent text-white text-sm border border-gray-700 focus:outline-none"
+                  className="w-full px-3 py-2 rounded-[2px] bg-transparent text-white text-sm border border-gray-800 focus:outline-none"
                   value={modifyForm.pingInterval}
                   onKeyDown={(e) => {
                     if (e.key === "-" || e.key === "e") {
@@ -1019,12 +1079,12 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
                 </button>
                 <button
                   type="submit"
-                  className="px-4 py-2 bg-blue-600 text-white rounded hover:bg-blue-700 font-semibold text-sm cursor-pointer flex items-center justify-center"
+                  className="px-4 py-2 bg-emerald-500 text-black rounded hover:bg-emerald-600 font-semibold text-sm cursor-pointer flex items-center justify-center"
                   disabled={isModifying}
                 >
                   {isModifying && (
                     <svg
-                      className="animate-spin h-4 w-4 text-white inline-block mr-2"
+                      className="animate-spin h-4 w-4 text-black inline-block mr-2"
                       xmlns="http://www.w3.org/2000/svg"
                       fill="none"
                       viewBox="0 0 24 24"

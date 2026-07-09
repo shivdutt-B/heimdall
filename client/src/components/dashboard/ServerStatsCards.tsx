@@ -153,7 +153,7 @@ export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3, delay: index * 0.1 }}
           key={card.title}
-          className={`rounded-lg bg-gradient-to-br ${card.color} backdrop-blur-sm border border-white/10 p-4`}
+          className={`rounded-[3px] bg-gradient-to-br ${card.color} backdrop-blur-sm border border-white/10 p-4`}
         >
           <div className="flex items-start justify-between">
             <div className={`p-2 rounded-lg bg-black/30 ${card.textColor}`}>
