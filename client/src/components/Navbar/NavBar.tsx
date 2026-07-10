@@ -4,6 +4,7 @@ import { authState } from "../../store/auth";
 import { serversAtom, serverDetailsAtom, pingHistoryAtom, selectedDaysAtom } from "../../store/serverAtoms";
 import useDeleteAccount from "../../hooks/useDeleteAccount";
 import React from "react";
+import { ArrowUpRight } from "lucide-react";
 
 const NavBar: React.FC = () => {
   const auth = useRecoilValue(authState);
@@ -136,7 +137,7 @@ const NavBar: React.FC = () => {
                   </div>
                 ) : (
                   <button
-                    className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none bg-white text-primary-foreground hover:bg-white/90 h-8 rounded-[3px] px-2 py-3 border border-gray-300 relative"
+                    className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium transition-colors focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none bg-emerald-500 text-primary-foreground hover:bg-emerald-600 h-8 rounded-[3px] px-2 py-3 relative"
                     id="signup-link"
                     type="button"
                     onClick={(e) => {
@@ -167,7 +168,7 @@ const NavBar: React.FC = () => {
                     {showUserDialog && auth.user && (
                       <div
                         id="user-dialog"
-                        className="w-64 bg-bg-dark border border-red rounded shadow-lg z-50 p-4 text-left flex flex-col items-stretch gap-2"
+                        className="w-64 bg-bg-dark rounded shadow-lg z-50 p-4 text-left flex flex-col items-stretch gap-2 border border-gray-500 "
                         style={{ top: "50px", position: "absolute", right: 0 }}
                       >
                         <div className="mb-2">
@@ -176,21 +177,27 @@ const NavBar: React.FC = () => {
                           </div>
                           <div className="text-white/70 text-xs">{auth.user.name}</div>
                         </div>
-                        <div className="flex flex-col gap-2 mt-4">
+                        <div className="flex flex-col gap-4 mt-4">
+                          <button
+                            onClick={() => navigate("/dashboard")}
+                            className="w-fit text-white text-sm cursor-pointer text-left flex items-center hover:text-emerald-500 transition-colors duration-300"
+                          >
+                            Dashboard <ArrowUpRight className="w-4 h-4 ml-1" />
+                          </button>
                           <button
                             onClick={() => setShowLogoutConfirm(true)}
-                            className="w-full text-white text-sm px-3 py-2 rounded hover:bg-gray-800 text-left"
+                            className="w-fit text-white text-sm cursor-pointer text-left flex items-center hover:text-emerald-500 transition-colors duration-300"
                           >
-                            Logout
+                            Logout <ArrowUpRight className="w-4 h-4 ml-1" />
                           </button>
                           <button
                             onClick={() => {
                               setShowDeleteConfirm(true);
                               setShowUserDialog(false);
                             }}
-                            className="w-full text-red-500 text-sm px-3 py-2 rounded hover:bg-gray-800 text-left"
+                            className="w-fit text-red-500 text-sm cursor-pointer text-left flex items-center"
                           >
-                            Delete Account
+                            Delete Account <ArrowUpRight className="w-4 h-4 ml-1" />
                           </button>
                         </div>
                       </div>
@@ -208,7 +215,7 @@ const NavBar: React.FC = () => {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
           style={{ minHeight: "100vh", minWidth: "100vw" }}
         >
-          <div className="bg-black rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
+          <div className="bg-black rounded-[4px] p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
             <h2 className="text-md font-semibold text-white mb-2">
               Confirm Logout
             </h2>
@@ -217,13 +224,13 @@ const NavBar: React.FC = () => {
             </p>
             <div className="flex gap-2 justify-center">
               <button
-                className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                className="px-4 py-2 bg-white text-black rounded-[2px] font-semibold text-sm cursor-pointer"
                 onClick={() => setShowLogoutConfirm(false)}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold text-sm cursor-pointer"
+                className="px-4 py-2 bg-red-600 text-white rounded-[2px] hover:bg-red-700 font-semibold text-sm cursor-pointer"
                 onClick={() => {
                   localStorage.removeItem("token");
                   resetAuth();
@@ -248,7 +255,7 @@ const NavBar: React.FC = () => {
           className="fixed inset-0 z-50 flex items-center justify-center bg-black/60"
           style={{ minHeight: "100vh", minWidth: "100vw" }}
         >
-          <div className="bg-black rounded-lg p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
+          <div className="bg-black rounded-[2px] p-6 w-full max-w-xs shadow-lg border border-gray-700 text-center">
             <h2 className="text-md font-semibold text-white mb-2">
               Delete Account
             </h2>
@@ -277,7 +284,7 @@ const NavBar: React.FC = () => {
             )}
             <div className="flex gap-2 justify-center">
               <button
-                className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                className="px-4 py-2 bg-white text-black rounded-[2px] font-semibold text-sm cursor-pointer"
                 onClick={() => {
                   setShowDeleteConfirm(false);
                   setError(null);
@@ -287,7 +294,7 @@ const NavBar: React.FC = () => {
                 Cancel
               </button>
               <button
-                className={`px-4 py-2 bg-red-600 text-white rounded font-semibold text-sm cursor-pointer ${loading ? 'opacity-50' : 'hover:bg-red-700'
+                className={`px-4 py-2 bg-red-600 text-white rounded-[2px] font-semibold text-sm cursor-pointer ${loading ? 'opacity-50' : 'hover:bg-red-700'
                   }`}
                 onClick={() => deleteAccount(() => setShowDeleteConfirm(false))}
                 disabled={loading}

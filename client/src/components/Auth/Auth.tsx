@@ -82,16 +82,16 @@ export const Auth = () => {
     <div className="flex justify-center items-center min-h-screen bg-bg-dark text-white/80">
       <div className="w-full max-w-[400px] px-4">
         <Tabs defaultValue="signin" className="w-full">
-          <TabsList className="h-10 bg-bg-card grid w-full grid-cols-2 p-0 rounded-md gap-3">
+          <TabsList className="h-10 bg-transparent grid w-full grid-cols-2 p-0 rounded-[4px] gap-3">
             <TabsTrigger
               value="signin"
-              className="data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-medium rounded-sm transition-all duration-200"
+              className="data-[state=active]:bg-emerald-500 data-[state=active]:text-black data-[state=active]:font-medium rounded-[2px] transition-all duration-200 cursor-pointer bg-white text-black"
             >
               Sign In
             </TabsTrigger>
             <TabsTrigger
               value="signup"
-              className="data-[state=active]:bg-white data-[state=active]:text-black data-[state=active]:font-medium rounded-sm transition-all duration-200"
+              className="data-[state=active]:bg-emerald-500 bg-white text-black data-[state=active]:text-black data-[state=active]:font-medium rounded-[2px] transition-all duration-200 cursor-pointer"
             >
               Sign Up
             </TabsTrigger>
@@ -113,7 +113,7 @@ export const Auth = () => {
                   : handleSignIn
               }
             >
-              <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px]">
+              <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-[4px] min-h-[400px]">
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                     Sign In
@@ -141,7 +141,7 @@ export const Auth = () => {
                           email: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
                       placeholder="name@example.com"
                       required
                     />
@@ -161,7 +161,7 @@ export const Auth = () => {
                             password: e.target.value,
                           }))
                         }
-                        className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                        className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
                         placeholder="••••••••"
                         required
                       />
@@ -177,7 +177,7 @@ export const Auth = () => {
                         type="text"
                         value={verificationCode}
                         onChange={(e) => setVerificationCode(e.target.value)}
-                        className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                        className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
                         placeholder="Enter verification code"
                         required
                       />
@@ -191,7 +191,7 @@ export const Auth = () => {
                       !signInForm.email || // Always require email
                       (!isCodeSignIn && !signInForm.password) // Require password only for regular sign in
                     }
-                    className="w-full bg-white text-black font-medium py-2 rounded-sm hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full bg-white text-black font-medium py-2 rounded-[2px] hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
                   >
                     {auth.loading
                       ? "Processing..."
@@ -211,14 +211,14 @@ export const Auth = () => {
                     //   setSignInForm((prev) => ({ ...prev, password: "" })); // Clear password when switching modes
                     // }}
 
-                    className="cursor-not-allowed w-full mt-2 bg-transparent border border-white/30 text-white/80 font-medium py-2 rounded-sm hover:bg-white/10 transition-colors"
+                    className="cursor-not-allowed w-full mt-2 bg-transparent border border-white/30 text-white/80 font-medium py-2 rounded-[2px] hover:bg-white/10 transition-colors"
                   >
                     {isCodeSignIn
                       ? "Sign in with password"
                       : "Sign in with code"}
                   </button>
                 </div>
-                <div className="mt-4 p-3 bg-yellow-900/40 border border-yellow-600/50 text-yellow-200 rounded-sm text-sm">
+                <div className="mt-4 p-3 bg-yellow-900/40 border border-yellow-600/50 text-yellow-200 rounded-[2px] text-sm">
                   <span className="font-semibold">Sign in with code</span> is
                   temporarily disabled. Please use{" "}
                   <span className="font-semibold">password sign in</span>.
@@ -229,7 +229,7 @@ export const Auth = () => {
 
           <TabsContent value="signup" className="animate-fadeIn">
             <form onSubmit={handleSignUp}>
-              <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-sm min-h-[400px]">
+              <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-[2px] min-h-[400px]">
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                     Create Account
@@ -253,7 +253,7 @@ export const Auth = () => {
                           name: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
                       placeholder="John Doe"
                       required
                     />
@@ -275,7 +275,7 @@ export const Auth = () => {
                           email: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
                       placeholder="name@example.com"
                       required
                     />
@@ -297,7 +297,7 @@ export const Auth = () => {
                           password: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-sm focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
                       placeholder="••••••••"
                       required
                     />
@@ -305,7 +305,7 @@ export const Auth = () => {
                   <button
                     type="submit"
                     disabled={auth.loading}
-                    className="w-full bg-white text-black font-medium py-2 rounded-sm hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full bg-white text-black font-medium py-2 rounded-[2px] hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
                   >
                     {auth.loading ? "Creating Account..." : "Create Account"}
                   </button>

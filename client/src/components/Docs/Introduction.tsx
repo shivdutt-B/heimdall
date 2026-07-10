@@ -25,8 +25,8 @@ interface FeatureCardProps {
 const FeatureCard: React.FC<FeatureCardProps> = ({ title, description }) => (
   <div className="flex-1 rounded-[3px] border border-white/10 bg-transparent p-6">
     <div className="flex items-center gap-2 mb-2">
-      <Check className="h-5 w-5 text-emerald-400" />
-      <h3 className="font-medium text-white">{title}</h3>
+      <Check className="h-5 w-5 text-emerald-500" />
+      <h3 className="font-medium text-emerald-500">{title}</h3>
     </div>
     <p className="text-sm text-white/60">{description}</p>
   </div>
@@ -42,7 +42,7 @@ const WhatIsHeimdall: React.FC = () => (
       Heimdall is a smart server watchdog that prevents backend servers from
       sleeping by pinging them periodically and tracking uptime performance.
       It's particularly useful for services hosted on platforms like Render,
-      Fly.io, and Railway, which may put your servers to sleep after periods of
+      Fly.io, Railway, koyeb, and Northflank which may put your servers to sleep after periods of
       inactivity.
     </p>
     <div className="flex flex-col sm:flex-row gap-4 my-6">
@@ -75,7 +75,7 @@ const Step: React.FC<StepProps> = ({ number, title, description }) => (
       {number}
     </span>
     <div>
-      <p className="font-medium text-white">{title}</p>
+      <p className="font-medium text-emerald-500">{title}</p>
       <p className="text-white/60">{description}</p>
     </div>
   </div>
@@ -634,8 +634,8 @@ interface FaqItemProps {
 const FaqItem: React.FC<FaqItemProps> = ({ question, answer }) => (
   <div className="rounded-[4px] border border-white/10 bg-transparent p-4">
     <div className="flex items-center gap-2">
-      <ChevronDown className="h-5 w-5 text-emerald-400" />
-      <h3 className="font-medium text-white">{question}</h3>
+      <ChevronDown className="h-5 w-5 text-emerald-500" />
+      <h3 className="font-medium text-emerald-500">{question}</h3>
     </div>
     <div className="mt-2 pl-7">
       <p className="text-white/60">{answer}</p>
@@ -707,7 +707,7 @@ const Introduction: React.FC = () => {
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
         <Link
           to="/"
-          className="h-8 px-2 border-gray-700 bg-white/80 text-black mb-3 inline-flex items-center font-inter font-medium rounded-xs"
+          className="h-8 px-2 bg-emerald-500 text-black mb-3 inline-flex items-center font-inter font-medium rounded-[2px]"
         >
           <svg
             className="h-5 w-5 mr-1"
@@ -736,7 +736,7 @@ const Introduction: React.FC = () => {
         </div>
         <Link
           to="/"
-          className="h-8 px-2 border-gray-700 bg-white/80 text-black mb-3 inline-flex items-center font-inter font-medium rounded-xs"
+          className="h-8 px-2 bg-emerald-500 text-black mb-3 inline-flex items-center font-inter font-medium rounded-[2px]"
         >
           <svg
             className="h-5 w-5 mr-1"

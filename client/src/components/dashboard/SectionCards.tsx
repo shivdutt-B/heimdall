@@ -441,8 +441,8 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
             onClick={() => setCurrentPage(index)}
             className={`w-2 h-2 rounded-full transition-all duration-300 ${
               currentPage === index
-                ? "bg-white w-4"
-                : "bg-gray-600 hover:bg-gray-500"
+                ? "bg-emerald-500 w-4"
+                : "bg-white hover:bg-white/50"
             }`}
             aria-label={`Go to page ${index + 1}`}
           />
@@ -885,13 +885,13 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
             </p>
             <div className="flex gap-2 justify-center">
               <button
-                className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                className="px-4 py-2 bg-white text-black rounded-[2px] font-semibold text-sm cursor-pointer"
                 onClick={() => setShowDeleteConfirm(false)}
               >
                 Cancel
               </button>
               <button
-                className="px-4 py-2 bg-red-600 text-white rounded hover:bg-red-700 font-semibold text-sm cursor-pointer"
+                className="px-4 py-2 bg-red-600 text-white rounded-[2px] hover:bg-red-700 font-semibold text-sm cursor-pointer"
                 disabled={isDeleting}
                 onClick={async () => {
                   if (!serverToDelete) return;
@@ -1071,7 +1071,7 @@ export const SectionCards: React.FC<SectionCardsProps> = ({
               <div className="flex gap-2 justify-center mt-2">
                 <button
                   type="button"
-                  className="px-4 py-2 bg-white text-black rounded font-semibold text-sm cursor-pointer"
+                  className="px-4 py-2 bg-white text-black rounded-[2px] font-semibold text-sm cursor-pointer"
                   onClick={() => setShowModifyDialog(false)}
                   disabled={isModifying}
                 >
