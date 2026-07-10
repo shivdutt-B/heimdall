@@ -722,7 +722,7 @@ const WarningBanner: React.FC = () => (
       <span className="inline-block bg-yellow-500 text-black font-semibold px-[4px] rounded-[2px]">
         750-hour free tier
       </span>{" "}
-      quota on free hosting platforms like Render, Railway, or Fly.io.
+      quota on free hosting platforms like Render, Railway, or Fly.io, koyeb, and Northflank.
     </p>
   </div>
 );
