@@ -113,7 +113,7 @@ export const ChartAreaInteractive: React.FC<Props> = ({
 
   // Handle empty states
   const EmptyState = ({ message }: { message: string; showDays?: boolean }) => (
-    <div className={`rounded-md border border-gray-800 bg-transparent ${className}`}>
+    <div className={`rounded-[2px] border border-gray-800 bg-transparent ${className}`}>
       {/* Only show days selection if we have a server but no data */}
       {hasServers && serverId && <DaysSelection />}
       <div className="p-6 text-center">

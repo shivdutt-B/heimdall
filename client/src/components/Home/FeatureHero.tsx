@@ -6,7 +6,7 @@ import image4 from "../../assets/home/image4.png";
 
 const FeatureHero: React.FC = () => {
   return (
-    <section className="w-full py-24 bg-[#080b11] text-white overflow-hidden relative">
+    <section className="w-full py-8 sm:py-16 text-white overflow-hidden relative">
       {/* Background radial glow */}
       <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-indigo-500/5 rounded-full blur-[120px] pointer-events-none" />
 

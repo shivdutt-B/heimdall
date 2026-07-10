@@ -92,7 +92,7 @@ const NavBar: React.FC = () => {
               <div className="flex gap-2">
                 <Link
                   to="/docs"
-                  className="justify-center whitespace-nowrap text-[13px] font-semibold focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none h-8 rounded-[3px] px-2 py-3 flex items-center gap-1 transition-colors hover:bg-bg-card hover:text-white border border-[grey] bg-bg-card text-white"
+                  className="justify-center whitespace-nowrap text-[13px] font-normal focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none h-8 rounded-[3px] px-2 py-3 flex items-center gap-1 transition-colors hover:bg-bg-card hover:text-white border border-[grey] bg-bg-card text-white"
                 >
                   Docs
                   <svg
@@ -113,7 +113,7 @@ const NavBar: React.FC = () => {
                 </Link>
 
                 {auth.loading ? (
-                  <div className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium h-8 rounded-sm px-2 py-3 border border-gray-300 bg-white">
+                  <div className="inline-flex text-black items-center justify-center gap-2 whitespace-nowrap text-[13px] font-medium h-8 rounded-[2px] px-2 py-3 bg-emerald-500">
                     <svg
                       className="animate-spin h-5 w-5 text-black"
                       xmlns="http://www.w3.org/2000/svg"

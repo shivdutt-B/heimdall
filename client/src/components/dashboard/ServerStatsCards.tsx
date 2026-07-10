@@ -47,7 +47,7 @@ export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
   if (!stats) {
     return (
       <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-        <div className="rounded-lg bg-black/20 border border-white/10 p-6 text-center">
+        <div className="rounded-[4px] bg-black/20 border border-white/10 p-6 text-center">
           <p className="text-gray-400">Select a server to view statistics</p>
         </div>
       </div>

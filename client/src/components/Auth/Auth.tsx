@@ -80,6 +80,19 @@ export const Auth = () => {
 
   return (
     <div className="flex justify-center items-center min-h-screen bg-bg-dark text-white/80">
+      {/* Added style block for the smooth transition animation */}
+      <style>
+        {`
+          @keyframes slideFadeIn {
+            0% { opacity: 0; transform: translateY(10px) scale(0.18); }
+            100% { opacity: 1; transform: translateY(0) scale(1); }
+          }
+          .animate-slideFadeIn {
+            animation: slideFadeIn 0.4s cubic-bezier(0.16, 1, 0.3, 1) forwards;
+          }
+        `}
+      </style>
+      
       <div className="w-full max-w-[400px] px-4">
         <Tabs defaultValue="signin" className="w-full">
           <TabsList className="h-10 bg-transparent grid w-full grid-cols-2 p-0 rounded-[4px] gap-3">
@@ -95,15 +108,11 @@ export const Auth = () => {
             >
               Sign Up
             </TabsTrigger>
+            
           </TabsList>
 
-          {(error || auth.error) && (
-            <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-red-200 rounded-sm text-sm">
-              {error || auth.error}
-            </div>
-          )}
-
-          <TabsContent value="signin" className="animate-fadeIn">
+          {/* Changed className to use the new animation */}
+          <TabsContent value="signin" className="animate-slideFadeIn">
             <form
               onSubmit={
                 isCodeSignIn
@@ -113,7 +122,7 @@ export const Auth = () => {
                   : handleSignIn
               }
             >
-              <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-[4px] min-h-[400px]">
+              <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-[4px]">
                 <div className="mb-4">
                   <h2 className="text-xl font-semibold bg-gradient-to-r from-white to-gray-400 bg-clip-text text-transparent">
                     Sign In
@@ -191,7 +200,7 @@ export const Auth = () => {
                       !signInForm.email || // Always require email
                       (!isCodeSignIn && !signInForm.password) // Require password only for regular sign in
                     }
-                    className="w-full bg-white text-black font-medium py-2 rounded-[2px] hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full bg-emerald-500 text-black font-medium py-2 rounded-[2px] hover:bg-emerald-600 transition-colors cursor-pointer disabled:opacity-50 disabled:hover:scale-100"
                   >
                     {auth.loading
                       ? "Processing..."
@@ -202,32 +211,38 @@ export const Auth = () => {
                       : "Sign In"}
                   </button>
 
-                  <button
+                  {/* <button
                     type="button"
-                    // onClick={() => {
-                    //   setIsCodeSignIn(!isCodeSignIn);
-                    //   setCodeSent(false);
-                    //   setVerificationCode("");
-                    //   setSignInForm((prev) => ({ ...prev, password: "" })); // Clear password when switching modes
-                    // }}
+                    onClick={() => {
+                      setIsCodeSignIn(!isCodeSignIn);
+                      setCodeSent(false);
+                      setVerificationCode("");
+                      setSignInForm((prev) => ({ ...prev, password: "" })); // Clear password when switching modes
+                    }}
 
                     className="cursor-not-allowed w-full mt-2 bg-transparent border border-white/30 text-white/80 font-medium py-2 rounded-[2px] hover:bg-white/10 transition-colors"
                   >
                     {isCodeSignIn
                       ? "Sign in with password"
                       : "Sign in with code"}
-                  </button>
+                  </button> */}
                 </div>
-                <div className="mt-4 p-3 bg-yellow-900/40 border border-yellow-600/50 text-yellow-200 rounded-[2px] text-sm">
+                {/* <div className="mt-4 p-3 bg-yellow-900/40 border border-yellow-600/50 text-yellow-200 rounded-[2px] text-sm">
                   <span className="font-semibold">Sign in with code</span> is
                   temporarily disabled. Please use{" "}
                   <span className="font-semibold">password sign in</span>.
-                </div>
+                </div> */}
               </div>
             </form>
+            {(error || auth.error) && (
+            <div className="mt-4 p-3 bg-red-900/50 border border-red-500/50 text-red-200 rounded-[2px] text-sm">
+              {error || auth.error}
+            </div>
+          )}
           </TabsContent>
 
-          <TabsContent value="signup" className="animate-fadeIn">
+          {/* Changed className to use the new animation */}
+          <TabsContent value="signup" className="animate-slideFadeIn">
             <form onSubmit={handleSignUp}>
               <div className="bg-transparent p-6 border border-gray-700 shadow-lg rounded-[2px] min-h-[400px]">
                 <div className="mb-4">
@@ -305,7 +320,7 @@ export const Auth = () => {
                   <button
                     type="submit"
                     disabled={auth.loading}
-                    className="w-full bg-white text-black font-medium py-2 rounded-[2px] hover:bg-white/90 transition-colors transform hover:scale-[1.02] duration-200 disabled:opacity-50 disabled:hover:scale-100"
+                    className="w-full bg-emerald-500 text-black font-medium py-2 rounded-[2px] hover:bg-emerald-600 transition-colors cursor-pointer disabled:opacity-50 disabled:hover:scale-100"
                   >
                     {auth.loading ? "Creating Account..." : "Create Account"}
                   </button>

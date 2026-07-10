@@ -127,7 +127,7 @@ const logoList: LogoItem[] = [
 
 const LogoTicker: React.FC = () => {
   return (
-    <div className="w-full py-24 bg-[#080b11]/20 relative">
+    <div className="w-full py-8 sm:py-16 relative">
       <div className="max-w-5xl mx-auto px-6 select-none text-center">
         <p className="text-[18px] md:text-md font-bold tracking-[0.15em] uppercase text-white/80 mb-8">
           Keeps your servers active across leading cloud platforms

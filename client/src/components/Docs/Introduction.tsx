@@ -3,6 +3,38 @@ import { Button } from "../Common/button";
 import { Check, ChevronDown, Copy, Info } from "lucide-react";
 import { Link } from "react-router-dom";
 
+const steps = [
+  {
+    number: "1",
+    title: "Install NPM or Python package",
+    description:
+      "Add the lightweight Heimdall wrapper package to your codebase using npm or pip install.",
+  },
+  {
+    number: "2",
+    title: "Configure with your app",
+    description: "Initialize the package inside your server entry point file.",
+  },
+  {
+    number: "3",
+    title: "Deploy your server",
+    description:
+      "Push your updated code to Render, Railway, Fly.io, koyeb, or northflank platform.",
+  },
+  {
+    number: "4",
+    title: "Add backend URL",
+    description:
+      "Register your deployed application endpoint inside your workspace dashboard.",
+  },
+  {
+    number: "5",
+    title: "Prevent cold starts",
+    description:
+      "Heimdall starts background ping requests to keep your application warm and responsive 24/7.",
+  },
+];
+
 // Header section component
 const Header: React.FC = () => (
   <div className="space-y-2 mb-8">
@@ -42,8 +74,8 @@ const WhatIsHeimdall: React.FC = () => (
       Heimdall is a smart server watchdog that prevents backend servers from
       sleeping by pinging them periodically and tracking uptime performance.
       It's particularly useful for services hosted on platforms like Render,
-      Fly.io, Railway, koyeb, and Northflank which may put your servers to sleep after periods of
-      inactivity.
+      Fly.io, Railway, koyeb, and Northflank which may put your servers to sleep
+      after periods of inactivity.
     </p>
     <div className="flex flex-col sm:flex-row gap-4 my-6">
       <FeatureCard
@@ -92,21 +124,16 @@ const GettingStarted: React.FC = () => (
       a few minutes.
     </p>
     <div className="space-y-4 my-6">
-      <Step
-        number={1}
-        title="Create an account"
-        description="Sign up for a free Heimdall account to get started."
-      />
-      <Step
-        number={2}
-        title="Add your server"
-        description="Enter your server URL and configure how often you want Heimdall to check on it."
-      />
-      <Step
-        number={3}
-        title="Monitor your server"
-        description="Heimdall will start pinging your server and tracking its performance."
-      />
+      {steps.map((item, index) => {
+        return (
+          <Step
+            key={index}
+            number={index + 1}
+            title={item.title}
+            description={item.description}
+          />
+        );
+      })}
     </div>
   </section>
 );
