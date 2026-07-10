@@ -2,6 +2,12 @@ name: Deploy — all services
 
 on:
   workflow_dispatch:
+    inputs:
+      no_cache_worker:
+        description: 'Force a clean (no-cache) rebuild of worker-service image'
+        required: false
+        type: boolean
+        default: false
 
 concurrency:
   group: ec2-deploy
@@ -9,7 +15,7 @@ concurrency:
 
 jobs:
 
-  # ─── Step 1: Sync repo and clean up unnecessary files ───────────────────────
+  # ─── Step 1: Ensure swap exists, then sync repo ─────────────────────────────
   sync-repo:
     name: Sync repo on EC2
     runs-on: ubuntu-latest
@@ -24,6 +30,22 @@ jobs:
             set -e
             echo ""
             echo "-------------------------------------------------------------"
+            echo "ENSURING SWAP SPACE (prevents OOM crashes during builds)"
+            echo "-------------------------------------------------------------"
+            echo ""
+            if [ "$(swapon --show | wc -l)" -eq 0 ]; then
+              echo "NO SWAP FOUND, CREATING 2G SWAPFILE..."
+              sudo fallocate -l 2G /swapfile || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+              echo "SWAP CREATED"
+            else
+              echo "SWAP ALREADY CONFIGURED, SKIPPING"
+            fi
+            echo ""
+            echo "-------------------------------------------------------------"
             echo "SYNCING REPO"
             echo "-------------------------------------------------------------"
             echo ""
@@ -36,6 +58,8 @@ jobs:
             git pull origin main
             echo "CLEANING UP UNNECESSARY FILES..."
             rm -rf client server LICENCE README.md readme.assets
+            echo "CLEANING NPM CACHE..."
+            npm cache clean --force || true
             echo "REPO SYNCED AND CLEANED"
             echo ""
             echo "-------------------------------------------------------------"
@@ -64,11 +88,13 @@ jobs:
             echo "INJECTING SECRETS..."
             DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_ALERT }} doppler secrets download --no-file --format env > .env
             echo "INSTALLING DEPENDENCIES..."
-            npm install --production=false
+            npm ci
             echo "BUILDING..."
-            npm run build
+            NODE_OPTIONS="--max-old-space-size=512" npm run build
+            echo "REMOVING DEV DEPENDENCIES..."
+            npm prune --omit=dev
             echo "RESTARTING PM2..."
-            pm2 restart alert-service || pm2 start npm --name "alert-service" -- run start
+            pm2 restart alert-service --update-env || pm2 start npm --name "alert-service" -- run start
             echo "ALERT-SERVICE DEPLOYED"
             echo ""
             echo "-------------------------------------------------------------"
@@ -97,11 +123,13 @@ jobs:
             echo "INJECTING SECRETS..."
             DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_DISPATCH }} doppler secrets download --no-file --format env > .env
             echo "INSTALLING DEPENDENCIES..."
-            npm install --production=false
+            npm ci
             echo "BUILDING..."
-            npm run build
+            NODE_OPTIONS="--max-old-space-size=512" npm run build
+            echo "REMOVING DEV DEPENDENCIES..."
+            npm prune --omit=dev
             echo "RESTARTING PM2..."
-            pm2 restart dispatch-service || pm2 start npm --name "dispatch-service" -- run start
+            pm2 restart dispatch-service --update-env || pm2 start npm --name "dispatch-service" -- run start
             echo "DISPATCH-SERVICE DEPLOYED"
             echo ""
             echo "-------------------------------------------------------------"
@@ -129,11 +157,19 @@ jobs:
             cd ~/heimdall/worker-service
             echo "INJECTING SECRETS..."
             DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_WORKER }} doppler secrets download --no-file --format env > .env
-            echo "BUILDING DOCKER IMAGE..."
-            docker build --no-cache -t heimdall-worker:latest .
+            if [ "${{ github.event.inputs.no_cache_worker }}" = "true" ]; then
+              echo "FORCING CLEAN BUILD (NO CACHE)..."
+              docker build --no-cache -t heimdall-worker:latest .
+            else
+              echo "BUILDING DOCKER IMAGE (USING LAYER CACHE)..."
+              docker build -t heimdall-worker:latest .
+            fi
             echo "REMOVING OLD STOPPED WORKER CONTAINERS..."
             docker ps -q --filter "ancestor=heimdall-worker:latest" | xargs -r docker stop
             docker ps -aq --filter "ancestor=heimdall-worker:latest" | xargs -r docker rm
+            echo "PRUNING DANGLING IMAGES / OLD BUILD CACHE..."
+            docker image prune -f
+            docker builder prune -f --filter "until=48h"
             echo "WORKER-SERVICE IMAGE BUILT"
             echo ""
             echo "-------------------------------------------------------------"
@@ -162,11 +198,13 @@ jobs:
             echo "INJECTING SECRETS..."
             DOPPLER_TOKEN=${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }} doppler secrets download --no-file --format env > .env
             echo "INSTALLING DEPENDENCIES..."
-            npm install --production=false
+            npm ci
             echo "BUILDING..."
-            npm run build
+            NODE_OPTIONS="--max-old-space-size=512" npm run build
+            echo "REMOVING DEV DEPENDENCIES..."
+            npm prune --omit=dev
             echo "RESTARTING PM2..."
-            pm2 restart scale-worker-service || pm2 start npm --name "scale-worker-service" -- run start
+            pm2 restart scale-worker-service --update-env || pm2 start npm --name "scale-worker-service" -- run start
             echo "SCALE-WORKER-SERVICE DEPLOYED"
             echo ""
             echo "-------------------------------------------------------------"
