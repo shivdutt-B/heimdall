@@ -18,7 +18,7 @@ const formatNumber = (num: number) => {
 
 function HeroOnRipple() {
   const auth = useRecoilValue(authState);
-  const { stats, loading, error } = usePublicStats();
+  const { stats, loading } = usePublicStats();
 
   return (
     <div className="relative text-white text-center font-inter flex flex-col items-center justify-center max-w-4xl mx-auto px-4 mt-6">
