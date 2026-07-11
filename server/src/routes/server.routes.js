@@ -83,5 +83,4 @@ router.delete("/:id", serverController.deleteServer);
 // @access  Private
 router.post("/memory-history", serverController.getMemoryHistory);
 
-
 module.exports = router;

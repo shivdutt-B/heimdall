@@ -71,4 +71,9 @@ router.post(
 // @access  Private
 router.delete('/delete-account', authMiddleware, userController.deleteAccount);
 
+// @route   GET api/public/stats
+// @desc    Get total pings and pings/day
+// @access  Private
+router.get("/stats", userController.getPingsStats);
+
 module.exports = router;

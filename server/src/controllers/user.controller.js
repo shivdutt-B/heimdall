@@ -165,4 +165,57 @@ exports.deleteAccount = async (req, res) => {
   }
 };
 
+/**
+ * Get Total Pings and Pings/Day
+ * @route GET /api/public/stats
+ */
+exports.getPingsStats = async (req, res) => {
+  try {
+    // Beginning of today (UTC)
+    const today = new Date();
+    today.setUTCHours(0, 0, 0, 0);
+
+    // Total pings
+    const totalPings = await prisma.pingHistory.count();
+
+    // Oldest ping
+    const oldestPing = await prisma.pingHistory.findFirst({
+      orderBy: {
+        timestamp: "asc",
+      },
+      select: {
+        timestamp: true,
+      },
+    });
+
+    let pingsPerDay = 0;
+
+    if (oldestPing) {
+      const totalDays = Math.max(
+        1,
+        Math.ceil(
+          (Date.now() - oldestPing.timestamp.getTime()) / (1000 * 60 * 60 * 24),
+        ),
+      );
+
+      pingsPerDay = Math.round(totalPings / totalDays);
+    }
+
+    return res.status(200).json({
+      success: true,
+      data: {
+        totalPings,
+        pingsPerDay,
+      },
+    });
+  } catch (error) {
+    console.error("Error fetching public stats:", error);
+
+    return res.status(500).json({
+      success: false,
+      message: "Failed to fetch public statistics.",
+    });
+  }
+};
+
 module.exports = exports;

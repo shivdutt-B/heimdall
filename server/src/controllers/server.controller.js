@@ -57,7 +57,7 @@ exports.getServerById = async (req, res) => {
     // Calculate total pings and successful/failed counts
     const totalPings = pingStats.reduce(
       (acc, curr) => acc + curr._count.status,
-      0
+      0,
     );
     const successfulPings =
       pingStats.find((p) => p.status === true)?._count.status || 0;
@@ -97,7 +97,8 @@ exports.createServer = async (req, res) => {
 
   const { url, name, pingInterval, failureThreshold } = req.body;
 
-  try {    // Prevent duplicate servers (by url or name across all users)
+  try {
+    // Prevent duplicate servers (by url or name across all users)
     const existingServer = await prisma.server.findFirst({
       where: {
         OR: [{ url: url }, { name: name }],
@@ -105,10 +106,14 @@ exports.createServer = async (req, res) => {
     });
     if (existingServer) {
       if (existingServer.name === name) {
-        return res.status(400).json({ message: "This server name is already in use." });
+        return res
+          .status(400)
+          .json({ message: "This server name is already in use." });
       }
       if (existingServer.url === url) {
-        return res.status(400).json({ message: "This server URL is already being monitored." });
+        return res
+          .status(400)
+          .json({ message: "This server URL is already being monitored." });
       }
     }
 
@@ -153,24 +158,26 @@ exports.updateServer = async (req, res) => {
 
     if (!existingServer) {
       return res.status(404).json({ message: "Server not found" });
-    }    // If name or url is being updated, check for duplicates across all users
+    } // If name or url is being updated, check for duplicates across all users
     if (name || url) {
       const duplicateServer = await prisma.server.findFirst({
         where: {
           id: { not: req.params.id }, // Exclude current server
-          OR: [
-            { name: name || undefined },
-            { url: url || undefined }
-          ]
+          OR: [{ name: name || undefined }, { url: url || undefined }],
         },
       });
 
       if (duplicateServer) {
         if (duplicateServer.name === name) {
-          return res.status(400).json({ message: "This server name is already in use by another user" });
+          return res.status(400).json({
+            message: "This server name is already in use by another user",
+          });
         }
         if (duplicateServer.url === url) {
-          return res.status(400).json({ message: "This server URL is already being monitored by another user" });
+          return res.status(400).json({
+            message:
+              "This server URL is already being monitored by another user",
+          });
         }
       }
     }
@@ -300,7 +307,9 @@ exports.getMemoryHistory = async (req, res) => {
       },
     });
     // Exclude serverId and id from each record
-    const filteredMemoryHistory = memoryHistory.map(({ serverId, id, ...rest }) => rest);
+    const filteredMemoryHistory = memoryHistory.map(
+      ({ serverId, id, ...rest }) => rest,
+    );
     res.json({ memoryHistory: filteredMemoryHistory, startDate, endDate });
   } catch (err) {
     console.error("Get memory history error:", err.message);
