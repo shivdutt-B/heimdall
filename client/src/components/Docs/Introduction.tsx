@@ -1,6 +1,5 @@
 import React, { useState } from "react";
-import { Button } from "../Common/button";
-import { Check, ChevronDown, Copy, Info } from "lucide-react";
+import { Check, ChevronDown, Copy} from "lucide-react";
 import { Link } from "react-router-dom";
 
 const steps = [
@@ -511,21 +510,6 @@ const ApiReference: React.FC = () => {
     }
   };
 
-  const getFilename = (tech: string) => {
-    switch (tech) {
-      case "nodejs":
-        return "index.js";
-      case "django":
-        return "urls.py";
-      case "fastapi":
-        return "main.py";
-      case "flask":
-        return "app.py";
-      default:
-        return "code";
-    }
-  };
-
   const techs = [
     { id: "nodejs", label: "Node.js" },
     { id: "django", label: "Django" },
@@ -537,7 +521,6 @@ const ApiReference: React.FC = () => {
   const installCmd = getInstallCommand(activeTech);
   const code = getCodeSnippet(activeTech);
   const language = getLanguage(activeTech);
-  const filename = getFilename(activeTech);
 
   return (
     <section className="space-y-4">

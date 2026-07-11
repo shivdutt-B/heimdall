@@ -9,7 +9,7 @@ const Footer = () => {
       </div>
 
       {/* Large text */}
-      <TextHoverEffect text="Heimdall" />
+      <TextHoverEffect text="Heimdall" duration={0} />
 
       {/* Footer content */}
       <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-8 flex flex-col items-center text-center space-y-6">

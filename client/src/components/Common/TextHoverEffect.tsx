@@ -1,9 +1,9 @@
-import React, { useRef, useEffect, useState } from "react";
+import { useRef, useEffect, useState } from "react";
 import { motion } from "framer-motion";
 export const TextHoverEffect = ({
   text,
   duration,
-}) => {
+}: { text: string, duration: number }) => {
   const svgRef = useRef(null);
   const containerRef = useRef(null);
   const [cursor, setCursor] = useState({ x: 0, y: 0 });
@@ -44,7 +44,8 @@ export const TextHoverEffect = ({
   }, []);
   useEffect(() => {
     if (svgRef.current && cursor.x !== null && cursor.y !== null) {
-      const svgRect = svgRef.current.getBoundingClientRect();
+      const svgRef = useRef<SVGSVGElement | null>(null);
+      const svgRect: DOMRect = svgRef.current!.getBoundingClientRect();
       const cxPercentage = ((cursor.x - svgRect.left) / svgRect.width) * 100;
       const cyPercentage = ((cursor.y - svgRect.top) / svgRect.height) * 100;
       setMaskPosition({
