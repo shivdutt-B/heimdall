@@ -19,11 +19,8 @@ export const usePublicStats = () => {
     try {
       setLoading(true);
 
-    //   const url = `${import.meta.env.VITE_API_URL}/api/users/stats`
-    const url = `http://localhost:5000/api/users/stats`
-      console.log('url: ', url)
+      const url = `${import.meta.env.VITE_API_URL}/api/users/stats`
       const response = await axios.get(url);
-      console.log('res: ', response.data)
 
       setStats(response.data.data);
       setError(null);

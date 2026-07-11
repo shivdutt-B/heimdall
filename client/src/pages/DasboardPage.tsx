@@ -59,7 +59,6 @@ const Dashboard: React.FC = () => {
 
   // Only auto-select first server if there are servers and none is selected
   useEffect(() => {
-    console.log(pings, "pings");
     if (servers.length > 0 && !selectedServer) {
       setSelectedServer(servers[0].name);
     }
