@@ -13,7 +13,6 @@ export const usePublicStats = () => {
   });
 
   const [loading, setLoading] = useState(true);
-  const [error, setError] = useState<string | null>(null);
 
   const fetchStats = async () => {
     try {
@@ -23,10 +22,8 @@ export const usePublicStats = () => {
       const response = await axios.get(url);
 
       setStats(response.data.data);
-      setError(null);
     } catch (err) {
       console.error("Failed to fetch public stats:", err);
-      setError("Failed to fetch public stats.");
     } finally {
       setLoading(false);
     }
@@ -39,7 +36,6 @@ export const usePublicStats = () => {
   return {
     stats,
     loading,
-    error,
     refetch: fetchStats,
   };
 };
