@@ -168,7 +168,7 @@ const NavBar: React.FC = () => {
                     {showUserDialog && auth.user && (
                       <div
                         id="user-dialog"
-                        className="w-64 bg-bg-dark rounded shadow-lg z-50 p-4 text-left flex flex-col items-stretch gap-2 border border-gray-500 "
+                        className="w-64 bg-bg-dark rounded shadow-lg z-50 p-4 text-left flex flex-col items-stretch gap-2 border border-gray-800 "
                         style={{ top: "50px", position: "absolute", right: 0 }}
                       >
                         <div className="mb-2">

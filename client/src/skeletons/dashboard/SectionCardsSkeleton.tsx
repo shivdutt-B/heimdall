@@ -18,22 +18,22 @@ export const SectionCardsSkeleton: React.FC = () => {
         {[1, 2, 3].map((index) => (
           <div
             key={index}
-            className="rounded-lg border border-white/10 bg-black/20 p-4 sm:p-6"
+            className="rounded-[4px] border border-white/10 bg-black/20 p-4 sm:p-6"
           >
             <div className="flex justify-between items-start">
-              <div className="w-24 h-4 bg-gray-700 rounded animate-pulse"></div>
-              <div className="w-16 h-6 bg-gray-700 rounded-full animate-pulse"></div>
+              <div className="w-24 h-4 bg-gray-700 rounded-[2px] animate-pulse"></div>
+              <div className="w-16 h-6 bg-gray-700 rounded-[2px] animate-pulse"></div>
             </div>
             <div className="mt-3">
-              <div className="w-full h-4 bg-gray-700 rounded animate-pulse"></div>
+              <div className="w-full h-4 bg-gray-700 rounded-[2px] animate-pulse"></div>
               <div className="mt-2 space-y-1">
                 <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-gray-700 rounded animate-pulse"></div>
-                  <div className="w-32 h-4 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="w-4 h-4 bg-gray-700 rounded-[2px] animate-pulse"></div>
+                  <div className="w-32 h-4 bg-gray-700 rounded-[2px] animate-pulse"></div>
                 </div>
                 <div className="flex items-center gap-1">
-                  <div className="w-4 h-4 bg-gray-700 rounded animate-pulse"></div>
-                  <div className="w-32 h-4 bg-gray-700 rounded animate-pulse"></div>
+                  <div className="w-4 h-4 bg-gray-700 rounded-[2px] animate-pulse"></div>
+                  <div className="w-32 h-4 bg-gray-700 rounded-[2px] animate-pulse"></div>
                 </div>
               </div>
             </div>

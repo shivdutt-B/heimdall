@@ -156,7 +156,7 @@ export const ServerStatsCards: React.FC<ServerStatsCardsProps> = ({
           className={`rounded-[3px] bg-gradient-to-br ${card.color} backdrop-blur-sm border border-white/10 p-4`}
         >
           <div className="flex items-start justify-between">
-            <div className={`p-2 rounded-lg bg-black/30 ${card.textColor}`}>
+            <div className={`p-2 rounded-full bg-black/30 ${card.textColor}`}>
               {card.icon}
             </div>
           </div>

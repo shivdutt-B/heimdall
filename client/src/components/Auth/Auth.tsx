@@ -150,7 +150,7 @@ export const Auth = () => {
                           email: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300 hover:border-emerald-400"
                       placeholder="name@example.com"
                       required
                     />
@@ -170,7 +170,7 @@ export const Auth = () => {
                             password: e.target.value,
                           }))
                         }
-                        className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                        className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300 hover:border-emerald-400"
                         placeholder="••••••••"
                         required
                       />
@@ -268,7 +268,7 @@ export const Auth = () => {
                           name: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300 hover:border-emerald-400"
                       placeholder="John Doe"
                       required
                     />
@@ -290,7 +290,7 @@ export const Auth = () => {
                           email: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300 hover:border-emerald-400"
                       placeholder="name@example.com"
                       required
                     />
@@ -312,7 +312,7 @@ export const Auth = () => {
                           password: e.target.value,
                         }))
                       }
-                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-white/30 transition-all duration-300 hover:border-gray-500"
+                      className="w-full p-2 bg-transparent border border-gray-700 rounded-[2px] focus:outline-none focus:ring-1 focus:ring-emerald-500 transition-all duration-300 hover:border-emerald-400"
                       placeholder="••••••••"
                       required
                     />
