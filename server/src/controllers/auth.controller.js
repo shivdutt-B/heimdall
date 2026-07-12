@@ -1,9 +1,7 @@
-const { PrismaClient } = require("@prisma/client");
+const prisma = require("../utils/prisma");
 const bcrypt = require("bcryptjs");
 const jwt = require("jsonwebtoken");
 const { validationResult } = require("express-validator");
-
-const prisma = new PrismaClient();
 
 /**
  * Register a new user
@@ -84,8 +82,6 @@ exports.login = async (req, res) => {
     const user = await prisma.user.findUnique({
       where: { email },
     });
-
-    console.log("User found:", user);
 
     if (!user) {
       return res.status(400).json({ message: "Invalid credentials" });

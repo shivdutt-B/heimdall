@@ -1,7 +1,5 @@
-const { PrismaClient } = require("@prisma/client");
 const { validationResult } = require("express-validator");
-
-const prisma = new PrismaClient();
+const prisma = require("../utils/prisma");
 
 /**
  * Get all servers for authenticated user

@@ -1,7 +1,8 @@
 const express = require("express");
 const cors = require("cors");
 const morgan = require("morgan");
-const { PrismaClient } = require("@prisma/client");
+const prisma = require("./utils/prisma");
+
 require("dotenv").config();
 const heimdall = require('heimdall-nodejs-sdk');
 
@@ -13,7 +14,6 @@ const userRoutes = require("./routes/user.routes");
 // Create Express app
 const app = express();
 heimdall.ping(app)
-const prisma = new PrismaClient();
 
 // Middleware
 app.use(cors());

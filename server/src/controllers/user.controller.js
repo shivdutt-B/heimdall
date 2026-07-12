@@ -1,11 +1,10 @@
-const { PrismaClient } = require('@prisma/client');
 const { validationResult } = require('express-validator');
 const bcrypt = require('bcryptjs');
 const jwt = require('jsonwebtoken');
 const { sendEmail } = require('../utils/email');
+const prisma = require("../utils/prisma");
 
 const VERIFICATION_CODE_EXPIRY = 10 * 60 * 1000; // 10 minutes in milliseconds
-const prisma = new PrismaClient();
 
 /**
  * Send verification code for email sign in
