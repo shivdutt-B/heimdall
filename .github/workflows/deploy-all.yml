@@ -4,197 +4,99 @@ on:
   push:
     branches:
       - main
-    paths:
-      - "alert-service/**"
-      - "dispatch-service/**"
-      - "worker-service/**"
-      - "scale-worker-service/**"
-      - ".github/workflows/deploy.yml"
 
   workflow_dispatch:
     inputs:
       no_cache_worker:
-        description: Force clean worker Docker build
+        description: Force rebuild worker image
         type: boolean
         default: false
 
-concurrency:
-  group: ec2-deploy
-  cancel-in-progress: false
-
 jobs:
   deploy:
-    name: Deploy Services
     runs-on: ubuntu-latest
 
     steps:
-      - uses: appleboy/ssh-action@v1.0.3
+      - name: Deploy to EC2
+        uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EC2_HOST }}
           username: ${{ secrets.EC2_USER }}
           key: ${{ secrets.EC2_SSH_KEY }}
-          timeout: 60s
           command_timeout: 40m
 
           script: |
-            set -Eeuo pipefail
-
-            banner() {
-              echo ""
-              echo "============================================================"
-              echo "$1"
-              echo "============================================================"
-            }
-
-            deploy_node_service() {
-              SERVICE="$1"
-              TOKEN="$2"
-
-              banner "Deploying $SERVICE"
-
-              cd ~/heimdall/$SERVICE
-
-              DOPPLER_TOKEN="$TOKEN" \
-              doppler secrets download \
-                --no-file \
-                --format env > .env
-
-              npm ci
-
-              NODE_OPTIONS="--max-old-space-size=512" npm run build
-
-              npm prune --omit=dev
-
-              pm2 restart "$SERVICE" --update-env \
-                || pm2 start npm --name "$SERVICE" -- run start
-            }
-
-            #######################################################
-            # SWAP
-            #######################################################
-
-            banner "Checking swap"
-
-            if swapon --show | grep -q "/swapfile"; then
-
-              echo "Swap already enabled."
-
-            elif [ -f /swapfile ]; then
-
-              echo "Enabling existing swap..."
-              sudo swapon /swapfile || true
-
-            else
-
-              FREE=$(df --output=avail -m / | tail -1)
-
-              if [ "$FREE" -gt 2500 ]; then
-
-                echo "Creating swap..."
-
-                sudo fallocate -l 2G /swapfile \
-                || sudo dd if=/dev/zero of=/swapfile bs=1M count=2048
-
-                sudo chmod 600 /swapfile
-                sudo mkswap /swapfile
-                sudo swapon /swapfile
-
-                grep -q "/swapfile" /etc/fstab \
-                || echo '/swapfile none swap sw 0 0' \
-                | sudo tee -a /etc/fstab
-
-              else
-
-                echo "Not enough disk space."
-                echo "Skipping swap."
-
-              fi
-
-            fi
-
-            #######################################################
-            # SYNC REPOSITORY
-            #######################################################
-
-            banner "Sync repository"
-
-            if [ ! -d ~/heimdall ]; then
-              git clone https://github.com/shivdutt-B/heimdall.git ~/heimdall
-            fi
+            set -e
 
             cd ~/heimdall
 
             git fetch origin
-
             git reset --hard origin/main
 
-            git clean -fd
+            ############################
+            # Alert Service
+            ############################
 
-            #######################################################
-            # ALERT
-            #######################################################
+            cd ~/heimdall/alert-service
 
-            deploy_node_service \
-              alert-service \
-              "${{ secrets.DOPPLER_TOKEN_ALERT }}"
+            DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_ALERT }}" \
+            doppler secrets download --no-file --format env > .env
 
-            #######################################################
-            # DISPATCH
-            #######################################################
+            npm ci
+            npm run build
 
-            deploy_node_service \
-              dispatch-service \
-              "${{ secrets.DOPPLER_TOKEN_DISPATCH }}"
+            pm2 restart alert-service || pm2 start npm --name alert-service -- run start
 
-            #######################################################
-            # WORKER IMAGE
-            #######################################################
+            ############################
+            # Dispatch Service
+            ############################
 
-            banner "Building Worker Image"
+            cd ~/heimdall/dispatch-service
+
+            DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_DISPATCH }}" \
+            doppler secrets download --no-file --format env > .env
+
+            npm ci
+            npm run build
+
+            pm2 restart dispatch-service || pm2 start npm --name dispatch-service -- run start
+
+            ############################
+            # Worker Docker Image
+            ############################
 
             cd ~/heimdall/worker-service
 
             DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_WORKER }}" \
-            doppler secrets download \
-              --no-file \
-              --format env > .env
+            doppler secrets download --no-file --format env > .env
 
             if [ "${{ github.event.inputs.no_cache_worker }}" = "true" ]; then
-
-              docker build --no-cache \
-                -t heimdall-worker:latest .
-
+              docker build --no-cache -t heimdall-worker:latest .
             else
-
-              docker build \
-                -t heimdall-worker:latest .
-
+              docker build -t heimdall-worker:latest .
             fi
 
-            docker image prune -af
+            ############################
+            # Scale Worker Service
+            ############################
 
-            docker builder prune -af --filter "until=72h"
+            cd ~/heimdall/scale-worker-service
 
+            DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }}" \
+            doppler secrets download --no-file --format env > .env
+
+            npm ci
+            npm run build
+
+            pm2 restart scale-worker-service || pm2 start npm --name scale-worker-service -- run start
+
+            ############################
+            # Cleanup
+            ############################
+
+            docker image prune -f
             docker container prune -f
-
-            #######################################################
-            # SCALE WORKER
-            #######################################################
-
-            deploy_node_service \
-              scale-worker-service \
-              "${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }}"
-
-            #######################################################
-            # PM2
-            #######################################################
-
-            banner "Saving PM2"
 
             pm2 save
 
-            #######################################################
-            # DONE
-            #######################################################
-
-            banner "Deployment Complete"
+            echo "Deployment completed successfully."
