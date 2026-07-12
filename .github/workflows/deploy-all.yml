@@ -33,6 +33,13 @@ jobs:
             git fetch origin
             git reset --hard origin/main
 
+            # Remove unnecessary files
+            rm -rf client
+            rm -rf server
+            rm -rf readme.assets
+            rm -f README.md
+            rm -f LICENCE
+
             ############################
             # Alert Service
             ############################
