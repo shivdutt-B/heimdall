@@ -171,34 +171,33 @@ exports.deleteAccount = async (req, res) => {
  */
 exports.getPingsStats = async (req, res) => {
   try {
-    // Beginning of today (UTC)
-    const today = new Date();
-    today.setUTCHours(0, 0, 0, 0);
-
-    // Total pings
-    const totalPings = await prisma.pingHistory.count();
-
-    // Oldest ping
-    const oldestPing = await prisma.pingHistory.findFirst({
-      orderBy: {
-        timestamp: "asc",
+    const stats = await prisma.globalStats.findUnique({
+      where: {
+        id: 1,
       },
       select: {
-        timestamp: true,
+        totalPings: true,
+        firstPingAt: true,
       },
     });
 
+    let totalPings = 0;
     let pingsPerDay = 0;
 
-    if (oldestPing) {
-      const totalDays = Math.max(
-        1,
-        Math.ceil(
-          (Date.now() - oldestPing.timestamp.getTime()) / (1000 * 60 * 60 * 24),
-        ),
-      );
+    if (stats) {
+      totalPings = Number(stats.totalPings);
 
-      pingsPerDay = Math.round(totalPings / totalDays);
+      if (stats.firstPingAt) {
+        const totalDays = Math.max(
+          1,
+          Math.ceil(
+            (Date.now() - stats.firstPingAt.getTime()) /
+              (1000 * 60 * 60 * 24)
+          )
+        );
+
+        pingsPerDay = Math.round(totalPings / totalDays);
+      }
     }
 
     return res.status(200).json({

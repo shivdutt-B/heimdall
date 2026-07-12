@@ -90,3 +90,13 @@ model MemoryHistory {
 
   @@map("memory_history")
 }
+
+model GlobalStats {
+  id           Int      @id @default(1)
+  totalPings   BigInt   @default(0) @map("total_pings")
+  firstPingAt  DateTime? @map("first_ping_at")
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  @@map("global_stats")
+}
