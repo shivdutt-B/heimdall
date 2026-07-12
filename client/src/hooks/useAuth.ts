@@ -9,53 +9,54 @@ export const useAuth = () => {
   const hasInitiallyFetched = useRef(false);
 
   useEffect(() => {
+    const token = localStorage.getItem("token");
+
+    if (!token) {
+      setAuth({
+        user: null,
+        token: null,
+        loading: false,
+        error: null,
+      });
+      return;
+    }
+
+    if (hasInitiallyFetched.current) return;
+    hasInitiallyFetched.current = true;
+
     const fetchUser = async () => {
       try {
-        setAuth((prev) => ({ ...prev, loading: true }));
-
-        const response = await axios.get(
+        const { data } = await axios.get(
           `${import.meta.env.VITE_BACKEND_URL}/api/auth/me`,
           {
             headers: {
-              "x-auth-token": localStorage.getItem("token"),
+              "x-auth-token": token,
             },
-          }
+          },
         );
 
-        const userData = response.data;
-
-        setAuth((prev) => ({
-          ...prev,
+        setAuth({
           user: {
-            // id: userData.id,
-            name: userData.name,
-            email: userData.email,
+            name: data.name,
+            email: data.email,
           },
+          token,
           loading: false,
           error: null,
-        }));
-      } catch (error) {
-        setAuth((prev) => ({
-          ...prev,
+        });
+      } catch (err) {
+        localStorage.removeItem("token");
+
+        setAuth({
           user: null,
+          token: null,
           loading: false,
-          error: error instanceof Error ? error.message : "An error occurred",
-        }));
+          error: err instanceof Error ? err.message : "Authentication failed",
+        });
       }
     };
 
-    const token = localStorage.getItem("token");
-    if (token && !hasInitiallyFetched.current) {
-      hasInitiallyFetched.current = true;
-      fetchUser();
-    } else if (!token) {
-      setAuth((prev) => ({
-        ...prev,
-        user: null,
-        loading: false,
-        error: null,
-      }));
-    }
+    fetchUser();
   }, [setAuth]);
 
   return {

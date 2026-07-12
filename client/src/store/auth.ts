@@ -17,7 +17,7 @@ export const authState = atom<AuthState>({
   default: {
     user: null,
     token: null,
-    loading: false,
+    loading: true,
     error: null,
   },
 });

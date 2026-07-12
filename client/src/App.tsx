@@ -7,6 +7,7 @@ import DocsPage from "./pages/DocsPage";
 import { Routes, Route } from "react-router-dom";
 import Dashboard from "./pages/DasboardPage";
 import { useAuth } from "./hooks/useAuth";
+import ProtectedRoute from "../src/components/Helper/ProtectedRoute";
 
 function App() {
   useAuth();
@@ -14,12 +15,17 @@ function App() {
   return (
     <>
       <NavBar />
+
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
         <Route path="/docs" element={<DocsPage />} />
-        <Route path="/dashboard/*" element={<Dashboard />} />
+
+        <Route element={<ProtectedRoute />}>
+          <Route path="/dashboard/*" element={<Dashboard />} />
+        </Route>
       </Routes>
+
       <Footer />
     </>
   );

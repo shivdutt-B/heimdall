@@ -7,7 +7,7 @@ export async function findServersToDispatch() {
         /*
             This function finds all active servers that need to be pinged.
             It checks for servers that are active and whose nextPingAt time is less than or equal to the current time.
-        */       
+        */     
         const servers = await prisma.server.findMany({
             where: {
                 nextPingAt: { lte: new Date() }
