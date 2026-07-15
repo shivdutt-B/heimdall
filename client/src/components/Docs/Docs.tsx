@@ -711,7 +711,7 @@ const WarningBanner: React.FC = () => (
 );
 
 // Main Introduction component
-const Introduction: React.FC = () => {
+const Docs: React.FC = () => {
   return (
     <div className="overflow-auto font-inter">
       <div className="mx-auto max-w-4xl px-4 sm:px-6 lg:px-8 py-12 md:py-16">
@@ -769,4 +769,4 @@ const Introduction: React.FC = () => {
   );
 };
 
-export default Introduction;
+export default Docs;

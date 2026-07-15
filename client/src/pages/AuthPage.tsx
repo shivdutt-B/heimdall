@@ -1,7 +1,6 @@
-// import AuthLayout from "../layouts/AuthPage";
+import Auth from "../components/Auth/Auth";
+function AuthPage() {
+  return <Auth />;
+}
 
-// function AuthPage() {
-//   return <AuthLayout />;
-// }
-
-// export default AuthPage;
+export default AuthPage;

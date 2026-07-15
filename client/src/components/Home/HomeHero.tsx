@@ -16,7 +16,7 @@ const formatNumber = (num: number) => {
   return num.toLocaleString();
 };
 
-function HeroOnRipple() {
+function HomeHero() {
   const auth = useRecoilValue(authState);
   const { stats, loading } = usePublicStats();
 
@@ -173,4 +173,4 @@ function HeroOnRipple() {
   );
 }
 
-export default HeroOnRipple;
+export default HomeHero;
