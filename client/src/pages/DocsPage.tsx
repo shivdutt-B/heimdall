@@ -1,4 +1,4 @@
-import DocsLayout from "../layouts/DocsLayout";
+import DocsLayout from "../layouts/DocsPage";
 import Introduction from "../components/Docs/Introduction";
 
 function DocsPage() {

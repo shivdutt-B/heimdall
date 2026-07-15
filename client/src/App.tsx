@@ -1,13 +1,15 @@
 import "./App.css";
 import Footer from "./components/Footer/Footer";
 import NavBar from "./components/Navbar/NavBar";
-import HomePage from "./pages/HomePage";
-import AuthPage from "./pages/AuthPage";
-import DocsPage from "./pages/DocsPage";
+import HomePage from "./layouts/HomePage";
+import AuthPage from "./layouts/AuthPage";
+import DocsPage from "./layouts/DocsPage";
 import { Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/DasboardPage";
+import DashboardPage from "./layouts/DashboardLayout";
 import { useAuth } from "./hooks/useAuth";
 import ProtectedRoute from "../src/components/Helper/ProtectedRoute";
+import Introduction from "../src/components/Docs/Introduction";
+
 
 function App() {
   useAuth();
@@ -19,10 +21,10 @@ function App() {
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/auth" element={<AuthPage />} />
-        <Route path="/docs" element={<DocsPage />} />
+        <Route path="/docs" element={<DocsPage children={<Introduction />} />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard/*" element={<Dashboard />} />
+          <Route path="/dashboard/*" element={<DashboardPage />} />
         </Route>
       </Routes>
 

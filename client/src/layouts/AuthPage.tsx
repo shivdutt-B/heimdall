@@ -1,6 +1,6 @@
 import Auth from "../components/Auth/Auth";
-function AuthLayout() {
+function AuthPage() {
   return <Auth />;
 }
 
-export default AuthLayout;
+export default AuthPage;

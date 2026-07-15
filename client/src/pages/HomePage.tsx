@@ -1,4 +1,4 @@
-import Home from "../layouts/HomeLayout";
+import Home from "../layouts/HomePage";
 
 function HomePage() {
   return <Home />;

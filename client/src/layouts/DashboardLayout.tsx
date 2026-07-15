@@ -1,16 +1,15 @@
 import React from "react";
 
-interface DashboardLayoutProps {
+interface DashboardPageProps {
   children: React.ReactNode;
 }
 
-export const DashboardLayout: React.FC<DashboardLayoutProps> = ({
-  children,
-}) => {
+function DashboardPage({ children }: DashboardPageProps) {
   return (
     <div className="min-h-screen bg-bg-dark font-inter">
-      {/* <SiteHeader /> */}
       <main className="flex-1">{children}</main>
     </div>
   );
 };
+
+export default DashboardPage;

@@ -5,7 +5,7 @@ import FeatureHero from "../components/Home/FeatureHero";
 import SupportedTech from "../components/Home/SupportedTech";
 
 
-function Home() {
+function HomePage() {
   return (
     <>
       <RippleHero />
@@ -17,4 +17,4 @@ function Home() {
   );
 }
 
-export default Home;
+export default HomePage;

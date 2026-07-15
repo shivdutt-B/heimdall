@@ -1,10 +1,10 @@
 import React from "react";
 
-interface DocsLayoutProps {
+interface DocsPageProps {
   children: React.ReactNode;
 }
 
-function DocsLayout({ children }: DocsLayoutProps) {
+function DocsPage({ children }: DocsPageProps) {
   return (
     <div className="bg-bg-dark text-white/80 min-h-screen flex flex-col">
       <div className="flex-1">
@@ -14,4 +14,4 @@ function DocsLayout({ children }: DocsLayoutProps) {
   );
 }
 
-export default DocsLayout;
+export default DocsPage;
