@@ -1,7 +1,7 @@
-import Home from "../layouts/HomePage";
+// import Home from "../layouts/HomePage";
 
-function HomePage() {
-  return <Home />;
-}
+// function HomePage() {
+//   return <Home />;
+// }
 
-export default HomePage;
+// export default HomePage;

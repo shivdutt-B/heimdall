@@ -1,7 +1,7 @@
-import AuthLayout from "../layouts/AuthPage";
+// import AuthLayout from "../layouts/AuthPage";
 
-function AuthPage() {
-  return <AuthLayout />;
-}
+// function AuthPage() {
+//   return <AuthLayout />;
+// }
 
-export default AuthPage;
+// export default AuthPage;

@@ -5,7 +5,7 @@ import HomePage from "./layouts/HomePage";
 import AuthPage from "./layouts/AuthPage";
 import DocsPage from "./layouts/DocsPage";
 import { Routes, Route } from "react-router-dom";
-import DashboardPage from "./layouts/DashboardLayout";
+import DashboardLayout from "./layouts/DashboardLayout";
 import { useAuth } from "./hooks/useAuth";
 import ProtectedRoute from "../src/components/Helper/ProtectedRoute";
 import Introduction from "../src/components/Docs/Introduction";
@@ -24,7 +24,7 @@ function App() {
         <Route path="/docs" element={<DocsPage children={<Introduction />} />} />
 
         <Route element={<ProtectedRoute />}>
-          <Route path="/dashboard/*" element={<DashboardPage />} />
+          <Route path="/dashboard/*" element={<DashboardLayout />} />
         </Route>
       </Routes>
 
