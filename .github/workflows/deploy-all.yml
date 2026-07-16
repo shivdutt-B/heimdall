@@ -17,7 +17,7 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy to EXC
+      - name: Deploy Heimdall
         uses: appleboy/ssh-action@v1.0.3
         with:
           host: ${{ secrets.EXC_HOST }}
@@ -28,23 +28,44 @@ jobs:
           script: |
             set -e
 
-            cd ~/heimdall
+            REPO_DIR="$HOME/heimdall"
+
+            echo "=================================="
+            echo "Updating Repository"
+            echo "=================================="
+
+            if [ ! -d "$REPO_DIR" ]; then
+              echo "Repository directory not found!"
+              exit 1
+            fi
+
+            cd "$REPO_DIR"
+
+            if [ ! -d ".git" ]; then
+              echo "Directory exists but is NOT a git repository."
+              exit 1
+            fi
 
             git fetch origin
             git reset --hard origin/main
 
-            # Remove unnecessary files
+            #########################################
+            # Remove Unnecessary Directories
+            #########################################
+
             rm -rf client
             rm -rf server
             rm -rf readme.assets
             rm -f README.md
             rm -f LICENCE
 
-            ############################
+            #########################################
             # Alert Service
-            ############################
+            #########################################
 
-            cd ~/heimdall/alert-service
+            echo "Deploying Alert Service..."
+
+            cd "$REPO_DIR/alert-service"
 
             DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_ALERT }}" \
             doppler secrets download --no-file --format env > .env
@@ -52,13 +73,19 @@ jobs:
             npm ci
             npm run build
 
-            pm2 restart alert-service || pm2 start npm --name alert-service -- run start
+            if pm2 describe alert-service >/dev/null 2>&1; then
+              pm2 restart alert-service
+            else
+              pm2 start npm --name alert-service -- run start
+            fi
 
-            ############################
+            #########################################
             # Dispatch Service
-            ############################
+            #########################################
 
-            cd ~/heimdall/dispatch-service
+            echo "Deploying Dispatch Service..."
+
+            cd "$REPO_DIR/dispatch-service"
 
             DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_DISPATCH }}" \
             doppler secrets download --no-file --format env > .env
@@ -66,13 +93,19 @@ jobs:
             npm ci
             npm run build
 
-            pm2 restart dispatch-service || pm2 start npm --name dispatch-service -- run start
+            if pm2 describe dispatch-service >/dev/null 2>&1; then
+              pm2 restart dispatch-service
+            else
+              pm2 start npm --name dispatch-service -- run start
+            fi
 
-            ############################
+            #########################################
             # Worker Docker Image
-            ############################
+            #########################################
 
-            cd ~/heimdall/worker-service
+            echo "Building Worker Image..."
+
+            cd "$REPO_DIR/worker-service"
 
             DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_WORKER }}" \
             doppler secrets download --no-file --format env > .env
@@ -83,11 +116,13 @@ jobs:
               docker build -t heimdall-worker:latest .
             fi
 
-            ############################
+            #########################################
             # Scale Worker Service
-            ############################
+            #########################################
 
-            cd ~/heimdall/scale-worker-service
+            echo "Deploying Scale Worker..."
+
+            cd "$REPO_DIR/scale-worker-service"
 
             DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }}" \
             doppler secrets download --no-file --format env > .env
@@ -95,15 +130,27 @@ jobs:
             npm ci
             npm run build
 
-            pm2 restart scale-worker-service || pm2 start npm --name scale-worker-service -- run start
+            if pm2 describe scale-worker-service >/dev/null 2>&1; then
+              pm2 restart scale-worker-service
+            else
+              pm2 start npm --name scale-worker-service -- run start
+            fi
 
-            ############################
+            #########################################
             # Cleanup
-            ############################
+            #########################################
+
+            echo "Cleaning Docker..."
 
             docker image prune -f
             docker container prune -f
 
             pm2 save
 
-            echo "Deployment completed successfully."
+            echo ""
+            echo "=================================="
+            echo "Deployment Completed Successfully"
+            echo "=================================="
+
+            pm2 list
+            docker images | grep heimdall
