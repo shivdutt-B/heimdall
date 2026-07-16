@@ -46,6 +46,7 @@ jobs:
               exit 1
             fi
 
+            git remote set-url origin https://github.com/shivdutt-B/heimdall.git
             git fetch origin
             git reset --hard origin/main
 
