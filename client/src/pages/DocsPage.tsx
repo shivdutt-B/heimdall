@@ -1,4 +1,3 @@
-import React from "react";
 import Docs from "../components/Docs/Docs";
 
 function DocsPage() {

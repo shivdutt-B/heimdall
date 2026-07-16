@@ -3,18 +3,8 @@ import { Link } from "react-router-dom";
 import { authState } from "../../store/auth";
 import { useRecoilValue } from "recoil";
 import { usePublicStats } from "../../hooks/usePublicStats";
+import shortenNumber from "../../utils/shortenNumber";
 
-const formatNumber = (num: number) => {
-  if (num >= 1_000_000) {
-    return `${(num / 1_000_000).toFixed(1).replace(".0", "")}M+`;
-  }
-
-  if (num >= 1_000) {
-    return `${(num / 1_000).toFixed(1).replace(".0", "")}K+`;
-  }
-
-  return num.toLocaleString();
-};
 
 function HomeHero() {
   const auth = useRecoilValue(authState);
@@ -52,7 +42,7 @@ function HomeHero() {
             Total Pings
           </span>
         ) : (
-          <>{`${stats.totalPings || 1500000} Total Pings`}</>
+          <>{`${(stats.totalPings.toLocaleString() || 1500000)} Total Pings`}</>
         )}
       </div>
 
@@ -106,7 +96,7 @@ function HomeHero() {
             Pings / Day
           </span>
         ) : (
-          <>{`${formatNumber(stats.pingsPerDay || 7600)} Pings / Day`}</>
+          <>{`${shortenNumber(stats.pingsPerDay || 7600)} Pings / Day`}</>
         )}
       </div>
 
