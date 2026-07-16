@@ -12,6 +12,12 @@ on:
         type: boolean
         default: false
 
+# Prevent two deploys from stepping on each other if pushes land close together.
+# A second run waits for the first to finish instead of racing it or killing it mid-way.
+concurrency:
+  group: deploy-heimdall
+  cancel-in-progress: false
+
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -26,27 +32,80 @@ jobs:
           command_timeout: 40m
 
           script: |
-            set -e
+            set -euo pipefail
 
             REPO_DIR="$HOME/heimdall"
+            REPO_URL="https://github.com/shivdutt-B/heimdall.git"
+            LOG_DIR="$(mktemp -d)"
 
-            echo "=================================="
-            echo "Updating Repository"
-            echo "=================================="
+            ALERT_TOKEN="${{ secrets.DOPPLER_TOKEN_ALERT }}"
+            DISPATCH_TOKEN="${{ secrets.DOPPLER_TOKEN_DISPATCH }}"
+            WORKER_TOKEN="${{ secrets.DOPPLER_TOKEN_WORKER }}"
+            SCALE_WORKER_TOKEN="${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }}"
+            NO_CACHE_WORKER="${{ github.event.inputs.no_cache_worker }}"
 
-            if [ ! -d "$REPO_DIR" ]; then
-              echo "Repository directory not found!"
-              exit 1
+            log_section() {
+              echo ""
+              echo "=================================="
+              echo "$1"
+              echo "=================================="
+            }
+
+            # Shared logic for the three simple npm/pm2 services (alert, dispatch, scale-worker)
+            deploy_pm2_service() {
+              local dir="$1" name="$2" token="$3"
+
+              echo "--- Deploying $name ---"
+              cd "$REPO_DIR/$dir"
+
+              DOPPLER_TOKEN="$token" doppler secrets download --no-file --format env > .env
+
+              npm ci --prefer-offline --no-audit --no-fund
+              npm run build
+
+              if pm2 describe "$name" >/dev/null 2>&1; then
+                pm2 restart "$name"
+              else
+                pm2 start npm --name "$name" -- run start
+              fi
+
+              echo "--- $name deployed successfully ---"
+            }
+
+            # Worker image build + scale-worker deploy must stay sequential (scale-worker
+            # depends on the freshly built image), but this whole branch is independent
+            # of alert-service/dispatch-service, so it runs concurrently with them.
+            build_and_deploy_worker() {
+              echo "--- Building worker image ---"
+              cd "$REPO_DIR/worker-service"
+
+              DOPPLER_TOKEN="$WORKER_TOKEN" doppler secrets download --no-file --format env > .env
+
+              export DOCKER_BUILDKIT=1
+              if [ "$NO_CACHE_WORKER" = "true" ]; then
+                docker build --no-cache -t heimdall-worker:latest .
+              else
+                docker build -t heimdall-worker:latest .
+              fi
+              echo "--- Worker image built ---"
+
+              deploy_pm2_service "scale-worker-service" "scale-worker-service" "$SCALE_WORKER_TOKEN"
+            }
+
+            #########################################
+            # Sync Repository (self-healing)
+            #########################################
+
+            log_section "Updating Repository"
+
+            if [ ! -d "$REPO_DIR/.git" ]; then
+              echo "Repository missing or invalid — cloning fresh..."
+              rm -rf "$REPO_DIR"
+              git clone "$REPO_URL" "$REPO_DIR"
             fi
 
             cd "$REPO_DIR"
-
-            if [ ! -d ".git" ]; then
-              echo "Directory exists but is NOT a git repository."
-              exit 1
-            fi
-
-            git remote set-url origin https://github.com/shivdutt-B/heimdall.git
+            git remote set-url origin "$REPO_URL"
             git fetch origin
             git reset --hard origin/main
 
@@ -54,104 +113,63 @@ jobs:
             # Remove Unnecessary Directories
             #########################################
 
-            rm -rf client
-            rm -rf server
-            rm -rf readme.assets
-            rm -f README.md
-            rm -f LICENCE
+            rm -rf client server readme.assets
+            rm -f README.md LICENCE
 
             #########################################
-            # Alert Service
+            # Deploy Services (parallel where possible)
             #########################################
 
-            echo "Deploying Alert Service..."
+            log_section "Deploying Services"
 
-            cd "$REPO_DIR/alert-service"
+            deploy_pm2_service "alert-service" "alert-service" "$ALERT_TOKEN" \
+              > "$LOG_DIR/alert.log" 2>&1 &
+            pid_alert=$!
 
-            DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_ALERT }}" \
-            doppler secrets download --no-file --format env > .env
+            deploy_pm2_service "dispatch-service" "dispatch-service" "$DISPATCH_TOKEN" \
+              > "$LOG_DIR/dispatch.log" 2>&1 &
+            pid_dispatch=$!
 
-            npm ci
-            npm run build
+            build_and_deploy_worker \
+              > "$LOG_DIR/worker.log" 2>&1 &
+            pid_worker=$!
 
-            if pm2 describe alert-service >/dev/null 2>&1; then
-              pm2 restart alert-service
-            else
-              pm2 start npm --name alert-service -- run start
-            fi
+            status=0
+            for entry in "pid_alert:alert-service" "pid_dispatch:dispatch-service" "pid_worker:worker+scale-worker"; do
+              pid_var="${entry%%:*}"
+              label="${entry##*:}"
+              pid="${!pid_var}"
+              if ! wait "$pid"; then
+                echo "FAILED: $label (see log below)"
+                status=1
+              fi
+            done
 
-            #########################################
-            # Dispatch Service
-            #########################################
+            log_section "Deployment Logs"
+            for f in "$LOG_DIR"/*.log; do
+              echo "----- $f -----"
+              cat "$f"
+              echo ""
+            done
 
-            echo "Deploying Dispatch Service..."
-
-            cd "$REPO_DIR/dispatch-service"
-
-            DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_DISPATCH }}" \
-            doppler secrets download --no-file --format env > .env
-
-            npm ci
-            npm run build
-
-            if pm2 describe dispatch-service >/dev/null 2>&1; then
-              pm2 restart dispatch-service
-            else
-              pm2 start npm --name dispatch-service -- run start
-            fi
-
-            #########################################
-            # Worker Docker Image
-            #########################################
-
-            echo "Building Worker Image..."
-
-            cd "$REPO_DIR/worker-service"
-
-            DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_WORKER }}" \
-            doppler secrets download --no-file --format env > .env
-
-            if [ "${{ github.event.inputs.no_cache_worker }}" = "true" ]; then
-              docker build --no-cache -t heimdall-worker:latest .
-            else
-              docker build -t heimdall-worker:latest .
-            fi
-
-            #########################################
-            # Scale Worker Service
-            #########################################
-
-            echo "Deploying Scale Worker..."
-
-            cd "$REPO_DIR/scale-worker-service"
-
-            DOPPLER_TOKEN="${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }}" \
-            doppler secrets download --no-file --format env > .env
-
-            npm ci
-            npm run build
-
-            if pm2 describe scale-worker-service >/dev/null 2>&1; then
-              pm2 restart scale-worker-service
-            else
-              pm2 start npm --name scale-worker-service -- run start
+            if [ "$status" -ne 0 ]; then
+              echo "One or more services failed to deploy. See logs above."
+              exit 1
             fi
 
             #########################################
             # Cleanup
             #########################################
 
-            echo "Cleaning Docker..."
+            log_section "Cleaning Docker"
 
             docker image prune -f
             docker container prune -f
 
             pm2 save
+            rm -rf "$LOG_DIR"
 
-            echo ""
-            echo "=================================="
-            echo "Deployment Completed Successfully"
-            echo "=================================="
+            log_section "Deployment Completed Successfully"
 
             pm2 list
             docker images | grep heimdall
