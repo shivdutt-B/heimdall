@@ -52,7 +52,7 @@ function HomeHero() {
             Total Pings
           </span>
         ) : (
-          <>{`${formatNumber(stats.totalPings || 1500000)} Total Pings`}</>
+          <>{`${stats.totalPings || 1500000} Total Pings`}</>
         )}
       </div>
 
