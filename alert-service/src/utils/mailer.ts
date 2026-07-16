@@ -344,7 +344,7 @@ export async function sendRecurringAlert(
   const mailOptions = {
     from: process.env.FROM_EMAIL,
     to: user.email,
-    subject: `🕒 Daily Alert: ${server.name} - ${downtime} Downtime`,
+    subject: `Daily Alert: ${server.name} - ${downtime} Downtime`,
     html: `
 <!DOCTYPE html>
 <html lang="en">
