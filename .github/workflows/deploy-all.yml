@@ -4,16 +4,9 @@ on:
   push:
     branches:
       - main
-
   workflow_dispatch:
-    inputs:
-      no_cache_worker:
-        description: Force rebuild worker image
-        type: boolean
-        default: false
 
-# Prevent two deploys from stepping on each other if pushes land close together.
-# A second run waits for the first to finish instead of racing it or killing it mid-way.
+# Prevent two deploys from stepping on each other.
 concurrency:
   group: deploy-heimdall
   cancel-in-progress: false
@@ -23,36 +16,82 @@ jobs:
     runs-on: ubuntu-latest
 
     steps:
-      - name: Deploy Heimdall
+      # The instance has no Elastic IP, so resolve its current public IP every run.
+      - name: Resolve EC2 public IP
+        id: ec2
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: ap-south-1
+        run: |
+          IP=$(aws ec2 describe-instances \
+            --filters "Name=tag:Name,Values=heimdall-internal" "Name=instance-state-name,Values=running" \
+            --query "Reservations[0].Instances[0].PublicIpAddress" \
+            --output text)
+          if [ -z "$IP" ] || [ "$IP" = "None" ]; then
+            echo "No running heimdall-internal instance found in ap-south-1"
+            exit 1
+          fi
+          echo "ip=$IP" >> "$GITHUB_OUTPUT"
+
+      # One-time host tooling, idempotent on later runs. Runs in its own SSH
+      # session so the docker group membership applies to the deploy step.
+      - name: Install host prerequisites
         uses: appleboy/ssh-action@v1.0.3
         with:
-          host: ${{ secrets.EXC_HOST }}
+          host: ${{ steps.ec2.outputs.ip }}
+          username: ${{ secrets.EXC_USER }}
+          key: ${{ secrets.EXC_SSH_KEY }}
+          script: |
+            set -euo pipefail
+
+            sudo apt-get update -y
+            sudo apt-get install -y git curl ca-certificates nodejs npm
+
+            command -v pm2 >/dev/null || sudo npm install -g pm2
+            command -v docker >/dev/null || curl -fsSL https://get.docker.com | sudo sh
+            command -v doppler >/dev/null || curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
+
+            sudo systemctl enable --now docker
+            sudo usermod -aG docker "$USER"
+            sudo env PATH="$PATH:/usr/bin" pm2 startup systemd -u "$USER" --hp "$HOME" || true
+
+      - name: Deploy services
+        uses: appleboy/ssh-action@v1.0.3
+        with:
+          host: ${{ steps.ec2.outputs.ip }}
           username: ${{ secrets.EXC_USER }}
           key: ${{ secrets.EXC_SSH_KEY }}
           command_timeout: 40m
-
+          envs: DOPPLER_TOKEN_ALERT,DOPPLER_TOKEN_DISPATCH,DOPPLER_TOKEN_WORKER,DOPPLER_TOKEN_SCALE_WORKER
           script: |
             set -euo pipefail
 
             REPO_DIR="$HOME/heimdall"
             REPO_URL="https://github.com/shivdutt-B/heimdall.git"
-            LOG_DIR="$(mktemp -d)"
 
-            ALERT_TOKEN="${{ secrets.DOPPLER_TOKEN_ALERT }}"
-            DISPATCH_TOKEN="${{ secrets.DOPPLER_TOKEN_DISPATCH }}"
-            WORKER_TOKEN="${{ secrets.DOPPLER_TOKEN_WORKER }}"
-            SCALE_WORKER_TOKEN="${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }}"
-            NO_CACHE_WORKER="${{ github.event.inputs.no_cache_worker }}"
+            # 1. Fetch the code
+            if [ ! -d "$REPO_DIR/.git" ]; then
+              rm -rf "$REPO_DIR"
+              git clone "$REPO_URL" "$REPO_DIR"
+            fi
+            cd "$REPO_DIR"
+            git remote set-url origin "$REPO_URL"
+            git fetch origin
+            git reset --hard origin/main
+            git clean -fd
 
-            log_section() {
-              echo ""
-              echo "=================================="
-              echo "$1"
-              echo "=================================="
-            }
+            # 2. Keep only the four services, remove everything else
+            find "$REPO_DIR" -mindepth 1 -maxdepth 1 \
+              ! -name .git \
+              ! -name alert-service \
+              ! -name dispatch-service \
+              ! -name scale-worker-service \
+              ! -name worker-service \
+              -exec rm -rf {} +
 
-            # Shared logic for the three simple npm/pm2 services (alert, dispatch, scale-worker)
-            deploy_pm2_service() {
+            # Shared deploy helper: Doppler secrets -> install -> build -> PM2
+            deploy_service() {
               local dir="$1" name="$2" token="$3"
 
               echo "--- Deploying $name ---"
@@ -63,113 +102,36 @@ jobs:
               npm ci --prefer-offline --no-audit --no-fund
               npm run build
 
+              # PM2 auto-restarts a crashed process by default
               if pm2 describe "$name" >/dev/null 2>&1; then
-                pm2 restart "$name"
+                pm2 restart "$name" --update-env
               else
                 pm2 start npm --name "$name" -- run start
               fi
-
-              echo "--- $name deployed successfully ---"
             }
 
-            # Worker image build + scale-worker deploy must stay sequential (scale-worker
-            # depends on the freshly built image), but this whole branch is independent
-            # of alert-service/dispatch-service, so it runs concurrently with them.
-            build_and_deploy_worker() {
-              echo "--- Building worker image ---"
-              cd "$REPO_DIR/worker-service"
+            # 3 + 4. Doppler secrets for alert-service, then start it
+            deploy_service "alert-service" "alert-service" "$DOPPLER_TOKEN_ALERT"
 
-              DOPPLER_TOKEN="$WORKER_TOKEN" doppler secrets download --no-file --format env > .env
+            # 5. dispatch-service
+            deploy_service "dispatch-service" "dispatch-service" "$DOPPLER_TOKEN_DISPATCH"
 
-              export DOCKER_BUILDKIT=1
-              if [ "$NO_CACHE_WORKER" = "true" ]; then
-                docker build --no-cache -t heimdall-worker:latest .
-              else
-                docker build -t heimdall-worker:latest .
-              fi
-              echo "--- Worker image built ---"
+            # 6. Build the worker image only, do not run a container
+            echo "--- Building worker image ---"
+            cd "$REPO_DIR/worker-service"
+            DOPPLER_TOKEN="$DOPPLER_TOKEN_WORKER" doppler secrets download --no-file --format env > .env
+            docker build -t heimdall-worker:latest .
 
-              deploy_pm2_service "scale-worker-service" "scale-worker-service" "$SCALE_WORKER_TOKEN"
-            }
+            # 7. scale-worker-service (uses the image built above)
+            deploy_service "scale-worker-service" "scale-worker-service" "$DOPPLER_TOKEN_SCALE_WORKER"
 
-            #########################################
-            # Sync Repository (self-healing)
-            #########################################
-
-            log_section "Updating Repository"
-
-            if [ ! -d "$REPO_DIR/.git" ]; then
-              echo "Repository missing or invalid — cloning fresh..."
-              rm -rf "$REPO_DIR"
-              git clone "$REPO_URL" "$REPO_DIR"
-            fi
-
-            cd "$REPO_DIR"
-            git remote set-url origin "$REPO_URL"
-            git fetch origin
-            git reset --hard origin/main
-
-            #########################################
-            # Remove Unnecessary Directories
-            #########################################
-
-            rm -rf client server readme.assets
-            rm -f README.md LICENCE
-
-            #########################################
-            # Deploy Services (parallel where possible)
-            #########################################
-
-            log_section "Deploying Services"
-
-            deploy_pm2_service "alert-service" "alert-service" "$ALERT_TOKEN" \
-              > "$LOG_DIR/alert.log" 2>&1 &
-            pid_alert=$!
-
-            deploy_pm2_service "dispatch-service" "dispatch-service" "$DISPATCH_TOKEN" \
-              > "$LOG_DIR/dispatch.log" 2>&1 &
-            pid_dispatch=$!
-
-            build_and_deploy_worker \
-              > "$LOG_DIR/worker.log" 2>&1 &
-            pid_worker=$!
-
-            status=0
-            for entry in "pid_alert:alert-service" "pid_dispatch:dispatch-service" "pid_worker:worker+scale-worker"; do
-              pid_var="${entry%%:*}"
-              label="${entry##*:}"
-              pid="${!pid_var}"
-              if ! wait "$pid"; then
-                echo "FAILED: $label (see log below)"
-                status=1
-              fi
-            done
-
-            log_section "Deployment Logs"
-            for f in "$LOG_DIR"/*.log; do
-              echo "----- $f -----"
-              cat "$f"
-              echo ""
-            done
-
-            if [ "$status" -ne 0 ]; then
-              echo "One or more services failed to deploy. See logs above."
-              exit 1
-            fi
-
-            #########################################
-            # Cleanup
-            #########################################
-
-            log_section "Cleaning Docker"
-
+            # Keep the 8GB root disk from filling up with old image layers
             docker image prune -f
-            docker container prune -f
 
             pm2 save
-            rm -rf "$LOG_DIR"
-
-            log_section "Deployment Completed Successfully"
-
             pm2 list
-            docker images | grep heimdall
+        env:
+          DOPPLER_TOKEN_ALERT: ${{ secrets.DOPPLER_TOKEN_ALERT }}
+          DOPPLER_TOKEN_DISPATCH: ${{ secrets.DOPPLER_TOKEN_DISPATCH }}
+          DOPPLER_TOKEN_WORKER: ${{ secrets.DOPPLER_TOKEN_WORKER }}
+          DOPPLER_TOKEN_SCALE_WORKER: ${{ secrets.DOPPLER_TOKEN_SCALE_WORKER }}
