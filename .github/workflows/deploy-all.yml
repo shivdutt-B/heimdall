@@ -55,7 +55,8 @@ jobs:
             fi
 
             # AL2023 ships curl-minimal (provides curl); installing full curl conflicts
-            sudo dnf install -y git ca-certificates docker nodejs20 nodejs20-npm
+            # gnupg2 is required by Doppler's installer for signature verification
+            sudo dnf install -y git ca-certificates docker gnupg2 nodejs20 nodejs20-npm
 
             command -v pm2 >/dev/null || sudo npm install -g pm2
             command -v doppler >/dev/null || curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
