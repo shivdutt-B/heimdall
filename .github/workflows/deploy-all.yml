@@ -54,9 +54,10 @@ jobs:
               echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
             fi
 
-            # AL2023 ships curl-minimal (provides curl); installing full curl conflicts
-            # gnupg2 is required by Doppler's installer for signature verification
-            sudo dnf install -y git ca-certificates docker gnupg2 nodejs20 nodejs20-npm
+            # AL2023 ships curl-minimal and gnupg2-minimal; full curl conflicts with
+            # curl-minimal, and Doppler needs gpg from the full gnupg2 package.
+            # --allowerasing lets dnf replace gnupg2-minimal with gnupg2.
+            sudo dnf install -y --allowerasing git ca-certificates docker gnupg2 nodejs20 nodejs20-npm
 
             command -v pm2 >/dev/null || sudo npm install -g pm2
             command -v doppler >/dev/null || curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
