@@ -25,7 +25,7 @@ jobs:
           AWS_DEFAULT_REGION: ap-south-1
         run: |
           IP=$(aws ec2 describe-instances \
-            --filters "Name=tag:Name,Values=heimdall-internal" "Name=instance-state-name,Values=running" \
+            --filters "Name=tag:Name,Values=heimdall-al2023" "Name=instance-state-name,Values=running" \
             --query "Reservations[0].Instances[0].PublicIpAddress" \
             --output text)
           if [ -z "$IP" ] || [ "$IP" = "None" ]; then
@@ -45,11 +45,18 @@ jobs:
           script: |
             set -euo pipefail
 
-            sudo apt-get update -y
-            sudo apt-get install -y git curl ca-certificates nodejs npm
+            # t3.micro has 1GB RAM - add swap so npm/tsc/docker builds don't OOM
+            if ! sudo swapon --show | grep -q .; then
+              sudo fallocate -l 2G /swapfile
+              sudo chmod 600 /swapfile
+              sudo mkswap /swapfile
+              sudo swapon /swapfile
+              echo '/swapfile none swap sw 0 0' | sudo tee -a /etc/fstab
+            fi
+
+            sudo dnf install -y git curl ca-certificates docker nodejs20 nodejs20-npm
 
             command -v pm2 >/dev/null || sudo npm install -g pm2
-            command -v docker >/dev/null || curl -fsSL https://get.docker.com | sudo sh
             command -v doppler >/dev/null || curl -Ls --tlsv1.2 --proto "=https" --retry 3 https://cli.doppler.com/install.sh | sudo sh
 
             sudo systemctl enable --now docker
